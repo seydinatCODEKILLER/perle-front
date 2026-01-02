@@ -23,3 +23,11 @@ export const PUBLIC_ENDPOINTS = [
   "/auth/login",
   "/auth/register",
 ];
+
+/**
+ * Sur ces endpoints, on NE déconnecte PAS l'utilisateur
+ */
+export const EXPECTED_401_ENDPOINTS = [
+  "/auth/login",
+  "/auth/register",
+];

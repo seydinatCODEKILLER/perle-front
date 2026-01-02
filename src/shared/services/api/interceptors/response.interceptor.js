@@ -7,6 +7,8 @@ import {
 import { NETWORK_ERROR_MESSAGES } from "../constants/error-messages";
 import { isRetryableError, getRetryDelay, sleep } from "../utils/retry.utils";
 import { API_CONFIG } from "../config/api.config";
+import apiClient from "../api.service";
+import { shouldAutoLogoutOn401 } from "../utils/ndpoint-checker";
 
 /**
  * Intercepteur de réponse réussie
@@ -69,11 +71,11 @@ const handleNetworkError = async (error, config) => {
  */
 const handleHttpError = async (error, config) => {
   const { status, data } = error.response;
+  const url = config?.url || "";
 
   // 401 - Non autorisé
-  if (status === 401) {
-    tokenManager.logout("Session expirée. Veuillez vous reconnecter.");
-    return Promise.reject(error);
+    if (status === 401) {
+    return handle401Error(error, url);
   }
 
   // 403 - Accès interdit
@@ -122,6 +124,27 @@ const handleHttpError = async (error, config) => {
 };
 
 /**
+ * ✅ GESTION INTELLIGENTE DES 401 (VERSION SANS REFRESH TOKEN)
+ * 
+ * @param {import('axios').AxiosError} error
+ * @param {string} url
+ * @returns {Promise}
+ */
+const handle401Error = (error, url) => {
+  if (!shouldAutoLogoutOn401(url)) {
+    // Ne PAS déconnecter, laisser le composant gérer l'erreur
+    // Exemple: afficher "Identifiants incorrects" sur la page de login
+    return Promise.reject(error);
+  }
+
+  // ✅ CAS 2: Endpoint protégé avec token invalide/expiré
+  // → Déconnecter l'utilisateur et afficher un message
+  tokenManager.logout("Session expirée. Veuillez vous reconnecter.");
+  
+  return Promise.reject(error);
+};
+
+/**
  * Retry une requête avec backoff exponentiel
  */
 const retryRequest = async (config) => {
@@ -132,6 +155,5 @@ const retryRequest = async (config) => {
 
   await sleep(delay);
 
-  const { apiClient } = await import("../apiClient");
   return apiClient(config);
 };

@@ -2,9 +2,11 @@
  * @typedef {Object} User
  * @property {string} id
  * @property {string} email
- * @property {string} name
  * @property {string} [avatar]
  * @property {string} [role]
+ * @property {string} nom
+ * @property {string} prenom
+ * @property {string} phone
  */
 
 /**

@@ -1,39 +1,37 @@
-import { api } from "@/shared/services/api";
+import { api, createApiWithExtraction } from "@/shared/services/api";
 
 /**
  * API d'authentification
  */
-export const authApi = {
+ const rawAuthApi = {
   /**
-   * Connexion utilisateur
-   * @param {{phone: string, password: string}} credentials
+   * Connexion utilisateur avec téléphone
+   * @param {LoginCredentials} credentials
+   * @returns {Promise<LoginResponse>}
    */
-  login: (credentials) => 
-    api.post("/auth/login", credentials),
+  login: async (credentials) => await api.post("/auth/login", credentials),
 
   /**
    * Inscription utilisateur
-   * @param {{email: string, password: string, name: string}} data
+   * @param {{phone: string, password: string, name: string}} data
    */
-  register: (data) => 
-    api.post("/auth/register", data),
+  register: async (data) => await api.post("/auth/register", data),
 
   /**
    * Déconnexion
    */
-  logout: () => 
-    api.post("/auth/logout"),
+  logout: async () => await api.post("/auth/logout"),
 
   /**
    * Récupérer l'utilisateur actuel
    */
-  getCurrentUser: () => 
-    api.get("/auth/me"),
+  getCurrentUser: async () => await api.get("/auth/me"),
 
   /**
    * Mettre à jour le profil
    * @param {Partial<User>} data
    */
-  updateProfile: (data) => 
-    api.put("/auth/profile", data)
+  updateProfile: async (data) => await api.put("/auth/profile", data),
 };
+
+export const authApi = createApiWithExtraction(rawAuthApi);
