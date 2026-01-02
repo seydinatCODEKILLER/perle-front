@@ -30,7 +30,7 @@ export const createAuthActions = (set, get, storageKey) => ({
     });
 
     toast.success(AUTH_MESSAGES.LOGIN_SUCCESS, {
-      description: `Bienvenue ${data.user.name || data.user.email}`,
+      description: `Bienvenue ${data.user.email}`,
     });
   },
 

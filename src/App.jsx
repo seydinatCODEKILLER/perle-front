@@ -1,12 +1,21 @@
-import { Button } from "./components/ui/button";
+import { AppProviders } from "./app/providers/AppProviders";
+import { AppRoutes } from "./routes/AppRoutes";
+import { Toaster } from "@/components/ui/sonner";
 
-function App() {
+/**
+ * Composant principal de l'application
+ */
+export function App() {
   return (
-    <div>
-      <p className="text-red-500">Bonjour react</p>
-      <Button className="hover:bg-blue-500 hover:cursor-pointer">Click me</Button>
-    </div>
+    <AppProviders>
+      <AppRoutes />
+      <Toaster 
+        position="top-right" 
+        richColors 
+        expand 
+        visibleToasts={5}
+        closeButton
+      />
+    </AppProviders>
   );
 }
-
-export default App;
