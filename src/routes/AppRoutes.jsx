@@ -5,10 +5,19 @@ import { Loader2 } from "lucide-react";
 import { ROUTES } from "./config/routes.config";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
+import {
+  NotFoundPage,
+  ServerErrorPage,
+  UnauthorizedPage,
+} from "@/features/errors";
+import Organizations from "@/features/organizations/Organizations";
+import LandingPage from "@/features/landing-page/LandingPage";
 
 // Lazy loading des composants
-const LoginForm = lazy(() => 
-  import("@/features/auth/components/LoginForm").then(m => ({ default: m.LoginForm }))
+const LoginForm = lazy(() =>
+  import("@/features/auth/components/LoginForm").then((m) => ({
+    default: m.LoginForm,
+  }))
 );
 
 // Loader pour le lazy loading
@@ -29,9 +38,13 @@ export const AppRoutes = () => {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         {/* Redirection racine */}
-        <Route 
-          path={ROUTES.HOME} 
-          element={<Navigate to={ROUTES.LOGIN} replace />} 
+        <Route
+          path={ROUTES.HOME}
+          element={
+            <PublicRoute>
+              <LandingPage />
+            </PublicRoute>
+          }
         />
 
         {/* Route de connexion */}
@@ -43,40 +56,22 @@ export const AppRoutes = () => {
             </PublicRoute>
           }
         />
+        {/* Routes d'erreur */}
+        <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
+        <Route path={ROUTES.SERVER_ERROR} element={<ServerErrorPage />} />
 
         {/* Routes protégées - À implémenter plus tard */}
         <Route
           path={ROUTES.ORGANIZATION}
           element={
             <ProtectedRoute>
-              <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                  <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-                  <p className="text-muted-foreground">À implémenter</p>
-                </div>
-              </div>
+              <Organizations />
             </ProtectedRoute>
           }
         />
 
         {/* Route 404 */}
-        <Route
-          path={ROUTES.NOT_FOUND}
-          element={
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="text-center">
-                <h1 className="text-6xl font-bold mb-4">404</h1>
-                <p className="text-xl text-muted-foreground mb-8">Page non trouvée</p>
-                <a
-                  href={ROUTES.LOGIN}
-                  className="text-primary hover:underline"
-                >
-                  Retour à l'accueil
-                </a>
-              </div>
-            </div>
-          }
-        />
+        <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
       </Routes>
     </Suspense>
   );

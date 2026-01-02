@@ -13,6 +13,7 @@ export const ROUTES = {
   // Routes d'erreur
   NOT_FOUND: "*",
   UNAUTHORIZED: "/unauthorized",
+  SERVER_ERROR: "/500",
 };
 
 /**
