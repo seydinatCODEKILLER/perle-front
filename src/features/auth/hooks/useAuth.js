@@ -55,3 +55,9 @@ export const useUserName = () =>
  */
 export const useUserRole = () =>
   useAuthStore(authSelectors.userRole);
+
+/**
+ * Hook pour le statut d'initialisation
+ */
+export const useAuthInitialized = () =>
+  useAuthStore(authSelectors.isInitialized);

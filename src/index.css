@@ -1,6 +1,17 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Import de Poppins (police principale) */
+@import "@fontsource/poppins/100.css";
+@import "@fontsource/poppins/200.css";
+@import "@fontsource/poppins/300.css";
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/500.css";
+@import "@fontsource/poppins/600.css";
+@import "@fontsource/poppins/700.css";
+@import "@fontsource/poppins/800.css";
+@import "@fontsource/poppins/900.css";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -119,5 +130,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Poppins", sans-serif;
+  }
+
+  @layer utilities {
+    .font-poppins {
+      font-family: "Poppins", sans-serif;
+    }
   }
 }
