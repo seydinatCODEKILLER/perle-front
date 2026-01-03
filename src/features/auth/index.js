@@ -17,15 +17,18 @@ export {
 
 // Login Hook
 export { useLogin } from "./hooks/useLogin";
+export { useRegister } from "./hooks/useRegister";
 
 // Components
 export { LoginForm } from "./components/LoginForm";
+export { RegisterForm } from "./components/RegisterForm";
 
 // Constants
 export { AUTH_CONFIG, AUTH_MESSAGES } from "./constants/auth.constants";
 
 // Validators
 export { loginSchema, phoneValidators } from "./validators/login.schema";
+export { registerSchema } from "./validators/register.schema";
 
 // API
 export { authApi } from "./api/auth.api";

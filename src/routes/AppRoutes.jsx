@@ -12,6 +12,7 @@ import {
 } from "@/features/errors";
 import Organizations from "@/features/organizations/Organizations";
 import LandingPage from "@/features/landing-page/LandingPage";
+import { RegisterForm } from "@/features/auth";
 
 // Lazy loading des composants
 const LoginForm = lazy(() =>
@@ -56,6 +57,17 @@ export const AppRoutes = () => {
             </PublicRoute>
           }
         />
+
+        {/* Route d'inscription */}
+        <Route
+          path={ROUTES.REGISTER}
+          element={
+            <PublicRoute>
+              <RegisterForm />
+            </PublicRoute>
+          }
+        />
+
         {/* Routes d'erreur */}
         <Route path={ROUTES.UNAUTHORIZED} element={<UnauthorizedPage />} />
         <Route path={ROUTES.SERVER_ERROR} element={<ServerErrorPage />} />
