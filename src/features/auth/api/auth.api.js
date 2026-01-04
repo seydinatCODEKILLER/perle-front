@@ -1,9 +1,10 @@
 import { api, createApiWithExtraction } from "@/shared/services/api";
+import { transformRegisterData } from "../utils/register-data-transformer";
 
 /**
  * API d'authentification
  */
- const rawAuthApi = {
+const rawAuthApi = {
   /**
    * Connexion utilisateur avec téléphone
    * @param {LoginCredentials} credentials
@@ -15,24 +16,10 @@ import { api, createApiWithExtraction } from "@/shared/services/api";
    * Inscription utilisateur
    * @param {{phone: string, password: string, name: string}} data
    */
-  register: async (data) => {
-    const formData = new FormData();
+  register: (data) => {
+    const formData = transformRegisterData(data);
 
-    formData.append("prenom", data.prenom);
-    formData.append("nom", data.nom);
-    formData.append("email", data.email);
-    formData.append("phone", data.phone);
-    formData.append("password", data.password);
-
-    if (data.avatar) {
-      formData.append("avatarFile", data.avatar);
-    }
-    const response = await api.post("/auth/register", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      }
-    });
-    return response.data;
+    return api.post("/auth/register", formData);
   },
 
   /**
