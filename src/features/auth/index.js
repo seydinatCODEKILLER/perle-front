@@ -20,8 +20,8 @@ export { useLogin } from "./hooks/useLogin";
 export { useRegister } from "./hooks/useRegister";
 
 // Components
-export { LoginForm } from "./components/LoginForm";
-export { RegisterForm } from "./components/RegisterForm";
+export { LoginForm } from "./pages/LoginForm";
+export { RegisterPage } from "./pages/RegisterPage";
 
 // Constants
 export { AUTH_CONFIG, AUTH_MESSAGES } from "./constants/auth.constants";
