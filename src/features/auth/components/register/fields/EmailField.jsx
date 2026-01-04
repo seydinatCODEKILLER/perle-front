@@ -18,7 +18,7 @@ export const EmailField = ({ control }) => (
               {...field}
               type="email"
               placeholder="john.doe@example.com"
-              className="h-12 pl-11 rounded-xl"
+              className="h-12 pl-11 rounded"
             />
           </div>
         </FormControl>
