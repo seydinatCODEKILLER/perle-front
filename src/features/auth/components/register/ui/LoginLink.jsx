@@ -6,7 +6,7 @@ export const LoginLink = () => (
     Vous avez déjà un compte ?{" "}
     <a
       href="/login"
-      className="text-green-600 hover:text-green-700 font-semibold transition-colors"
+      className="text-orange-600 hover:text-orange-700 underline font-semibold transition-colors"
     >
       Se connecter
     </a>

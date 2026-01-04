@@ -20,7 +20,7 @@ export { useLogin } from "./hooks/useLogin";
 export { useRegister } from "./hooks/useRegister";
 
 // Components
-export { LoginForm } from "./pages/LoginForm";
+export { LoginPage } from "./pages/LoginPage";
 export { RegisterPage } from "./pages/RegisterPage";
 
 // Constants

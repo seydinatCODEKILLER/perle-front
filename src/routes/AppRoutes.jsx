@@ -12,11 +12,11 @@ import {
 } from "@/features/errors";
 import Organizations from "@/features/organizations/Organizations";
 import LandingPage from "@/features/landing-page/LandingPage";
-import { RegisterPage } from "@/features/auth";
+import { LoginPage, RegisterPage } from "@/features/auth";
 
 // Lazy loading des composants
 const LoginForm = lazy(() =>
-  import("@/features/auth/pages/LoginForm").then((m) => ({
+  import("@/features/auth/pages/LoginPage").then((m) => ({
     default: m.LoginForm,
   }))
 );
@@ -53,7 +53,7 @@ export const AppRoutes = () => {
           path={ROUTES.LOGIN}
           element={
             <PublicRoute>
-              <LoginForm />
+              <LoginPage />
             </PublicRoute>
           }
         />
