@@ -21,7 +21,7 @@ export const AvatarUpload = ({ preview, onUpload, disabled = false }) => {
         className={`relative ${!disabled && 'cursor-pointer'} group`}
         onClick={() => !disabled && fileInputRef.current?.click()}
       >
-        <Avatar className="w-40 h-40 rounded-3xl shadow-2xl border-4 border-white/40 transition-transform group-hover:scale-105">
+        <Avatar className="w-40 h-40 rounded-3xl shadow-2xl  transition-transform group-hover:scale-105">
           {preview ? (
             <AvatarImage src={preview} alt="Preview" />
           ) : (

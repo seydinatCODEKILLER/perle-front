@@ -19,7 +19,7 @@ export const PhoneField = ({ control }) => (
               {...field}
               type="tel"
               placeholder="+221 77 123 45 67"
-              className="h-12 pl-11 rounded-xl"
+              className="h-12 pl-11 rounded"
             />
           </div>
         </FormControl>

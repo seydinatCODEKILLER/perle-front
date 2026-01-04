@@ -13,7 +13,7 @@ export const NameFields = ({ control }) => (
         <FormItem>
           <FormLabel>Prénom</FormLabel>
           <FormControl>
-            <Input {...field} placeholder="John" className="h-12 rounded-xl" />
+            <Input {...field} placeholder="John" className="h-12 rounded" />
           </FormControl>
           <FormMessage className="text-xs" />
         </FormItem>
@@ -27,7 +27,7 @@ export const NameFields = ({ control }) => (
         <FormItem>
           <FormLabel>Nom</FormLabel>
           <FormControl>
-            <Input {...field} placeholder="Doe" className="h-12 rounded-xl" />
+            <Input {...field} placeholder="Doe" className="h-12 rounded" />
           </FormControl>
           <FormMessage className="text-xs" />
         </FormItem>

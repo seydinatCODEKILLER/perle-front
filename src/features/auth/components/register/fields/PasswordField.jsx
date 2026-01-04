@@ -58,7 +58,7 @@ export const PasswordField = ({ control, name, label, placeholder, showStrength 
                     {...field}
                     type={showPassword ? "text" : "password"}
                     placeholder={placeholder}
-                    className="h-12 pr-12 rounded-xl"
+                    className="h-12 pr-12 rounded"
                   />
                   <Button
                     type="button"

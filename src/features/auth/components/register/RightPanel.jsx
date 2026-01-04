@@ -15,14 +15,14 @@ import { Form } from "@/components/ui/form";
  */
 export const RightPanel = ({ form, onSubmit, isPending }) => (
   <motion.div
-    className="flex items-center justify-center p-8 lg:p-12 bg-background"
+    className="flex items-center justify-center p-6 lg:p-8 bg-background"
     initial={{ opacity: 0, x: 50 }}
     animate={{ opacity: 1, x: 0 }}
     transition={{ duration: 0.6 }}
   >
     <div className="w-full max-w-md">
       {/* Header */}
-      <FormHeader />
+      {/* <FormHeader /> */}
 
       {/* Form */}
       <Form {...form}>
