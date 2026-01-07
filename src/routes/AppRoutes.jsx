@@ -11,7 +11,7 @@ import {
   UnauthorizedPage,
 } from "@/features/errors";
 import Organizations from "@/features/organizations/Organizations";
-import LandingPage from "@/features/landing-page/LandingPage";
+import LandingPage from "@/features/landing-page/pages/LandingPage";
 import { LoginPage, RegisterPage } from "@/features/auth";
 
 // Lazy loading des composants
