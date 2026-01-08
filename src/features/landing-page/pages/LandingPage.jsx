@@ -1,11 +1,11 @@
 import React from "react";
-import { HeaderHero } from "../components/HeaderHero";
 import FeaturesSection from "../components/FeaturesSection";
-import RolesSection from "../components/RolesSection";
 import TestimonialsSection from "../components/TestimonialsSection";
-import PricingSection from "../components/PricingSection";
-import FAQSection from "../components/FAQSection";
 import Footer from "../components/Footer";
+import { HeaderHero } from "../components/HeaderHero/HeaderHero";
+import { PricingSection } from "../components/PricingSection/PricingSection";
+import { FAQSection } from "../components/FAQSection/FAQSection";
+import RolesSection from "../components/RolesSection";
 
 const LandingPage = () => {
   return (
@@ -18,7 +18,7 @@ const LandingPage = () => {
       </section>
 
       {/* Section 3: Roles */}
-      <section id="pricing">
+      <section id="roles">
         <RolesSection />
       </section>
 
