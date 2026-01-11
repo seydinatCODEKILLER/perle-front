@@ -10,9 +10,9 @@ import {
   ServerErrorPage,
   UnauthorizedPage,
 } from "@/features/errors";
-import Organizations from "@/features/organizations/Organizations";
 import LandingPage from "@/features/landing-page/pages/LandingPage";
 import { LoginPage, RegisterPage } from "@/features/auth";
+import { Organizations } from "@/features/organizations/pages/Organizations";
 
 // Lazy loading des composants
 const LoginForm = lazy(() =>

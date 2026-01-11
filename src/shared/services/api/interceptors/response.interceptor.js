@@ -15,16 +15,20 @@ import { shouldAutoLogoutOn401 } from "../utils/ndpoint-checker";
  * @param {import('axios').AxiosResponse} response
  * @returns {import('axios').AxiosResponse}
  */
+// interceptors/response.interceptor.js
 export const responseInterceptor = (response) => {
+  console.log("📥 RESPONSE:", response.config.url);
+  console.log("📊 Status:", response.status);
+  console.log("📦 Data:", response.data);
+  
   // Logger le temps de réponse en dev
   if (import.meta.env.DEV && response.config.metadata) {
     const duration = Date.now() - response.config.metadata.startTime;
-    console.log(`✅ ${response.config.method.toUpperCase()} ${response.config.url} - ${duration}ms`);
+    console.log(`⏱️ Duration: ${duration}ms`);
   }
 
   return response;
 };
-
 /**
  * Intercepteur d'erreur de réponse
  * @param {import('axios').AxiosError} error

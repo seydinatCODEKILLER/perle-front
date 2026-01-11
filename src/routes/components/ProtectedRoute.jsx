@@ -11,6 +11,12 @@ export const ProtectedRoute = ({ children }) => {
   const isInitialized = useAuthInitialized();
   const location = useLocation();
 
+  console.log("🔒 ProtectedRoute", {
+  isInitialized,
+  isAuthenticated,
+});
+
+
   // Attendre l'initialisation
   if (!isInitialized) {
     return (
