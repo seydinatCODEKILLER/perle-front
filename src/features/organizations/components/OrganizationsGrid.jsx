@@ -14,6 +14,7 @@ export const OrganizationsGrid = ({
   onTypeChange = () => {},
   onCreateClick = () => {},
   onEditClick = () => {},
+  onDeleteClick = () => {},
   onAccess = () => {},
   pagination = {},
   onPageChange = () => {},
@@ -110,6 +111,7 @@ export const OrganizationsGrid = ({
                 organization={org}
                 onAccess={onAccess}
                 onEdit={onEditClick}
+                onDelete={onDeleteClick}
               />
             ))}
           </div>

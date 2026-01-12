@@ -10,6 +10,8 @@ import { FloatLogoutWithConfirm } from "../components/FloatLogoutWithConfirm";
 import { useCreateOrganization } from "../hooks/useCreateOrganization";
 import { OrganizationFormModal } from "../components/OrganizationFormModal";
 import { useUpdateOrganization } from "../hooks/useUpdateOrganization";
+import { useDeleteOrganization } from "../hooks/useDeleteOrganization";
+import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 
 export const Organizations = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,6 +20,7 @@ export const Organizations = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrganization, setSelectedOrganization] = useState(null);
+    const [orgToDelete, setOrgToDelete] = useState(null); 
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
@@ -40,6 +43,7 @@ export const Organizations = () => {
 
   const createMutation = useCreateOrganization();
   const updateMutation = useUpdateOrganization();
+  const deleteMutation = useDeleteOrganization();
 
   const handleCreateOrganization = (formData) => {
     createMutation.mutate(formData, {
@@ -61,9 +65,21 @@ export const Organizations = () => {
     );
   };
 
+  const handleDeleteConfirm = () => {
+    if (orgToDelete) {
+      deleteMutation.mutate(orgToDelete.id, {
+        onSuccess: () => setOrgToDelete(null),
+      });
+    }
+  };
+
   const handleEditClick = (organization) => {
     setSelectedOrganization(organization);
     setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (organization) => {
+    setOrgToDelete(organization);
   };
 
   return (
@@ -81,6 +97,7 @@ export const Organizations = () => {
         selectedType={selectedType}
         onCreateClick={() => setIsCreateModalOpen(true)}
         onEditClick={handleEditClick}
+        onDeleteClick={handleDeleteClick}
         onTypeChange={setSelectedType}
         pagination={pagination}
         onPageChange={setCurrentPage}
@@ -102,6 +119,19 @@ export const Organizations = () => {
         organization={selectedOrganization}
         onUpdate={handleUpdateOrganization}
         isPending={updateMutation.isPending}
+      />
+
+      {/* Modal de confirmation de suppression (RÉUTILISABLE) */}
+      <ConfirmationModal
+        open={!!orgToDelete}
+        onClose={() => setOrgToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        title={`Supprimer ${orgToDelete?.name}`}
+        description="Cette action est irréversible. Toutes les données seront perdues."
+        variant="destructive"
+        confirmText="Supprimer définitivement"
+        cancelText="Annuler"
+        isLoading={deleteMutation.isPending}
       />
       <FloatLogoutWithConfirm />
     </div>
