@@ -24,6 +24,14 @@ const rawOrganizationApi = {
    * @returns {Promise<Organization>}
    */
   getOrganizationById: async (id) => await api.get(`/organizations/${id}`),
+
+    /**
+   * Créer une organisation
+   * @param {FormData} formData - Données de l'organisation
+   * @returns {Promise<Organization>}
+   */
+  createOrganization: async (formData) => 
+    await api.post("/organizations", formData),
 };
 
 export const organizationApi = createApiWithExtraction(rawOrganizationApi);
