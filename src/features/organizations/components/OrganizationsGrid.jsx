@@ -13,6 +13,7 @@ export const OrganizationsGrid = ({
   selectedType = "all",
   onTypeChange = () => {},
   onCreateClick = () => {},
+  onEditClick = () => {},
   onAccess = () => {},
   pagination = {},
   onPageChange = () => {},
@@ -34,6 +35,7 @@ export const OrganizationsGrid = ({
           onTypeChange("all");
         }}
         onCreateClick={onCreateClick}
+        onEditClick={onEditClick}
         totalResults={pagination.total || organizations.length}
       />
 
@@ -107,6 +109,7 @@ export const OrganizationsGrid = ({
                 key={org.id}
                 organization={org}
                 onAccess={onAccess}
+                onEdit={onEditClick}
               />
             ))}
           </div>

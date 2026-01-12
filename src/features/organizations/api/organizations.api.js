@@ -25,13 +25,30 @@ const rawOrganizationApi = {
    */
   getOrganizationById: async (id) => await api.get(`/organizations/${id}`),
 
-    /**
+  /**
    * Créer une organisation
    * @param {FormData} formData - Données de l'organisation
    * @returns {Promise<Organization>}
    */
-  createOrganization: async (formData) => 
+  createOrganization: async (formData) =>
     await api.post("/organizations", formData),
+
+  /**
+   * Mettre à jour une organisation
+   * @param {string} id - ID de l'organisation
+   * @param {FormData} formData - Données de mise à jour
+   * @returns {Promise<Organization>}
+   */
+  updateOrganization: async (id, formData) =>
+    await api.put(`/organizations/${id}`, formData),
+
+  /**
+   * Désactiver une organisation
+   * @param {string} id - ID de l'organisation
+   * @returns {Promise<Organization>}
+   */
+  deactivateOrganization: async (id) =>
+    await api.patch(`/organizations/${id}/deactivate`),
 };
 
 export const organizationApi = createApiWithExtraction(rawOrganizationApi);
