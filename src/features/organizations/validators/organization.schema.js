@@ -79,9 +79,53 @@ export const organizationSettingsSchema = z.object({
 });
 
 /**
+ * Schema pour la mise à jour d'organisation
+ */
+export const organizationUpdateSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Le nom doit contenir au moins 2 caractères")
+    .max(100, "Le nom ne doit pas dépasser 100 caractères")
+    .regex(/^[a-zA-Z0-9\s\-_&]+$/, "Caractères spéciaux non autorisés")
+    .optional(),
+
+  description: z
+    .string()
+    .max(500, "La description ne doit pas dépasser 500 caractères")
+    .optional(),
+
+  type: z.enum(["DAHIRA", "ASSOCIATION", "TONTINE", "GROUPEMENT"]).optional(),
+
+  currency: z.string().optional(),
+
+  address: z.string().optional(),
+
+  city: z.string().optional(),
+
+  country: z.string().optional(),
+
+  logo: z
+    .instanceof(File)
+    .refine(
+      (file) => file.size <= 5 * 1024 * 1024,
+      "La taille du logo ne doit pas dépasser 5MB"
+    )
+    .refine(
+      (file) =>
+        ["image/jpeg", "image/png", "image/webp", "image/svg+xml"].includes(
+          file.type
+        ),
+      "Format de fichier non supporté. Utilisez JPG, PNG, WEBP ou SVG"
+    )
+    .optional()
+    .nullable(),
+});
+
+/**
  * Types TypeScript (pour JSDoc)
  * @typedef {z.infer<typeof organizationSearchSchema>} OrganizationSearchParams
  * @typedef {z.infer<typeof organizationFiltersSchema>} OrganizationFilters
  * @typedef {z.infer<typeof organizationSettingsSchema>} OrganizationSettings
  * @typedef {z.infer<typeof organizationCreateSchema>} OrganizationCreateData
+ * @typedef {z.infer<typeof organizationUpdateSchema>} OrganizationUpdateData
  */

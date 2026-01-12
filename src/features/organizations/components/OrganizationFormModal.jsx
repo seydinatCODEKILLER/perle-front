@@ -7,21 +7,43 @@ import {
 } from "@/components/ui/dialog";
 import { X } from "lucide-react";
 import { CreateOrganizationForm } from "./CreateOrganizationForm";
-import { transformOrganizationData } from "../utils/organization-data-transformer";
+import { EditOrganizationForm } from "./EditOrganizationForm";
+import { prepareUpdateFormData, transformOrganizationData } from "../utils/organization-data-transformer";
 
 /**
- * Modal de création d'organisation
+ * Modal pour créer ou modifier une organisation
  */
 export const OrganizationFormModal = ({
   open,
   onOpenChange,
+  mode = "create", // "create" ou "edit"
+  organization = null, // Requis pour le mode "edit"
   onCreate,
+  onUpdate,
   isPending,
 }) => {
-  const handleSubmit = (data) => {
+  const isEditMode = mode === "edit";
+
+  const handleCreateSubmit = (data) => {
     const formData = transformOrganizationData(data);
-    console.log(data);
     onCreate(formData);
+  };
+
+  const handleUpdateSubmit = (data, existingLogo) => {
+    const formData = prepareUpdateFormData(data, existingLogo);
+    onUpdate({ id: organization.id, formData });
+  };
+
+  const getTitle = () => {
+    return isEditMode
+      ? `Modifier "${organization?.name}"`
+      : "Créer une nouvelle organisation";
+  };
+
+  const getDescription = () => {
+    return isEditMode
+      ? "Mettez à jour les informations de votre organisation"
+      : "Remplissez les informations pour créer votre dahira, association ou tontine";
   };
 
   return (
@@ -30,21 +52,35 @@ export const OrganizationFormModal = ({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="text-2xl">
-                Créer une nouvelle organisation
-              </DialogTitle>
+              <DialogTitle className="text-2xl">{getTitle()}</DialogTitle>
               <DialogDescription className="mt-2">
-                Remplissez les informations pour créer votre dahira, association
-                ou tontine
+                {getDescription()}
               </DialogDescription>
             </div>
+            <button
+              onClick={() => onOpenChange(false)}
+              className="rounded-full p-2 hover:bg-accent transition-colors"
+              disabled={isPending}
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
         </DialogHeader>
-        <CreateOrganizationForm
-          onSubmit={handleSubmit}
-          isPending={isPending}
-          onCancel={() => onOpenChange(false)}
-        />
+
+        {isEditMode ? (
+          <EditOrganizationForm
+            organization={organization}
+            onSubmit={handleUpdateSubmit}
+            isPending={isPending}
+            onCancel={() => onOpenChange(false)}
+          />
+        ) : (
+          <CreateOrganizationForm
+            onSubmit={handleCreateSubmit}
+            isPending={isPending}
+            onCancel={() => onOpenChange(false)}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
