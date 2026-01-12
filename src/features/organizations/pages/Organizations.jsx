@@ -4,11 +4,14 @@ import { OrganizationsGrid } from "../components/OrganizationsGrid";
 import { useOrganizations, useSearchOrganizations } from "../hooks/useOrganizations";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { FloatLogoutWithConfirm } from "../components/FloatLogoutWithConfirm";
+import { useCreateOrganization } from "../hooks/useCreateOrganization";
+import { OrganizationFormModal } from "../components/OrganizationFormModal";
 
 export const Organizations = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
@@ -28,6 +31,16 @@ export const Organizations = () => {
   const organizations = searchData?.organizations || allData || [];
   const pagination = searchData?.pagination;
 
+   const createMutation = useCreateOrganization();
+
+     const handleCreateOrganization = (formData) => {
+    createMutation.mutate(formData, {
+      onSuccess: () => {
+        setIsCreateModalOpen(false);
+      },
+    });
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <PageHeader
@@ -41,9 +54,17 @@ export const Organizations = () => {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         selectedType={selectedType}
+         onCreateClick={() => setIsCreateModalOpen(true)}
         onTypeChange={setSelectedType}
         pagination={pagination}
         onPageChange={setCurrentPage}
+      />
+      {/* Modals */}
+      <OrganizationFormModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+        onCreate={handleCreateOrganization}
+        isPending={createMutation.isPending}
       />
       <FloatLogoutWithConfirm />
     </div>
