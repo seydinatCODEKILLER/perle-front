@@ -7,4 +7,4 @@ export {
   isPublicEndpoint, 
   shouldAutoLogoutOn401, 
   requiresAuthentication 
-} from "./utils/ndpoint-checker";
+} from "./utils/endpoint-checker";

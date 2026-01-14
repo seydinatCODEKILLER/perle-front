@@ -7,47 +7,54 @@ import { PUBLIC_ENDPOINTS } from "../config/api.config";
 class TokenManager {
   constructor() {
     this.tokenGetter = null;
+    this.refreshTokenGetter = null;
     this.logoutHandler = null;
+    this.isRefreshing = false;
+    this.refreshSubscribers = [];
   }
 
   /**
-   * Enregistrer la fonction pour récupérer le token
-   * @param {() => string|null} getter
+   * Enregistrer la fonction pour récupérer l'access token
    */
   setTokenGetter(getter) {
     this.tokenGetter = getter;
   }
 
   /**
-   * Enregistrer la fonction de déconnexion
-   * @param {(reason?: string) => void} handler
+   * Enregistrer la fonction pour récupérer le refresh token
+   */
+  setRefreshTokenGetter(getter) {
+    this.refreshTokenGetter = getter;
+  }
+
+  /**
+   * Enregistrer le handler de déconnexion
    */
   setLogoutHandler(handler) {
     this.logoutHandler = handler;
   }
 
   /**
-   * Récupérer le token actuel
-   * @returns {string|null}
+   * Récupérer l'access token
    */
   getToken() {
-    if (!this.tokenGetter) {
-      console.warn("TokenManager: Aucun getter enregistré");
-      return null;
-    }
-    return this.tokenGetter();
+    return this.tokenGetter ? this.tokenGetter() : null;
   }
 
   /**
-   * Déclencher la déconnexion
-   * @param {string} [reason]
+   * Récupérer le refresh token
+   */
+  getRefreshToken() {
+    return this.refreshTokenGetter ? this.refreshTokenGetter() : null;
+  }
+
+  /**
+   * Déconnecter l'utilisateur
    */
   logout(reason) {
-    if (!this.logoutHandler) {
-      console.warn("TokenManager: Aucun handler de logout enregistré");
-      return;
+    if (this.logoutHandler) {
+      this.logoutHandler(reason);
     }
-    this.logoutHandler(reason);
   }
 
   /**
@@ -56,7 +63,36 @@ class TokenManager {
    * @returns {boolean}
    */
   isPublicEndpoint(url) {
-    return PUBLIC_ENDPOINTS.some(endpoint => url.includes(endpoint));
+    return PUBLIC_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+  }
+
+  /**
+   * Ajouter un subscriber pour le refresh
+   */
+  subscribeTokenRefresh(callback) {
+    this.refreshSubscribers.push(callback);
+  }
+
+  /**
+   * Notifier tous les subscribers
+   */
+  onTokenRefreshed(newToken) {
+    this.refreshSubscribers.forEach((callback) => callback(newToken));
+    this.refreshSubscribers = [];
+  }
+
+  /**
+   * Marquer le refresh comme en cours
+   */
+  setRefreshing(isRefreshing) {
+    this.isRefreshing = isRefreshing;
+  }
+
+  /**
+   * Vérifier si un refresh est en cours
+   */
+  isRefreshInProgress() {
+    return this.isRefreshing;
   }
 }
 

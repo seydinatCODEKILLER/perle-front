@@ -11,15 +11,15 @@ import { tokenManager } from "@/shared/services/api";
  */
 const initialState = {
   user: null,
-  token: null,
+  accessToken: null,
+  refreshToken: null,
   isAuthenticated: false,
   isLoading: false,
   isInitialized: false,
 };
 
 /**
- * Store d'authentification principal
- * @type {import('zustand').UseBoundStore<import('zustand').StoreApi<AuthStore>>}
+ * Store d'authentification principal avec support du refresh token
  */
 export const useAuthStore = create(
   persist(
@@ -31,11 +31,15 @@ export const useAuthStore = create(
   )
 );
 
-// ✅ ENREGISTRER LE STORE AUPRÈS DU TOKEN MANAGER
-// Ceci permet à l'API client d'accéder au token sans dépendance circulaire
+// ✅ ENREGISTRER LES GETTERS AUPRÈS DU TOKEN MANAGER
 tokenManager.setTokenGetter(() => {
   const state = useAuthStore.getState();
-  return state.token;
+  return state.accessToken;
+});
+
+tokenManager.setRefreshTokenGetter(() => {
+  const state = useAuthStore.getState();
+  return state.refreshToken;
 });
 
 tokenManager.setLogoutHandler((reason) => {

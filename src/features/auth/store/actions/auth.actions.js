@@ -1,21 +1,18 @@
 import { toast } from "sonner";
 import { AUTH_MESSAGES } from "../../constants/auth.constants";
-import { validateLoginData, validateUserUpdate } from "../../utils/validation.utils";
+import { validateUserUpdate } from "../../utils/validation.utils";
 import { clearAuthStorage } from "../../utils/storage.utils";
 import { authApi } from "../../api/auth.api";
 
 /**
- * Créer les actions du store d'authentification
- * @param {Function} set - Zustand set function
- * @param {Function} get - Zustand get function
- * @param {string} storageKey - Clé du localStorage
+ * Créer les actions du store d'authentification avec refresh token
  */
 export const createAuthActions = (set, get, storageKey) => ({
   /**
    * Définir l'utilisateur connecté
    */
   setUser: (data) => {
-    if (!validateLoginData(data)) {
+    if (!data?.user || !data?.accessToken || !data?.refreshToken) {
       console.error(AUTH_MESSAGES.INVALID_DATA, data);
       toast.error("Erreur", { description: AUTH_MESSAGES.INVALID_DATA });
       return;
@@ -23,26 +20,46 @@ export const createAuthActions = (set, get, storageKey) => ({
 
     set({
       user: data.user,
-      token: data.token,
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
       isAuthenticated: true,
       isLoading: false,
       isInitialized: true,
     });
 
     toast.success(AUTH_MESSAGES.LOGIN_SUCCESS, {
-      description: `Bienvenue ${data.user.email}`,
+      description: `Bienvenue ${data.user.prenom || data.user.email}`,
     });
+  },
+
+  /**
+   * Mettre à jour l'access token après refresh
+   */
+  setAccessToken: (accessToken) => {
+    set({ accessToken });
   },
 
   /**
    * Déconnecter l'utilisateur
    */
-  logout: (reason) => {
+  logout: async (reason) => {
     const wasAuthenticated = get().isAuthenticated;
+    const refreshToken = get().refreshToken;
+
+    // Appeler l'API de logout si on a un refresh token
+    if (refreshToken) {
+      try {
+        await authApi.logout(refreshToken);
+      } catch (error) {
+        console.error("Erreur lors du logout API:", error);
+        // Continuer la déconnexion même si l'API échoue
+      }
+    }
 
     set({
       user: null,
-      token: null,
+      accessToken: null,
+      refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
     });
@@ -60,7 +77,7 @@ export const createAuthActions = (set, get, storageKey) => ({
    * Initialiser l'authentification au chargement de l'app
    */
   initializeAuth: async () => {
-    const { token, isInitialized } = get();
+    const { accessToken, isInitialized } = get();
 
     // Éviter les initialisations multiples
     if (isInitialized) {
@@ -69,7 +86,7 @@ export const createAuthActions = (set, get, storageKey) => ({
     }
 
     // Pas de token = pas authentifié
-    if (!token) {
+    if (!accessToken) {
       set({
         isAuthenticated: false,
         isLoading: false,
@@ -82,8 +99,7 @@ export const createAuthActions = (set, get, storageKey) => ({
 
     try {
       // Vérifier la validité du token
-      const response = await authApi.getCurrentUser();
-      const user = response.data;
+      const user = await authApi.getCurrentUser();
 
       set({
         user,
@@ -98,8 +114,35 @@ export const createAuthActions = (set, get, storageKey) => ({
 
       const status = error?.response?.status;
 
-      // Token invalide ou expiré
-      if (status === 401 || status === 403) {
+      // Token invalide ou expiré - tenter un refresh
+      if (status === 401) {
+        const refreshToken = get().refreshToken;
+        
+        if (refreshToken) {
+          try {
+            const refreshResponse = await authApi.refreshToken(refreshToken);
+            const newAccessToken = refreshResponse.accessToken;
+            
+            set({ accessToken: newAccessToken });
+            
+            // Réessayer de récupérer l'utilisateur
+            const userResponse = await authApi.getCurrentUser();
+            set({
+              user: userResponse.data,
+              isAuthenticated: true,
+              isLoading: false,
+              isInitialized: true,
+            });
+            
+            console.log("✅ Token rafraîchi et auth réinitialisée");
+            return;
+          } catch (refreshError) {
+            console.error("❌ Échec du refresh token:", refreshError);
+            get().logout(AUTH_MESSAGES.SESSION_EXPIRED);
+            return;
+          }
+        }
+        
         get().logout(AUTH_MESSAGES.SESSION_EXPIRED);
       } else {
         // Erreur réseau ou serveur : garder l'auth en attendant
@@ -141,7 +184,7 @@ export const createAuthActions = (set, get, storageKey) => ({
   },
 
   /**
-   * Effacer les erreurs (pour usage futur)
+   * Effacer les erreurs
    */
   clearError: () => {
     // Placeholder pour gestion d'erreurs future
