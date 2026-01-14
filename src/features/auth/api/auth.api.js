@@ -23,11 +23,6 @@ const rawAuthApi = {
   },
 
   /**
-   * Déconnexion
-   */
-  logout: async () => await api.post("/auth/logout"),
-
-  /**
    * Récupérer l'utilisateur actuel
    */
   getCurrentUser: async () => await api.get("/auth/me"),
@@ -37,6 +32,29 @@ const rawAuthApi = {
    * @param {Partial<User>} data
    */
   updateProfile: async (data) => await api.put("/auth/profile", data),
+
+  /**
+   * Rafraîchir l'access token
+   */
+  refreshToken: async (refreshToken) =>
+    await api.post("/auth/refresh-token", { refreshToken }),
+
+  /**
+   * Déconnexion
+   */
+  logout: async (refreshToken) =>
+    await api.post("/auth/logout", { refreshToken }),
+
+  /**
+   * Révoquer un refresh token spécifique
+   */
+  revokeRefreshToken: async (refreshToken) =>
+    await api.post("/auth/revoke-refresh-token", { refreshToken }),
+
+  /**
+   * Révoquer tous les tokens de l'utilisateur
+   */
+  revokeAllTokens: async () => await api.post("/auth/revoke-all-tokens"),
 };
 
 export const authApi = createApiWithExtraction(rawAuthApi);

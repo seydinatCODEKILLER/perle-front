@@ -2,7 +2,8 @@
  * Configuration centralisée de l'API
  */
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_BASE_URL || "https://perle-api.onrender.com/api",
+  BASE_URL:
+    import.meta.env.VITE_API_BASE_URL || "https://perle-api.onrender.com/api",
   TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,
   RETRY_DELAY: 1000,
@@ -12,7 +13,7 @@ export const API_CONFIG = {
  * Headers par défaut
  */
 export const DEFAULT_HEADERS = {
-  "Accept": "application/json",
+  Accept: "application/json",
 };
 
 /**
@@ -21,6 +22,7 @@ export const DEFAULT_HEADERS = {
 export const PUBLIC_ENDPOINTS = [
   "/auth/login",
   "/auth/register",
+  "/auth/refresh-token",
 ];
 
 /**
@@ -29,4 +31,5 @@ export const PUBLIC_ENDPOINTS = [
 export const EXPECTED_401_ENDPOINTS = [
   "/auth/login",
   "/auth/register",
+  "/auth/refresh-token",
 ];
