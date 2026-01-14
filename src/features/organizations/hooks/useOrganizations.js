@@ -9,7 +9,6 @@ export const useOrganizations = () => {
   return useQuery({
     queryKey: ["organizations"],
     queryFn: async () => await organizationApi.getOrganizations(),
-    staleTime: 5 * 60 * 1000,
     retry: 2,
   });
 };
@@ -23,7 +22,6 @@ export const useSearchOrganizations = (params = {}) => {
   return useQuery({
     queryKey: ["organizations", "search", params],
     queryFn: async () => await organizationApi.searchOrganizations(params),
-    staleTime: 2 * 60 * 1000,
     retry: 2,
     enabled: !!params.search || !!params.type,
   });

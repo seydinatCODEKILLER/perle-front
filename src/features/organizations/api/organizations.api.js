@@ -19,6 +19,14 @@ const rawOrganizationApi = {
     await api.get("/organizations/search", { params }),
 
   /**
+   * Récupérer les organisations inactives (corbeille)
+   * @param {Object} params - Paramètres de pagination
+   * @returns {Promise<SearchResult>}
+   */
+  getInactiveOrganizations: async (params) =>
+    await api.get("/organizations/inactive", { params }),
+
+  /**
    * Récupérer une organisation par ID
    * @param {string} id - ID de l'organisation
    * @returns {Promise<Organization>}
@@ -49,6 +57,14 @@ const rawOrganizationApi = {
    */
   deactivateOrganization: async (id) =>
     await api.patch(`/organizations/${id}/deactivate`),
+
+  /**
+   * Réactiver une organisation (restaurer de la corbeille)
+   * @param {string} id - ID de l'organisation
+   * @returns {Promise<Organization>}
+   */
+  reactivateOrganization: async (id) =>
+    await api.patch(`/organizations/${id}/reactivate`),
 };
 
 export const organizationApi = createApiWithExtraction(rawOrganizationApi);

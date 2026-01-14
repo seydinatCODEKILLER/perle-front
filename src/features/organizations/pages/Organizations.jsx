@@ -12,6 +12,11 @@ import { OrganizationFormModal } from "../components/OrganizationFormModal";
 import { useUpdateOrganization } from "../hooks/useUpdateOrganization";
 import { useDeleteOrganization } from "../hooks/useDeleteOrganization";
 import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
+import { useInactiveOrganizations } from "../hooks/useInactiveOrganizations";
+import { useReactivateOrganization } from "../hooks/useReactivateOrganizations";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { TrashModal } from "../components/TrashModal";
 
 export const Organizations = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,7 +25,9 @@ export const Organizations = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOrganization, setSelectedOrganization] = useState(null);
-    const [orgToDelete, setOrgToDelete] = useState(null); 
+  const [orgToDelete, setOrgToDelete] = useState(null);
+  const [isTrashModalOpen, setIsTrashModalOpen] = useState(false);
+  const [trashPage, setTrashPage] = useState(1);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
@@ -35,6 +42,11 @@ export const Organizations = () => {
   const { data: searchData, isLoading: isSearchLoading } =
     useSearchOrganizations(searchParams);
   const { data: allData, isLoading: isAllLoading } = useOrganizations();
+  const { data: trashData, isLoading: isTrashLoading } =
+    useInactiveOrganizations({
+      page: trashPage,
+      limit: 10,
+    });
 
   const isLoading = isSearchLoading || isAllLoading;
 
@@ -44,6 +56,7 @@ export const Organizations = () => {
   const createMutation = useCreateOrganization();
   const updateMutation = useUpdateOrganization();
   const deleteMutation = useDeleteOrganization();
+  const reactivateMutation = useReactivateOrganization();
 
   const handleCreateOrganization = (formData) => {
     createMutation.mutate(formData, {
@@ -73,6 +86,17 @@ export const Organizations = () => {
     }
   };
 
+  const handleReactivate = (organizationId) => {
+    reactivateMutation.mutate(organizationId, {
+      onSuccess: () => {
+        // Réinitialiser la page de la corbeille si c'était le dernier élément
+        if (trashData?.organizations?.length === 1 && trashPage > 1) {
+          setTrashPage(trashPage - 1);
+        }
+      },
+    });
+  };
+
   const handleEditClick = (organization) => {
     setSelectedOrganization(organization);
     setIsEditModalOpen(true);
@@ -87,6 +111,21 @@ export const Organizations = () => {
       <PageHeader
         title="Mes Organisations"
         description="Gérez toutes vos organisations, dahiras et associations"
+        actions={
+          <Button
+            variant="outline"
+            onClick={() => setIsTrashModalOpen(true)}
+            className="gap-2"
+          >
+            <Trash2 className="w-4 h-4" />
+            Corbeille
+            {trashData?.pagination?.total > 0 && (
+              <span className="ml-1 px-2 py-0.5 text-xs bg-destructive text-destructive-foreground rounded-full">
+                {trashData.pagination.total}
+              </span>
+            )}
+          </Button>
+        }
       />
 
       <OrganizationsGrid
@@ -133,6 +172,19 @@ export const Organizations = () => {
         cancelText="Annuler"
         isLoading={deleteMutation.isPending}
       />
+
+      {/* Modal de la corbeille */}
+      <TrashModal
+        open={isTrashModalOpen}
+        onOpenChange={setIsTrashModalOpen}
+        organizations={trashData?.organizations}
+        isLoading={isTrashLoading}
+        onReactivate={handleReactivate}
+        isReactivating={reactivateMutation.isPending}
+        pagination={trashData?.pagination}
+        onPageChange={setTrashPage}
+      />
+
       <FloatLogoutWithConfirm />
     </div>
   );
