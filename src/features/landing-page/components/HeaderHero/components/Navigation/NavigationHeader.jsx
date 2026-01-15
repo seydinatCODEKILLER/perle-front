@@ -8,6 +8,7 @@ import { MobileMenu } from "./MobileMenu";
 import { NAVIGATION_ITEMS } from "../../constants/navigation";
 import { Logo } from "./Logo";
 import { DesktopNavigation } from "./DesktopNavigation";
+import { useNavigate } from "react-router-dom";
 
 export const NavigationHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -73,30 +74,40 @@ export const NavigationHeader = () => {
   );
 };
 
-const RightSideActions = ({ isMenuOpen, onMenuToggle }) => (
-  <>
-    <div className="hidden lg:flex items-center gap-4">
-      <ThemeToggle />
-      <Button
-        variant="ghost"
-        className="text-muted-foreground hover:text-foreground hover:bg-accent"
-      >
-        Connexion
-      </Button>
-      <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
-        Essai gratuit
-        <ChevronRight className="ml-2 h-4 w-4" />
-      </Button>
-    </div>
+const RightSideActions = ({ isMenuOpen, onMenuToggle }) => {
+  const navigate = useNavigate();
 
-    <div className="lg:hidden flex items-center gap-2">
-      <ThemeToggle />
-      <button
-        className="text-muted-foreground hover:text-foreground"
-        onClick={onMenuToggle}
-      >
-        {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-      </button>
-    </div>
-  </>
-);
+  return (
+    <>
+      <div className="hidden lg:flex items-center gap-4">
+        <ThemeToggle />
+
+        <Button
+          variant="ghost"
+          className="text-muted-foreground hover:text-foreground hover:bg-accent"
+          onClick={() => navigate("/login")}
+        >
+          Connexion
+        </Button>
+
+        <Button
+          className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+          onClick={() => navigate("/register")}
+        >
+          Essai gratuit
+          <ChevronRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="lg:hidden flex items-center gap-2">
+        <ThemeToggle />
+        <button
+          className="text-muted-foreground hover:text-foreground"
+          onClick={onMenuToggle}
+        >
+          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+      </div>
+    </>
+  );
+};

@@ -11,7 +11,7 @@ export const DesktopNavigation = ({ items }) => (
         whileHover={{ y: -2 }}
       >
         {item.label}
-        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 group-hover:w-full transition-all duration-300" />
+        <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-blue-500 to-indigo-500 group-hover:w-full transition-all duration-300" />
       </motion.a>
     ))}
   </nav>
