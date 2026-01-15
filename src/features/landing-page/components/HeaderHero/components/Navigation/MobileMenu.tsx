@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const MobileMenu = ({ isOpen, items, onClose }) => {
   if (!isOpen) return null;
+  const navigate = useNavigate();
 
   return (
     <motion.div
@@ -27,10 +29,14 @@ export const MobileMenu = ({ isOpen, items, onClose }) => {
           <Button
             variant="ghost"
             className="justify-start text-muted-foreground hover:text-foreground hover:bg-accent"
+            onClick={() => navigate("/login")}
           >
             Connexion
           </Button>
-          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white">
+          <Button
+            className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+            onClick={() => navigate("/register")}
+          >
             Essai gratuit
             <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
