@@ -2,18 +2,32 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Users, MapPin, Calendar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-export const OrganizationCard = ({ organization, onEdit, onDelete, onAccess }) => {
+export const OrganizationCard = ({
+  organization,
+  onEdit,
+  onDelete,
+  onAccess,
+}) => {
   const isOwner = organization.userRole === "ADMIN";
-  const isMember = organization.userRole === "MEMBER" || organization.userRole === "FINANCIAL_MANAGER";
+  const isMember =
+    organization.userRole === "MEMBER" ||
+    organization.userRole === "FINANCIAL_MANAGER";    
+
+  const navigate = useNavigate();
+
+  const handleAccess = () => {
+    navigate(`/organizations/${organization.id}/dashboard`);
+  };
 
   return (
     <Card className="hover:shadow-lg transition-shadow duration-300">
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div className="flex items-center space-x-4">
           {organization.logo ? (
-            <img 
-              src={organization.logo} 
+            <img
+              src={organization.logo}
               alt={organization.name}
               className="w-12 h-12 rounded-lg object-cover"
             />
@@ -33,7 +47,7 @@ export const OrganizationCard = ({ organization, onEdit, onDelete, onAccess }) =
           {organization.userRole}
         </Badge>
       </CardHeader>
-      
+
       <CardContent>
         <div className="space-y-3">
           {organization.description && (
@@ -41,36 +55,46 @@ export const OrganizationCard = ({ organization, onEdit, onDelete, onAccess }) =
               {organization.description}
             </p>
           )}
-          
+
           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
               <span>{organization._count?.members || 0} membres</span>
             </div>
-            
+
             {organization.city && (
               <div className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
                 <span>{organization.city}</span>
               </div>
             )}
-            
+
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              <span>{new Date(organization.createdAt).toLocaleDateString()}</span>
+              <span>
+                {new Date(organization.createdAt).toLocaleDateString()}
+              </span>
             </div>
           </div>
-          
+
           <div className="flex gap-2 pt-2">
             {isOwner ? (
               <>
-                <Button variant="outline" size="sm" onClick={() => onEdit(organization)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onEdit(organization)}
+                >
                   Modifier
                 </Button>
-                <Button variant="destructive" size="sm" onClick={() => onDelete(organization)}>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => onDelete(organization)}
+                >
                   Supprimer
                 </Button>
-                <Button size="sm" onClick={() => onAccess(organization)}>
+                <Button size="sm" onClick={handleAccess}>
                   Accéder
                 </Button>
               </>
