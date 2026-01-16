@@ -26,3 +26,15 @@ export const useSearchOrganizations = (params = {}) => {
     enabled: !!params.search || !!params.type,
   });
 };
+
+/**
+ * Hook pour récupérer une organisation par son ID
+ * @param {string} organizationId - ID de l'organisation
+ * @returns {import('@tanstack/react-query').UseQueryResult}
+ */
+export const useOrganization = (organizationId) => {
+  return useQuery({
+    queryKey: ["organization", organizationId],
+    queryFn: async () => await organizationApi.getOrganizationById(organizationId),
+  });
+}

@@ -13,6 +13,18 @@ import {
 import LandingPage from "@/features/landing-page/pages/LandingPage";
 import { LoginPage, RegisterPage } from "@/features/auth";
 import { Organizations } from "@/features/organizations/pages/Organizations";
+import { OrganizationLayout } from "@/components/layout/OrganizationLayout";
+
+// Lazy loading des pages d'organisation
+const OrganizationDashboard = lazy(() => 
+  import("@/features/dashboard/pages/OrganizationDashboard")
+);
+const MembersPage = lazy(() => 
+  import("@/features/members/pages/MembersPage")
+);
+const PersonalDashboard = lazy(() => 
+  import("@/features/dashboard/pages/PersonalDashboard")
+);
 
 // Lazy loading des composants
 const LoginForm = lazy(() =>
@@ -81,6 +93,33 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Routes de l'organisation avec layout */}
+        <Route
+          path={ROUTES.ORGANIZATION_DETAIL}
+          element={
+            <ProtectedRoute>
+              <OrganizationLayout />
+            </ProtectedRoute>
+          }
+        >
+          {/* Redirection par défaut vers le dashboard selon l'espace */}
+          <Route index element={<Navigate to="dashboard" replace />} />
+
+          {/* Routes de gestion (management space) */}
+          <Route path="dashboard" element={<OrganizationDashboard />} />
+          <Route path="members" element={<MembersPage />} />
+          <Route path="contributions" element={<div>Contributions</div>} />
+          <Route path="transactions" element={<div>Transactions</div>} />
+          <Route path="debts" element={<div>Dettes</div>} />
+          <Route path="settings" element={<div>Paramètres</div>} />
+
+          {/* Routes personnelles (personal space) */}
+          <Route path="me/dashboard" element={<PersonalDashboard />} />
+          <Route path="me/contributions" element={<div>Mes cotisations</div>} />
+          <Route path="me/debts" element={<div>Mes dettes</div>} />
+          <Route path="me/history" element={<div>Mon historique</div>} />
+        </Route>
 
         {/* Route 404 */}
         <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} />
