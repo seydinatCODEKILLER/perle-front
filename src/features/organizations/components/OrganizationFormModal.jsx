@@ -48,7 +48,7 @@ export const OrganizationFormModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-none max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full md:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
