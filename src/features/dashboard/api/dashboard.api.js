@@ -24,6 +24,14 @@ const rawDashboardApi = {
    */
   getPersonalDashboard: async (organizationId) =>
     await api.get(`/statistiques/${organizationId}/member`),
+
+  /**
+   * Récupérer le dashboard automatique selon le rôle
+   * @param {string} organizationId - ID de l'organisation
+   * @returns {Promise<AutoDashboard>}
+   */
+  getAutoDashboard: async (organizationId) =>
+    await api.get(`/statistiques/${organizationId}/auto`),
 };
 
 export const dashboardApi = createApiWithExtraction(rawDashboardApi);

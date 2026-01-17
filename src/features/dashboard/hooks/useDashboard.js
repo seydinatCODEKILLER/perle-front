@@ -10,7 +10,7 @@ export const useAdminDashboard = () => {
     queryKey: ["dashboard", "admin", organizationId],
     queryFn: async () => {
       if (!organizationId) throw new Error("ID d'organisation manquant");
-      return await dashboardApi.getAdminDashboard(organizationId);
+      return await dashboardApi.getAutoDashboard(organizationId);
     },
     enabled: !!organizationId,
     onError: (error) => {
@@ -29,7 +29,7 @@ export const useFinancialDashboard = () => {
     queryKey: ["dashboard", "financial", organizationId],
     queryFn: async () => {
       if (!organizationId) throw new Error("ID d'organisation manquant");
-      return await dashboardApi.getFinancialDashboard(organizationId);
+      return await dashboardApi.getAutoDashboard(organizationId);
     },
     enabled: !!organizationId,
     onError: (error) => {
@@ -48,7 +48,7 @@ export const usePersonalDashboard = () => {
     queryKey: ["dashboard", "personal", organizationId],
     queryFn: async () => {
       if (!organizationId) throw new Error("ID d'organisation manquant");
-      return await dashboardApi.getPersonalDashboard(organizationId);
+      return await dashboardApi.getAutoDashboard(organizationId);
     },
     enabled: !!organizationId,
     onError: (error) => {
