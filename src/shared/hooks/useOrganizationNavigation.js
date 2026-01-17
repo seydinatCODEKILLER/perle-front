@@ -1,15 +1,27 @@
 import { NAVIGATION_CONFIG, SPACES } from "@/config/navigation.config";
-import { useState, useMemo } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useMemo, useCallback } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 
 export const useOrganizationNavigation = (userRole) => {
   const { organizationId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
+
+    const currentSpace = useMemo(() => {
+    if (location.pathname.includes('/me/')) {
+      return SPACES.PERSONAL;
+    }
+    return SPACES.MANAGEMENT;
+  }, [location.pathname]);
   
-  // Par défaut, on est dans l'espace management pour ADMIN/FINANCIAL_MANAGER
-  const [currentSpace, setCurrentSpace] = useState(
-    userRole === "MEMBER" ? SPACES.PERSONAL : SPACES.MANAGEMENT
-  );
+  // Fonction pour changer d'espace avec navigation
+  const setCurrentSpace = useCallback((newSpace) => {
+    if (newSpace === SPACES.PERSONAL) {
+      navigate(`/organizations/${organizationId}/me/dashboard`);
+    } else {
+      navigate(`/organizations/${organizationId}/dashboard`);
+    }
+  }, [organizationId, navigate]);
 
   // Récupérer les menus en fonction du rôle et de l'espace
   const menus = useMemo(() => {
@@ -17,7 +29,6 @@ export const useOrganizationNavigation = (userRole) => {
     return roleConfig[currentSpace] || [];
   }, [userRole, currentSpace]);
 
-  // Construire les URLs complètes avec l'organizationId
   const navigationItems = useMemo(() => {
     return menus.map(item => ({
       ...item,
@@ -26,7 +37,6 @@ export const useOrganizationNavigation = (userRole) => {
     }));
   }, [menus, organizationId, location.pathname]);
 
-  // Vérifier si l'utilisateur peut basculer d'espace
   const canSwitchSpace = userRole === "ADMIN" || userRole === "FINANCIAL_MANAGER";
   const hasManagementSpace = userRole === "ADMIN" || userRole === "FINANCIAL_MANAGER";
 
