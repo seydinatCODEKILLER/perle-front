@@ -11,26 +11,14 @@ import {
   UnauthorizedPage,
 } from "@/features/errors";
 import LandingPage from "@/features/landing-page/pages/LandingPage";
-import { RegisterPage } from "@/features/auth";
+import { LoginPage, RegisterPage } from "@/features/auth";
 import { Organizations } from "@/features/organizations/pages/Organizations";
 import { OrganizationLayout } from "@/components/layout/OrganizationLayout";
+import OrganizationDashboard from "@/features/dashboard/pages/OrganizationDashboard";
+import PersonalDashboard from "@/features/dashboard/pages/PersonalDashboard";
 
-// Lazy loading des pages d'organisation
-const OrganizationDashboard = lazy(() => 
-  import("@/features/dashboard/pages/OrganizationDashboard")
-);
 const MembersPage = lazy(() => 
   import("@/features/members/pages/MembersPage")
-);
-const PersonalDashboard = lazy(() => 
-  import("@/features/dashboard/pages/PersonalDashboard")
-);
-
-// Lazy loading des composants
-const LoginPage = lazy(() =>
-  import("@/features/auth/pages/LoginPage").then((m) => ({
-    default: m.LoginForm,
-  }))
 );
 
 // Loader pour le lazy loading
