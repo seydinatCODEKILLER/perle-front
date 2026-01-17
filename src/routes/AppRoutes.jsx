@@ -11,7 +11,7 @@ import {
   UnauthorizedPage,
 } from "@/features/errors";
 import LandingPage from "@/features/landing-page/pages/LandingPage";
-import { LoginPage, RegisterPage } from "@/features/auth";
+import { RegisterPage } from "@/features/auth";
 import { Organizations } from "@/features/organizations/pages/Organizations";
 import { OrganizationLayout } from "@/components/layout/OrganizationLayout";
 
@@ -27,7 +27,7 @@ const PersonalDashboard = lazy(() =>
 );
 
 // Lazy loading des composants
-const LoginForm = lazy(() =>
+const LoginPage = lazy(() =>
   import("@/features/auth/pages/LoginPage").then((m) => ({
     default: m.LoginForm,
   }))
