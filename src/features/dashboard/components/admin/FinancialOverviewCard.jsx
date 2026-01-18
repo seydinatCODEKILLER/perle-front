@@ -173,12 +173,12 @@ export const FinancialOverviewCard = ({ financialOverview, currency = "XOF", ind
                     className="flex justify-between items-center p-1.5 sm:p-2 rounded-lg hover:bg-muted/50 transition-colors group"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                      <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
                       <span className="text-xs sm:text-sm truncate">
                         {method.name}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                       <span className="text-xs sm:text-sm font-medium whitespace-nowrap">
                         {formatCurrency(method.amount, currency)}
                       </span>

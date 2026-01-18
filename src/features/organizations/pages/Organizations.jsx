@@ -6,7 +6,6 @@ import {
   useSearchOrganizations,
 } from "../hooks/useOrganizations";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { FloatLogoutWithConfirm } from "../components/FloatLogoutWithConfirm";
 import { useCreateOrganization } from "../hooks/useCreateOrganization";
 import { OrganizationFormModal } from "../components/OrganizationFormModal";
 import { useUpdateOrganization } from "../hooks/useUpdateOrganization";
@@ -17,6 +16,7 @@ import { useReactivateOrganization } from "../hooks/useReactivateOrganizations";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { TrashModal } from "../components/TrashModal";
+import { FloatLogoutWithConfirm } from "@/components/layout/FloatLogoutWithConfirm";
 
 export const Organizations = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -74,7 +74,7 @@ export const Organizations = () => {
           setIsEditModalOpen(false);
           setSelectedOrganization(null);
         },
-      }
+      },
     );
   };
 

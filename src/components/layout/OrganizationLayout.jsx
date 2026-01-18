@@ -1,20 +1,21 @@
 import { Outlet } from "react-router-dom";
 import { OrganizationSidebar } from "@/components/layout/OrganizationSidebar";
 import { useParams } from "react-router-dom";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { Loader2 } from "lucide-react";
 import { useOrganization } from "@/features/organizations/hooks/useOrganizations";
+import { FloatLogoutWithConfirm } from "@/components/layout/FloatLogoutWithConfirm";
 
 export const OrganizationLayout = () => {
   const { organizationId } = useParams();
 
   const { data: organization, isLoading } = useOrganization(organizationId);
 
-  // Pour l'instant, on utilise le rôle depuis l'organization
-  // Plus tard, on récupérera le rôle depuis le membership
   const userRole = organization?.userRole || "MEMBER";
-  console.log(organization);
-  
 
   if (isLoading) {
     return (
@@ -49,10 +50,17 @@ export const OrganizationLayout = () => {
 
         {/* Contenu principal */}
         <SidebarInset>
-          <div className="p-6">
+          <div className="p-4 md:p-6">
+            {/* Trigger visible seulement sur mobile */}
+            <div className="mb-4 md:hidden">
+              <SidebarTrigger />
+            </div>
+
             <Outlet />
           </div>
         </SidebarInset>
+
+        <FloatLogoutWithConfirm />
       </div>
     </SidebarProvider>
   );
