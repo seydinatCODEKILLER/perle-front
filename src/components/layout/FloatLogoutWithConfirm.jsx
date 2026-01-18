@@ -64,7 +64,7 @@ export const FloatLogoutWithConfirm = () => {
             <Button
               variant="outline"
               size="icon"
-              className="h-12 w-12 rounded-full shadow-lg hover:shadow-xl border-primary/20 hover:border-primary/40 transition-all duration-300 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 group"
+              className="h-12 w-12 rounded-full shadow-lg hover:shadow-xl border-primary/20 hover:border-primary/40 transition-all duration-300 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 group"
               aria-label="Menu paramètres"
             >
               <div className="relative">
