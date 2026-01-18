@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Suspense, lazy } from "react";
+import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
 import { ROUTES } from "./config/routes.config";
@@ -16,10 +16,7 @@ import { Organizations } from "@/features/organizations/pages/Organizations";
 import { OrganizationLayout } from "@/components/layout/OrganizationLayout";
 import OrganizationDashboard from "@/features/dashboard/pages/OrganizationDashboard";
 import PersonalDashboard from "@/features/dashboard/pages/PersonalDashboard";
-
-const MembersPage = lazy(() => 
-  import("@/features/members/pages/MembersPage")
-);
+import { MembersPage } from "@/features/members/pages/MembersPage";
 
 // Loader pour le lazy loading
 const PageLoader = () => (
