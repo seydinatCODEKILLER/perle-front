@@ -1,13 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, Phone, Mail, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, Phone, Mail, Calendar, Edit, Trash2 } from "lucide-react";
 import { formatMember, formatRole, formatStatus } from "../utils/member-helpers";
 
-export const MemberCard = ({ member }) => {
+export const MemberCard = ({ 
+  member, 
+  onEdit = () => {}, 
+  onDelete = () => {} 
+}) => {
   const formattedMember = formatMember(member);
+  const isCurrentUser = member.userId === "current-user-id";
 
   return (
-    <Card key={member.id} className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <div>
@@ -36,7 +42,7 @@ export const MemberCard = ({ member }) => {
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2">
             <Phone className="w-4 h-4 text-muted-foreground" />
@@ -55,6 +61,29 @@ export const MemberCard = ({ member }) => {
           <span>{formattedMember.contributionsCount} cotisations</span>
           <span>•</span>
           <span>{formattedMember.debtsCount} dettes</span>
+        </div>
+        
+        {/* Boutons d'action */}
+        <div className="flex gap-2 pt-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onEdit(member)}
+            className="flex-1"
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            Modifier
+          </Button>
+          <Button 
+            variant="destructive" 
+            size="sm" 
+            onClick={() => onDelete(member)}
+            className="flex-1"
+            disabled={isCurrentUser}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Supprimer
+          </Button>
         </div>
       </CardContent>
     </Card>

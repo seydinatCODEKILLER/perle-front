@@ -44,3 +44,15 @@ export const MEMBER_ERROR_MESSAGES = {
     description: "Une erreur est survenue",
   },
 };
+
+export const MEMBER_ACTIONS = {
+  UPDATE_ROLE: "UPDATE_ROLE",
+  UPDATE_STATUS: "UPDATE_STATUS",
+  UPDATE_MEMBER: "UPDATE_MEMBER",
+};
+
+export const MEMBER_STATUS_DESCRIPTIONS = {
+  ACTIVE: "Le membre a accès à toutes les fonctionnalités",
+  INACTIVE: "Le membre ne peut pas se connecter",
+  SUSPENDED: "Le membre est temporairement suspendu",
+};
