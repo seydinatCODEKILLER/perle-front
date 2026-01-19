@@ -4,7 +4,13 @@ import { useDebounce } from "@/shared/hooks/useDebounce";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useOrganizationMembers } from "../hooks/useMembers";
 import { useCreateMember } from "../hooks/useCreateMember";
+import { 
+  useUpdateMemberRole, 
+  useUpdateMemberStatus, 
+  useUpdateMember 
+} from "../hooks/useUpdateMember";
 import { AddMemberModal } from "../components/AddMemberModal";
+import { EditMemberModal } from "../components/EditMemberModal";
 import { MemberFilters } from "../components/MemberFilters";
 import { MemberCard } from "../components/MemberCard";
 import { Pagination } from "@/components/ui/pagination";
@@ -19,6 +25,8 @@ export const MembersPage = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
@@ -32,6 +40,9 @@ export const MembersPage = () => {
 
   const { data, isLoading } = useOrganizationMembers(organizationId, filters);
   const createMutation = useCreateMember();
+  const updateRoleMutation = useUpdateMemberRole();
+  const updateStatusMutation = useUpdateMemberStatus();
+  const updateMemberMutation = useUpdateMember();
 
   const members = data?.members || [];
   const pagination = data?.pagination;
@@ -45,6 +56,52 @@ export const MembersPage = () => {
         },
       }
     );
+  };
+
+  const handleUpdateRole = ({ membershipId, role }) => {
+    updateRoleMutation.mutate(
+      { organizationId, membershipId, role },
+      {
+        onSuccess: () => {
+          setIsEditModalOpen(false);
+          setSelectedMember(null);
+        },
+      }
+    );
+  };
+
+  const handleUpdateStatus = ({ membershipId, status }) => {
+    updateStatusMutation.mutate(
+      { organizationId, membershipId, status },
+      {
+        onSuccess: () => {
+          setIsEditModalOpen(false);
+          setSelectedMember(null);
+        },
+      }
+    );
+  };
+
+  const handleUpdateMember = ({ membershipId, updateData }) => {
+    updateMemberMutation.mutate(
+      { organizationId, membershipId, updateData },
+      {
+        onSuccess: () => {
+          setIsEditModalOpen(false);
+          setSelectedMember(null);
+        },
+      }
+    );
+  };
+
+  const handleEditClick = (member) => {
+    setSelectedMember(member);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (member) => {
+    // À implémenter plus tard
+    console.log("Supprimer membre:", member);
   };
 
   const handleClearFilters = () => {
@@ -80,16 +137,13 @@ export const MembersPage = () => {
 
       {/* Contenu */}
       {isLoading ? (
-        // État de chargement - SEULEMENT le contenu
         <div className="space-y-6">
-          {/* Grille skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
               <CardSkeleton key={i} />
             ))}
           </div>
           
-          {/* Pagination skeleton */}
           {pagination?.pages > 1 && (
             <div className="flex justify-center pt-6">
               <Skeleton className="h-10 w-64 rounded-lg" />
@@ -97,7 +151,6 @@ export const MembersPage = () => {
           )}
         </div>
       ) : isEmpty ? (
-        // État vide
         <Card>
           <CardContent className="py-12 text-center">
             <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
@@ -122,16 +175,18 @@ export const MembersPage = () => {
           </CardContent>
         </Card>
       ) : (
-        // État avec résultats
         <>
-          {/* Grille des membres */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {members.map((member) => (
-              <MemberCard key={member.id} member={member} />
+              <MemberCard
+                key={member.id}
+                member={member}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
+              />
             ))}
           </div>
           
-          {/* Pagination */}
           {pagination?.pages > 1 && (
             <div className="flex justify-center pt-6">
               <Pagination
@@ -151,6 +206,22 @@ export const MembersPage = () => {
         onSubmit={handleAddMember}
         isPending={createMutation.isPending}
         organizationName="votre organisation"
+      />
+
+      {/* Modal d'édition */}
+      <EditMemberModal
+        open={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedMember(null);
+        }}
+        member={selectedMember}
+        onUpdateRole={handleUpdateRole}
+        onUpdateStatus={handleUpdateStatus}
+        onUpdateMember={handleUpdateMember}
+        isUpdatingRole={updateRoleMutation.isPending}
+        isUpdatingStatus={updateStatusMutation.isPending}
+        isUpdatingMember={updateMemberMutation.isPending}
       />
     </div>
   );
@@ -174,6 +245,10 @@ const CardSkeleton = () => (
       <Skeleton className="h-4 w-1/2" />
       <div className="pt-2">
         <Skeleton className="h-3 w-24" />
+      </div>
+      <div className="flex gap-2 pt-4">
+        <Skeleton className="h-9 flex-1" />
+        <Skeleton className="h-9 flex-1" />
       </div>
     </div>
   </div>
