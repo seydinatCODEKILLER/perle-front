@@ -1,27 +1,30 @@
+// src/shared/hooks/useOrganizationNavigation.js
+
 import { NAVIGATION_CONFIG, SPACES } from "@/config/navigation.config";
 import { useMemo, useCallback } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
+import { useOrganizationAccess } from "@/features/organizations/hooks/useOrganizationAccess";
+import { getCurrentSpace } from "@/features/organizations/utils/organizationRoutes.utils";
 
+/**
+ * Hook pour gérer la navigation dans la sidebar
+ * Utilise les utilitaires centralisés pour la cohérence
+ */
 export const useOrganizationNavigation = (userRole) => {
   const { organizationId } = useParams();
   const location = useLocation();
-  const navigate = useNavigate();
+  const { navigateToOrganizationRoute } = useOrganizationAccess();
 
-    const currentSpace = useMemo(() => {
-    if (location.pathname.includes('/me/')) {
-      return SPACES.PERSONAL;
-    }
-    return SPACES.MANAGEMENT;
+  // Détermine l'espace actuel depuis l'URL
+  const currentSpace = useMemo(() => {
+    return getCurrentSpace(location.pathname);
   }, [location.pathname]);
   
   // Fonction pour changer d'espace avec navigation
   const setCurrentSpace = useCallback((newSpace) => {
-    if (newSpace === SPACES.PERSONAL) {
-      navigate(`/organizations/${organizationId}/me/dashboard`);
-    } else {
-      navigate(`/organizations/${organizationId}/dashboard`);
-    }
-  }, [organizationId, navigate]);
+    const route = newSpace === SPACES.PERSONAL ? 'me/dashboard' : 'dashboard';
+    navigateToOrganizationRoute(organizationId, route);
+  }, [organizationId, navigateToOrganizationRoute]);
 
   // Récupérer les menus en fonction du rôle et de l'espace
   const menus = useMemo(() => {
@@ -29,6 +32,7 @@ export const useOrganizationNavigation = (userRole) => {
     return roleConfig[currentSpace] || [];
   }, [userRole, currentSpace]);
 
+  // Construire les items de navigation avec les URLs complètes
   const navigationItems = useMemo(() => {
     return menus.map(item => ({
       ...item,
@@ -37,6 +41,7 @@ export const useOrganizationNavigation = (userRole) => {
     }));
   }, [menus, organizationId, location.pathname]);
 
+  // Permissions
   const canSwitchSpace = userRole === "ADMIN" || userRole === "FINANCIAL_MANAGER";
   const hasManagementSpace = userRole === "ADMIN" || userRole === "FINANCIAL_MANAGER";
 
