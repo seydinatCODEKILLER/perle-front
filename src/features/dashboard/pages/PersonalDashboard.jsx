@@ -1,4 +1,3 @@
-import { usePersonalDashboard } from "../hooks/useDashboard";
 import { MemberInfoCard } from "../components/personal/MemberInfoCard";
 import { PersonalKPICard } from "../components/personal/PersonalKPICard";
 import { ContributionsList } from "../components/personal/ContributionsList";
@@ -9,6 +8,7 @@ import { Loader2, AlertCircle, User, RefreshCw } from "lucide-react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { usePersonalDashboard } from "../hooks/useDashboard";
 
 export const PersonalDashboard = () => {
   const { data, isLoading, error, refetch } = usePersonalDashboard();
