@@ -74,10 +74,10 @@ export const createAuthActions = (set, get, storageKey) => ({
   },
 
   /**
-   * Initialiser l'authentification au chargement de l'app
+   * Initialiser l'authentification de manière optimiste
    */
   initializeAuth: async () => {
-    const { accessToken, isInitialized } = get();
+    const { accessToken, refreshToken, user, isInitialized } = get();
 
     // Éviter les initialisations multiples
     if (isInitialized) {
@@ -85,76 +85,71 @@ export const createAuthActions = (set, get, storageKey) => ({
       return;
     }
 
+    // ✅ Marquer comme initialisé IMMÉDIATEMENT
+    set({ isInitialized: true });
+
     // Pas de token = pas authentifié
-    if (!accessToken) {
+    if (!accessToken || !refreshToken) {
       set({
         isAuthenticated: false,
         isLoading: false,
-        isInitialized: true,
       });
       return;
     }
 
-    set({ isLoading: true });
-
-    try {
-      // Vérifier la validité du token
-      const user = await authApi.getCurrentUser();
-
+    // ✅ Si on a un user en cache, l'utiliser tout de suite
+    if (user) {
       set({
-        user,
         isAuthenticated: true,
         isLoading: false,
-        isInitialized: true,
+      });
+    } else {
+      set({ isLoading: true });
+    }
+
+    // ✅ Vérifier en arrière-plan (sans bloquer l'affichage)
+    try {
+      const userData = await authApi.getCurrentUser();
+
+      set({
+        user: userData,
+        isAuthenticated: true,
+        isLoading: false,
       });
 
-      console.log("✅ Auth initialisée avec succès");
+      console.log("✅ Auth vérifiée en arrière-plan");
     } catch (error) {
-      console.error("❌ Erreur d'initialisation auth:", error);
+      console.error("❌ Erreur de vérification auth:", error);
 
       const status = error?.response?.status;
 
-      // Token invalide ou expiré - tenter un refresh
       if (status === 401) {
-        const refreshToken = get().refreshToken;
-        
-        if (refreshToken) {
-          try {
-            const refreshResponse = await authApi.refreshToken(refreshToken);
-            const newAccessToken = refreshResponse.accessToken;
-            
-            set({ accessToken: newAccessToken });
-            
-            // Réessayer de récupérer l'utilisateur
-            const userResponse = await authApi.getCurrentUser();
-            set({
-              user: userResponse.data,
-              isAuthenticated: true,
-              isLoading: false,
-              isInitialized: true,
-            });
-            
-            console.log("✅ Token rafraîchi et auth réinitialisée");
-            return;
-          } catch (refreshError) {
-            console.error("❌ Échec du refresh token:", refreshError);
-            get().logout(AUTH_MESSAGES.SESSION_EXPIRED);
-            return;
-          }
-        }
-        
-        get().logout(AUTH_MESSAGES.SESSION_EXPIRED);
-      } else {
-        // Erreur réseau ou serveur : garder l'auth en attendant
-        set({
-          isAuthenticated: true,
-          isLoading: false,
-          isInitialized: true,
-        });
+        // Tenter un refresh
+        try {
+          const { accessToken: newToken } =
+            await authApi.refreshToken(refreshToken);
+          set({ accessToken: newToken });
 
-        toast.warning(AUTH_MESSAGES.OFFLINE_MODE, {
-          description: AUTH_MESSAGES.NETWORK_ERROR,
-          duration: 3000,
+          const userData = await authApi.getCurrentUser();
+          set({
+            user: userData,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+
+          console.log("✅ Token rafraîchi");
+        } catch (refreshError) {
+          console.error("❌ Échec du refresh:", refreshError);
+          get().logout("Session expirée");
+        }
+      } else {
+        // Erreur réseau : garder l'état en cache
+        set({ isLoading: false });
+
+        // Toast silencieux (pas bloquant)
+        toast.warning("Mode hors ligne", {
+          description: "Impossible de vérifier la session",
+          duration: 2000,
         });
       }
     }
