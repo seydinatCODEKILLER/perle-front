@@ -89,7 +89,6 @@ export const AppRoutes = () => {
           }
         >
           {/* Redirection par défaut vers le dashboard selon l'espace */}
-          <Route index element={<Navigate to="dashboard" replace />} />
 
           {/* Routes de gestion (management space) */}
           <Route path="dashboard" element={<OrganizationDashboard />} />

@@ -2,23 +2,18 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Users, MapPin, Calendar } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useOrganizationAccess } from "../hooks/useOrganizationAccess";
 
-export const OrganizationCard = ({
-  organization,
-  onEdit,
-  onDelete,
-  onAccess,
-}) => {
+export const OrganizationCard = ({ organization, onEdit, onDelete }) => {
   const isOwner = organization.userRole === "ADMIN";
   const isMember =
     organization.userRole === "MEMBER" ||
-    organization.userRole === "FINANCIAL_MANAGER";    
+    organization.userRole === "FINANCIAL_MANAGER";
 
-  const navigate = useNavigate();
+  const { navigateToOrganization } = useOrganizationAccess();
 
   const handleAccess = () => {
-    navigate(`/organizations/${organization.id}/dashboard`);
+    navigateToOrganization(organization.id, organization.userRole);
   };
 
   return (
@@ -61,18 +56,16 @@ export const OrganizationCard = ({
               <Users className="w-4 h-4" />
               <span>{organization._count?.members || 0} membres</span>
             </div>
-
             {organization.city && (
               <div className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
                 <span>{organization.city}</span>
               </div>
             )}
-
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
               <span>
-                {new Date(organization.createdAt).toLocaleDateString()}
+                {new Date(organization.createdAt).toLocaleDateString("fr-FR")}
               </span>
             </div>
           </div>
@@ -99,7 +92,7 @@ export const OrganizationCard = ({
                 </Button>
               </>
             ) : isMember ? (
-              <Button className="w-full" onClick={() => onAccess(organization)}>
+              <Button className="w-full" onClick={handleAccess}>
                 Accéder à l'organisation
               </Button>
             ) : null}

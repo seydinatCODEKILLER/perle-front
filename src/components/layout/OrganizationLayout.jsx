@@ -1,67 +1,47 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import { OrganizationSidebar } from "@/components/layout/OrganizationSidebar";
-import { useParams } from "react-router-dom";
-import {
-  SidebarProvider,
-  SidebarInset,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { Loader2 } from "lucide-react";
-import { useOrganization } from "@/features/organizations/hooks/useOrganizations";
+import { OrganizationRouter } from "@/features/organizations/routes/OrganizationRouter";
 import { FloatLogoutWithConfirm } from "@/components/layout/FloatLogoutWithConfirm";
+import { 
+  SidebarProvider, 
+  SidebarInset, 
+  SidebarTrigger 
+} from "@/components/ui/sidebar";
+import { useOrganization } from "@/features/organizations/hooks/useOrganizations";
 
+/**
+ * Layout principal des organisations
+ * La logique de routing est déléguée à OrganizationRouter
+ */
 export const OrganizationLayout = () => {
   const { organizationId } = useParams();
+  const { data: organization } = useOrganization(organizationId);
 
-  const { data: organization, isLoading } = useOrganization(organizationId);
-
-  const userRole = organization?.userRole || "MEMBER";
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">
-            Chargement de l'organisation...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!organization) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Organisation non trouvée</h1>
-          <p className="text-muted-foreground">
-            Cette organisation n'existe pas ou vous n'y avez pas accès.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+  // OrganizationRouter gère le chargement et les redirections
   return (
-    <SidebarProvider defaultOpen>
-      <div className="flex h-screen w-full">
-        <OrganizationSidebar organization={organization} userRole={userRole} />
+    <OrganizationRouter>
+      <SidebarProvider defaultOpen>
+        <div className="flex h-screen w-full">
+          <OrganizationSidebar 
+            organization={organization} 
+            userRole={organization?.userRole} 
+          />
 
-        {/* Contenu principal */}
-        <SidebarInset>
-          <div className="p-4 md:p-6">
-            {/* Trigger visible seulement sur mobile */}
-            <div className="mb-4 md:hidden">
+          <SidebarInset>
+            <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
               <SidebarTrigger />
-            </div>
+            </header>
+            
+            <main className="flex-1 overflow-auto">
+              <div className="p-4 md:p-6">
+                <Outlet />
+              </div>
+            </main>
+          </SidebarInset>
 
-            <Outlet />
-          </div>
-        </SidebarInset>
-
-        <FloatLogoutWithConfirm />
-      </div>
-    </SidebarProvider>
+          <FloatLogoutWithConfirm />
+        </div>
+      </SidebarProvider>
+    </OrganizationRouter>
   );
 };

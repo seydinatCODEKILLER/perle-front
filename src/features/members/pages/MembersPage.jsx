@@ -4,10 +4,10 @@ import { useDebounce } from "@/shared/hooks/useDebounce";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useOrganizationMembers } from "../hooks/useMembers";
 import { useCreateMember } from "../hooks/useCreateMember";
-import { 
-  useUpdateMemberRole, 
-  useUpdateMemberStatus, 
-  useUpdateMember 
+import {
+  useUpdateMemberRole,
+  useUpdateMemberStatus,
+  useUpdateMember,
 } from "../hooks/useUpdateMember";
 import { AddMemberModal } from "../components/AddMemberModal";
 import { EditMemberModal } from "../components/EditMemberModal";
@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, UserPlus } from "lucide-react";
+import { useDeleteMember } from "../hooks/useDeleteMember";
+import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 
 export const MembersPage = () => {
   const { organizationId } = useParams();
@@ -27,6 +29,7 @@ export const MembersPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [memberToDelete, setMemberToDelete] = useState(null);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
@@ -43,6 +46,7 @@ export const MembersPage = () => {
   const updateRoleMutation = useUpdateMemberRole();
   const updateStatusMutation = useUpdateMemberStatus();
   const updateMemberMutation = useUpdateMember();
+  const deleteMutation = useDeleteMember();
 
   const members = data?.members || [];
   const pagination = data?.pagination;
@@ -54,7 +58,7 @@ export const MembersPage = () => {
         onSuccess: () => {
           setIsAddModalOpen(false);
         },
-      }
+      },
     );
   };
 
@@ -66,7 +70,7 @@ export const MembersPage = () => {
           setIsEditModalOpen(false);
           setSelectedMember(null);
         },
-      }
+      },
     );
   };
 
@@ -78,7 +82,7 @@ export const MembersPage = () => {
           setIsEditModalOpen(false);
           setSelectedMember(null);
         },
-      }
+      },
     );
   };
 
@@ -90,7 +94,7 @@ export const MembersPage = () => {
           setIsEditModalOpen(false);
           setSelectedMember(null);
         },
-      }
+      },
     );
   };
 
@@ -99,9 +103,21 @@ export const MembersPage = () => {
     setIsEditModalOpen(true);
   };
 
+  const handleDeleteConfirm = () => {
+    if (memberToDelete) {
+      deleteMutation.mutate(
+        { organizationId, membershipId: memberToDelete.id },
+        {
+          onSuccess: () => {
+            setMemberToDelete(null);
+          },
+        },
+      );
+    }
+  };
+
   const handleDeleteClick = (member) => {
-    // À implémenter plus tard
-    console.log("Supprimer membre:", member);
+    setMemberToDelete(member);
   };
 
   const handleClearFilters = () => {
@@ -143,7 +159,7 @@ export const MembersPage = () => {
               <CardSkeleton key={i} />
             ))}
           </div>
-          
+
           {pagination?.pages > 1 && (
             <div className="flex justify-center pt-6">
               <Skeleton className="h-10 w-64 rounded-lg" />
@@ -186,7 +202,7 @@ export const MembersPage = () => {
               />
             ))}
           </div>
-          
+
           {pagination?.pages > 1 && (
             <div className="flex justify-center pt-6">
               <Pagination
@@ -222,6 +238,19 @@ export const MembersPage = () => {
         isUpdatingRole={updateRoleMutation.isPending}
         isUpdatingStatus={updateStatusMutation.isPending}
         isUpdatingMember={updateMemberMutation.isPending}
+      />
+
+      {/* Modal de suppression */}
+      <ConfirmationModal
+        open={!!memberToDelete}
+        onClose={() => setMemberToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        title={`Supprimer ${memberToDelete?.user?.prenom} ${memberToDelete?.user?.nom}`}
+        description="Cette action est irréversible. Le membre sera retiré de l'organisation."
+        variant="destructive"
+        confirmText="Supprimer définitivement"
+        cancelText="Annuler"
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

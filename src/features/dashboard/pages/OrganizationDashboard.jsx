@@ -1,5 +1,4 @@
 import React from "react";
-import { useAdminDashboard } from "../hooks/useDashboard";
 import { AlertCircle, Loader2, Building2, RefreshCw } from "lucide-react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,9 +8,10 @@ import { MemberStatusChart } from "../components/admin/MemberStatusChart";
 import { RecentActivities } from "../components/admin/RecentActivities";
 import { FinancialOverviewCard } from "../components/admin/FinancialOverviewCard";
 import { SubscriptionCard } from "../components/admin/SubscriptionCard";
+import { useManagementDashboard } from "../hooks/useDashboard";
 
 const OrganizationDashboard = () => {
-  const { data, isLoading, error, refetch } = useAdminDashboard();
+  const { data, isLoading, error, refetch } = useManagementDashboard();
 
   if (isLoading) {
     return (

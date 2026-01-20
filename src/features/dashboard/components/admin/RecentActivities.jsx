@@ -60,7 +60,7 @@ export const RecentActivities = ({ activities = [] }) => {
                     </span>
                     {activity.user && (
                       <span className="text-xs font-medium">
-                        Par {activity.user}
+                        Par {activity.user.prenom}
                       </span>
                     )}
                   </div>
