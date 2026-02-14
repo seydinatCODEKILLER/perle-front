@@ -1,6 +1,5 @@
-import { useState } from "react";
-// eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
 import { PricingHeader } from "./components/PricingHeader";
 import { PricingCards } from "./components/PricingCards";
 import { ComparisonToggle } from "./components/ComparisonToggle";
@@ -14,16 +13,17 @@ const PricingSection = () => {
   const [showComparison, setShowComparison] = useState(false);
   const annualSavings = 20;
 
-  const formatPrice = (price) => {
+  // Mémoriser la fonction formatPrice
+  const formatPrice = useCallback((price) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'EUR',
       minimumFractionDigits: 0
     }).format(price);
-  };
+  }, []);
 
   return (
-    <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-background via-background to-muted/50">
+    <section id="pricing" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 bg-linear-to-b from-background via-background to-muted/50">
       <div className="max-w-7xl mx-auto">
         <PricingHeader 
           billingPeriod={billingPeriod}
