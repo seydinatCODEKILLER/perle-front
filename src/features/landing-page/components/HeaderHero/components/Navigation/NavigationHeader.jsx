@@ -40,7 +40,7 @@ export const NavigationHeader = () => {
       <motion.div
         className={`mx-auto max-w-7xl py-4 ${
           isScrolled 
-            ? "rounded-xl border border-border/50 bg-background/80 backdrop-blur-lg mt-2 mx-4 sm:mx-6 shadow-xl dark:shadow-2xl" 
+            ? "rounded-2xl border border-border/50 bg-background/80 backdrop-blur-lg mt-2 mx-4 sm:mx-6 shadow-xl dark:shadow-2xl" 
             : ""
         }`}
         initial={false}

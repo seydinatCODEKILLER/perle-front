@@ -14,10 +14,10 @@ export const DashboardPreview = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.5 }}
     >
-      <div className="relative rounded-3xl border border-border bg-gradient-to-br from-card to-background p-2 shadow-2xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-indigo-500/10 to-transparent rounded-full blur-3xl" />
+      <div className="relative rounded-3xl border border-border bg-linear-to-br from-card to-background p-2 shadow-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 via-transparent to-indigo-500/5" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-linear-to-br from-blue-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-linear-to-tr from-indigo-500/10 to-transparent rounded-full blur-3xl" />
         
         <DashboardHeader />
         
@@ -25,11 +25,11 @@ export const DashboardPreview = () => {
           <DashboardStats />
           
           <div className="grid lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 rounded-xl bg-gradient-to-br from-blue-900/10 to-indigo-900/10 border border-border p-6">
+            <div className="lg:col-span-2 rounded-xl bg-linear-to-br from-blue-900/10 to-indigo-900/10 border border-border p-6">
               <FinancialChart />
             </div>
             
-            <div className="rounded-xl bg-gradient-to-br from-gray-900/20 to-background border border-border p-6">
+            <div className="rounded-xl bg-linear-to-br from-gray-900/20 to-background border border-border p-6">
               <RecentActivity />
             </div>
           </div>
@@ -47,7 +47,7 @@ const DashboardHeader = () => (
   <div className="relative z-10 p-6 border-b border-border">
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-xl">
+        <div className="p-3 bg-linear-to-r from-blue-500/20 to-indigo-500/20 rounded-xl">
           <BarChart3 className="h-6 w-6 text-blue-400" />
         </div>
         <div>
@@ -74,7 +74,7 @@ const FloatingElements = () => (
       animate={{ y: [0, -10, 0] }}
       transition={{ repeat: Infinity, duration: 3 }}
     >
-      <div className="px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-medium shadow-lg">
+      <div className="px-4 py-2 rounded-full bg-linear-to-r from-blue-500 to-indigo-500 text-white text-sm font-medium shadow-lg">
         Nouveau
       </div>
     </motion.div>

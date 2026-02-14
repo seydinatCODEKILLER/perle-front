@@ -8,7 +8,7 @@ export const ScrollIndicator = () => (
     transition={{ repeat: Infinity, duration: 2 }}
   >
     <div className="w-6 h-10 rounded-full border-2 border-border flex justify-center">
-      <div className="w-1 h-3 bg-gradient-to-b from-blue-400 to-indigo-400 rounded-full mt-2" />
+      <div className="w-1 h-3 bg-linear-to-b from-blue-400 to-indigo-400 rounded-full mt-2" />
     </div>
   </motion.div>
 );
