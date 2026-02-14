@@ -14,7 +14,7 @@ export const TrustIndicators = () => (
         {[1, 2, 3, 4, 5].map((i) => (
           <div
             key={i}
-            className="w-10 h-10 rounded-full border-2 border-background bg-gradient-to-br from-blue-500 to-indigo-500"
+            className="w-10 h-10 rounded-full border-2 border-background bg-linear-to-br from-blue-500 to-indigo-500"
           />
         ))}
       </div>
