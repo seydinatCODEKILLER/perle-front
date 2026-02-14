@@ -25,7 +25,7 @@ export const FinancialChart = () => {
             animate={{ height: `${height}%` }}
             transition={{ delay: i * 0.1, duration: 0.8 }}
           >
-            <div className="w-full h-full bg-gradient-to-t from-blue-500 to-indigo-500 rounded-t-lg" />
+            <div className="w-full h-full bg-linear-to-t from-blue-500 to-indigo-500 rounded-t-lg" />
             <div className="text-xs text-muted-foreground mt-2">
               {months[i]}
             </div>

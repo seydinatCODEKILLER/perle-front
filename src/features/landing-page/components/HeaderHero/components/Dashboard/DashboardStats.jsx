@@ -11,7 +11,7 @@ export const DashboardStats = () => {
 };
 
 const StatCard = ({ label, value, change, color }) => (
-  <div className="p-4 rounded-xl bg-gradient-to-br from-secondary/50 to-background border border-border hover:border-blue-500/30 transition-colors group">
+  <div className="p-4 rounded-xl bg-linear-to-br from-secondary/50 to-background border border-border hover:border-blue-500/30 transition-colors group">
     <div className="flex items-center justify-between mb-2">
       <span className="text-sm text-muted-foreground">{label}</span>
       <span className={`text-xs px-2 py-1 rounded-full ${
@@ -21,6 +21,6 @@ const StatCard = ({ label, value, change, color }) => (
       </span>
     </div>
     <div className="text-2xl font-bold text-foreground">{value}</div>
-    <div className={`mt-2 w-full h-1 bg-gradient-to-r ${color} rounded-full opacity-0 group-hover:opacity-100 transition-opacity`} />
+    <div className={`mt-2 w-full h-1 bg-linear-to-r ${color} rounded-full opacity-0 group-hover:opacity-100 transition-opacity`} />
   </div>
 );
