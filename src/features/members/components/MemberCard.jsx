@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users, Phone, Mail, Calendar, Edit, Trash2 } from "lucide-react";
 import { formatMember, formatRole, formatStatus } from "../utils/member-helpers";
+import { MEMBER_ROLES } from "../constants/member.constants";
 
 export const MemberCard = ({ 
   member, 
@@ -11,6 +12,8 @@ export const MemberCard = ({
 }) => {
   const formattedMember = formatMember(member);
   const isCurrentUser = member.userId === "current-user-id";
+  
+  const isAdmin = member.role === MEMBER_ROLES.ADMIN;
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -21,7 +24,7 @@ export const MemberCard = ({
               {formattedMember.fullName || "Utilisateur"}
             </CardTitle>
             <div className="flex gap-2 mt-2">
-              <Badge variant={formattedMember.role === "ADMIN" ? "default" : "secondary"}>
+              <Badge variant={member.role === "ADMIN" ? "default" : "secondary"}>
                 {formatRole(member.role)}
               </Badge>
               <Badge variant={member.status === "ACTIVE" ? "default" : "outline"}>
@@ -63,13 +66,14 @@ export const MemberCard = ({
           <span>{formattedMember.debtsCount} dettes</span>
         </div>
         
-        {/* Boutons d'action */}
+        {/* Boutons d'action - désactivés si le membre est ADMIN */}
         <div className="flex gap-2 pt-2">
           <Button 
             variant="outline" 
             size="sm" 
             onClick={() => onEdit(member)}
             className="flex-1"
+            disabled={isAdmin}
           >
             <Edit className="w-4 h-4 mr-2" />
             Modifier
@@ -79,7 +83,7 @@ export const MemberCard = ({
             size="sm" 
             onClick={() => onDelete(member)}
             className="flex-1"
-            disabled={isCurrentUser}
+            disabled={isCurrentUser || isAdmin}
           >
             <Trash2 className="w-4 h-4 mr-2" />
             Supprimer
@@ -88,4 +92,4 @@ export const MemberCard = ({
       </CardContent>
     </Card>
   );
-};
+}
