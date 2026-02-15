@@ -31,6 +31,11 @@ export const NAVIGATION_CONFIG = {
     management: [
       { label: "Dashboard", path: "dashboard", icon: "LayoutDashboard" },
       { label: "Membres", path: "members", icon: "Users" },
+      {
+        label: "Mes plans de cotisations",
+        path: "contribution-plans",
+        icon: "FileText",
+      },
       { label: "Cotisations", path: "contributions", icon: "Coins" },
       { label: "Transactions", path: "transactions", icon: "ArrowLeftRight" },
       { label: "Dettes", path: "debts", icon: "CreditCard" },
