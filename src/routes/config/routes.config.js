@@ -30,6 +30,7 @@ export const PUBLIC_ROUTES = [
 export const ORGANIZATION_ROUTES = {
   DASHBOARD: "dashboard",
   MEMBERS: "members",
+  CONTRIBUTIONS_PLANS: "contribution-plans",
   CONTRIBUTIONS: "contributions",
   TRANSACTIONS: "transactions",
   DEBTS: "debts",

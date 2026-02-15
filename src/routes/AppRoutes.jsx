@@ -17,6 +17,7 @@ import { OrganizationLayout } from "@/components/layout/OrganizationLayout";
 import OrganizationDashboard from "@/features/dashboard/pages/OrganizationDashboard";
 import PersonalDashboard from "@/features/dashboard/pages/PersonalDashboard";
 import { MembersPage } from "@/features/members/pages/MembersPage";
+import { ContributionPlansPage } from "@/features/plans/pages/ContributionPlansPage";
 
 // Loader pour le lazy loading
 const PageLoader = () => (
@@ -88,12 +89,12 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         >
-          {/* Redirection par défaut vers le dashboard selon l'espace */}
 
           {/* Routes de gestion (management space) */}
           <Route path="dashboard" element={<OrganizationDashboard />} />
           <Route path="members" element={<MembersPage />} />
-          <Route path="contributions" element={<div>Contributions</div>} />
+          <Route path="contribution-plans" element={<ContributionPlansPage />} />
+          <Route path="contributions" element={<div>Cotisations</div>} />
           <Route path="transactions" element={<div>Transactions</div>} />
           <Route path="debts" element={<div>Dettes</div>} />
           <Route path="settings" element={<div>Paramètres</div>} />
