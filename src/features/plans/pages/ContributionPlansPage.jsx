@@ -5,6 +5,8 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { useOrganizationPlans } from "../hooks/useContributionPlans";
 import { useCreatePlan } from "../hooks/useCreatePlan";
 import { useUpdatePlan } from "../hooks/useUpdatePlan";
+import { useGenerateContributions } from "../hooks/useGenerateContributions";
+import { useAssignPlanToMember } from "../hooks/useAssignPlanToMember";
 import { AddContributionPlanModal } from "../components/AddContributionPlanModal";
 import { EditContributionPlanModal } from "../components/EditContributionPlanModal";
 import { ContributionPlanFilters } from "../components/ContributionPlanFilters";
@@ -15,6 +17,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DollarSign, Plus } from "lucide-react";
 import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
+import { AssignPlanToMemberModal } from "@/features/plans/components/AssignPlanToMemberModal";
+import { GenerateContributionsModal } from "@/features/plans/components/GenerateContributionsModal";
 import { useTogglePlanStatus } from "../hooks/useTogglePlanStatus";
 
 export const ContributionPlansPage = () => {
@@ -22,10 +26,18 @@ export const ContributionPlansPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  
+  // Modals states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  
+  // Selected items
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [planToToggle, setPlanToToggle] = useState(null);
+  const [planToGenerate, setPlanToGenerate] = useState(null);
+  const [planToAssign, setPlanToAssign] = useState(null);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
@@ -37,14 +49,18 @@ export const ContributionPlansPage = () => {
     limit: 20,
   };
 
+  // Hooks
   const { data, isLoading } = useOrganizationPlans(organizationId, filters);
   const createMutation = useCreatePlan();
   const updateMutation = useUpdatePlan();
   const toggleStatusMutation = useTogglePlanStatus();
+  const generateMutation = useGenerateContributions();
+  const assignMutation = useAssignPlanToMember();
 
   const plans = data?.plans || [];
   const pagination = data?.pagination;
 
+  // Handlers pour CRUD des plans
   const handleAddPlan = (planData) => {
     createMutation.mutate(
       { organizationId, planData },
@@ -81,6 +97,32 @@ export const ContributionPlansPage = () => {
     }
   };
 
+  // Handlers pour génération et assignation
+  const handleGenerate = ({ planId, options }) => {
+    generateMutation.mutate(
+      { organizationId, planId, options },
+      {
+        onSuccess: () => {
+          setIsGenerateModalOpen(false);
+          setPlanToGenerate(null);
+        },
+      },
+    );
+  };
+
+  const handleAssign = ({ planId, membershipId }) => {
+    assignMutation.mutate(
+      { organizationId, planId, membershipId },
+      {
+        onSuccess: () => {
+          setIsAssignModalOpen(false);
+          setPlanToAssign(null);
+        },
+      },
+    );
+  };
+
+  // Click handlers
   const handleEditClick = (plan) => {
     setSelectedPlan(plan);
     setIsEditModalOpen(true);
@@ -88,6 +130,16 @@ export const ContributionPlansPage = () => {
 
   const handleToggleClick = (plan) => {
     setPlanToToggle(plan);
+  };
+
+  const handleGenerateClick = (plan) => {
+    setPlanToGenerate(plan);
+    setIsGenerateModalOpen(true);
+  };
+
+  const handleAssignClick = (plan) => {
+    setPlanToAssign(plan);
+    setIsAssignModalOpen(true);
   };
 
   const handleClearFilters = () => {
@@ -169,6 +221,8 @@ export const ContributionPlansPage = () => {
                 plan={plan}
                 onEdit={handleEditClick}
                 onToggleStatus={handleToggleClick}
+                onGenerate={handleGenerateClick}
+                onAssign={handleAssignClick}
               />
             ))}
           </div>
@@ -204,6 +258,31 @@ export const ContributionPlansPage = () => {
         plan={selectedPlan}
         onUpdate={handleUpdatePlan}
         isUpdating={updateMutation.isPending}
+      />
+
+      {/* Modal de génération */}
+      <GenerateContributionsModal
+        open={isGenerateModalOpen}
+        onClose={() => {
+          setIsGenerateModalOpen(false);
+          setPlanToGenerate(null);
+        }}
+        plan={planToGenerate}
+        onGenerate={handleGenerate}
+        isGenerating={generateMutation.isPending}
+      />
+
+      {/* Modal d'assignation */}
+      <AssignPlanToMemberModal
+        open={isAssignModalOpen}
+        onClose={() => {
+          setIsAssignModalOpen(false);
+          setPlanToAssign(null);
+        }}
+        plan={planToAssign}
+        organizationId={organizationId}
+        onAssign={handleAssign}
+        isAssigning={assignMutation.isPending}
       />
 
       {/* Modal de confirmation toggle status */}
@@ -245,7 +324,11 @@ const CardSkeleton = () => (
       <div className="pt-2">
         <Skeleton className="h-3 w-24" />
       </div>
-      <div className="flex gap-2 pt-4">
+      <div className="grid grid-cols-2 gap-2 pt-2 border-t">
+        <Skeleton className="h-8" />
+        <Skeleton className="h-8" />
+      </div>
+      <div className="flex gap-2 pt-2">
         <Skeleton className="h-9 flex-1" />
         <Skeleton className="h-9 flex-1" />
       </div>
