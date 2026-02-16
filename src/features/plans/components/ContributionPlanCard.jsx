@@ -1,14 +1,24 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, DollarSign, RefreshCw, Edit, Power, Users } from "lucide-react";
+import { 
+  Calendar, 
+  DollarSign, 
+  Edit, 
+  Power, 
+  Users, 
+  Zap, 
+  UserPlus 
+} from "lucide-react";
 import { formatPlan, getFrequencyBadgeColor } from "../utils/contribution-plan-helpers";
 import { cn } from "@/lib/utils";
 
 export const ContributionPlanCard = ({ 
   plan, 
   onEdit = () => {}, 
-  onToggleStatus = () => {} 
+  onToggleStatus = () => {},
+  onGenerate = () => {},
+  onAssign = () => {},
 }) => {
   const formattedPlan = formatPlan(plan);
 
@@ -86,13 +96,37 @@ export const ContributionPlanCard = ({
           </div>
         </div>
 
+        {/* Actions de gestion */}
+        {plan.isActive && (
+          <div className="grid grid-cols-2 gap-2 pt-2 border-t">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onGenerate(plan)}
+              className="text-xs"
+            >
+              <Zap className="w-3 h-3 mr-1" />
+              Générer
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onAssign(plan)}
+              className="text-xs"
+            >
+              <UserPlus className="w-3 h-3 mr-1" />
+              Assigner
+            </Button>
+          </div>
+        )}
+
+        {/* Actions principales */}
         <div className="flex gap-2 pt-2">
           <Button 
             variant="outline" 
             size="sm" 
             onClick={() => onEdit(plan)}
-            disabled={!plan.isActive}
-            className={cn("flex-1", !plan.isActive && "cursor-not-allowed")}
+            className="flex-1"
           >
             <Edit className="w-4 h-4 mr-2" />
             Modifier
