@@ -18,6 +18,8 @@ import OrganizationDashboard from "@/features/dashboard/pages/OrganizationDashbo
 import PersonalDashboard from "@/features/dashboard/pages/PersonalDashboard";
 import { MembersPage } from "@/features/members/pages/MembersPage";
 import { ContributionPlansPage } from "@/features/plans/pages/ContributionPlansPage";
+import { ContributionsPage } from "@/features/contributions/pages/ContributionsPage";
+import { MemberContributionsPage } from "@/features/contributions/pages/MemberContributionsPage";
 
 // Loader pour le lazy loading
 const PageLoader = () => (
@@ -94,14 +96,14 @@ export const AppRoutes = () => {
           <Route path="dashboard" element={<OrganizationDashboard />} />
           <Route path="members" element={<MembersPage />} />
           <Route path="contribution-plans" element={<ContributionPlansPage />} />
-          <Route path="contributions" element={<div>Cotisations</div>} />
+          <Route path="contributions" element={<ContributionsPage />} />
           <Route path="transactions" element={<div>Transactions</div>} />
           <Route path="debts" element={<div>Dettes</div>} />
           <Route path="settings" element={<div>Paramètres</div>} />
 
           {/* Routes personnelles (personal space) */}
           <Route path="me/dashboard" element={<PersonalDashboard />} />
-          <Route path="me/contributions" element={<div>Mes cotisations</div>} />
+          <Route path="me/contributions" element={<MemberContributionsPage />} />
           <Route path="me/debts" element={<div>Mes dettes</div>} />
           <Route path="me/history" element={<div>Mon historique</div>} />
         </Route>

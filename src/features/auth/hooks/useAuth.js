@@ -36,7 +36,7 @@ export const useCurrentUser = () =>
  * Hook pour récupérer le token
  */
 export const useAuthToken = () =>
-  useAuthStore(authSelectors.token);
+  useAuthStore(authSelectors.accessToken);
 
 /**
  * Hook pour le statut de chargement
@@ -51,7 +51,7 @@ export const useUserName = () =>
   useAuthStore(authSelectors.userName);
 
 /**
- * Hook pour le rôle utilisateur
+ * Hook pour le rôle utilisateur (rôle global plateforme)
  */
 export const useUserRole = () =>
   useAuthStore(authSelectors.userRole);
@@ -61,3 +61,35 @@ export const useUserRole = () =>
  */
 export const useAuthInitialized = () =>
   useAuthStore(authSelectors.isInitialized);
+
+/**
+ * Hook pour tous les memberships de l'utilisateur
+ */
+export const useMemberships = () =>
+  useAuthStore(authSelectors.memberships);
+
+/**
+ * Hook pour le membership complet d'une organisation
+ * Retourne { id, organizationId, role, loginId, memberNumber, status, organization }
+ */
+export const useCurrentMembership = (organizationId) =>
+  useAuthStore(authSelectors.getMembershipByOrganization(organizationId));
+
+/**
+ * Hook pour le membershipId d'une organisation
+ */
+export const useCurrentMembershipId = (organizationId) =>
+  useAuthStore(authSelectors.getMembershipIdByOrganization(organizationId));
+
+/**
+ * Hook pour le rôle dans une organisation
+ * Retourne "ADMIN" | "FINANCIAL_MANAGER" | "MEMBER" | null
+ */
+export const useOrganizationRole = (organizationId) =>
+  useAuthStore(authSelectors.getRoleByOrganization(organizationId));
+
+/**
+ * Hook pour vérifier si l'utilisateur est admin d'une organisation
+ */
+export const useIsOrganizationAdmin = (organizationId) =>
+  useAuthStore(authSelectors.isAdminOfOrganization(organizationId));
