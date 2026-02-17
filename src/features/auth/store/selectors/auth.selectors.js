@@ -12,4 +12,25 @@ export const authSelectors = {
   userRole: (state) => state.user?.role || null,
   userEmail: (state) => state.user?.email || null,
   userAvatar: (state) => state.user?.avatar || null,
+  memberships: (state) => state.user?.memberships || [],
+
+  getMembershipByOrganization: (organizationId) => (state) =>
+    state.user?.memberships?.find(
+      (m) => m.organizationId === organizationId
+    ) || null,
+
+  getMembershipIdByOrganization: (organizationId) => (state) =>
+    state.user?.memberships?.find(
+      (m) => m.organizationId === organizationId
+    )?.id || null,
+
+  getRoleByOrganization: (organizationId) => (state) =>
+    state.user?.memberships?.find(
+      (m) => m.organizationId === organizationId
+    )?.role || null,
+
+  isAdminOfOrganization: (organizationId) => (state) =>
+    state.user?.memberships?.find(
+      (m) => m.organizationId === organizationId
+    )?.role === "ADMIN",
 };
