@@ -20,6 +20,8 @@ import { MembersPage } from "@/features/members/pages/MembersPage";
 import { ContributionPlansPage } from "@/features/plans/pages/ContributionPlansPage";
 import { ContributionsPage } from "@/features/contributions/pages/ContributionsPage";
 import { MemberContributionsPage } from "@/features/contributions/pages/MemberContributionsPage";
+import { AdminTransactionsPage } from "@/features/transactions/pages/AdminTransactionsPage";
+import { MemberTransactionsPage } from "@/features/transactions/pages/MemberTransactionsPage";
 
 // Loader pour le lazy loading
 const PageLoader = () => (
@@ -91,20 +93,26 @@ export const AppRoutes = () => {
             </ProtectedRoute>
           }
         >
-
           {/* Routes de gestion (management space) */}
           <Route path="dashboard" element={<OrganizationDashboard />} />
           <Route path="members" element={<MembersPage />} />
-          <Route path="contribution-plans" element={<ContributionPlansPage />} />
+          <Route
+            path="contribution-plans"
+            element={<ContributionPlansPage />}
+          />
           <Route path="contributions" element={<ContributionsPage />} />
-          <Route path="transactions" element={<div>Transactions</div>} />
+          <Route path="transactions" element={<AdminTransactionsPage />} />
           <Route path="debts" element={<div>Dettes</div>} />
           <Route path="settings" element={<div>Paramètres</div>} />
 
           {/* Routes personnelles (personal space) */}
           <Route path="me/dashboard" element={<PersonalDashboard />} />
-          <Route path="me/contributions" element={<MemberContributionsPage />} />
+          <Route
+            path="me/contributions"
+            element={<MemberContributionsPage />}
+          />
           <Route path="me/debts" element={<div>Mes dettes</div>} />
+          <Route path="me/transactions" element={<MemberTransactionsPage />} />
           <Route path="me/history" element={<div>Mon historique</div>} />
         </Route>
 
