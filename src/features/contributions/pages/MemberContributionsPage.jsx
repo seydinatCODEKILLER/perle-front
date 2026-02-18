@@ -3,11 +3,12 @@ import { useParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Pagination } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Receipt, Search, Filter, History } from "lucide-react";
+import { Receipt, Search, Filter, History, RefreshCw } from "lucide-react";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { CONTRIBUTION_STATUS_OPTIONS } from "@/features/contributions/constants/contribution.constants";
 import { MemberStatsCards } from "../components/MemberStatsCards";
@@ -19,8 +20,7 @@ import { useMemberContributionsDashboard } from "../hooks/useMemberContributions
 
 export const MemberContributionsPage = () => {
   const { organizationId } = useParams();
-
-const membershipId = useCurrentMembershipId(organizationId);
+  const membershipId = useCurrentMembershipId(organizationId);
 
   // Filtres
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,6 +46,7 @@ const membershipId = useCurrentMembershipId(organizationId);
     stats,
     pagination,
     isLoading,
+    refetch,
   } = useMemberContributionsDashboard(organizationId, membershipId, filters);
 
   // Filtrage côté client par recherche (nom du plan)
@@ -85,10 +86,25 @@ const membershipId = useCurrentMembershipId(organizationId);
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Mes cotisations"
-        description="Consultez l'état de vos cotisations et votre historique"
-      />
+      {/* Header avec bouton actualiser */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex-1 min-w-0">
+          <PageHeader
+            title="Mes cotisations"
+            description="Consultez l'état de vos cotisations et votre historique"
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => refetch()}
+          disabled={isLoading}
+          className="gap-1.5 sm:gap-2 w-full sm:w-auto shrink-0"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          <span className="text-xs sm:text-sm">Actualiser</span>
+        </Button>
+      </div>
 
       {/* Stats */}
       <MemberStatsCards stats={stats} isLoading={isLoading} />
