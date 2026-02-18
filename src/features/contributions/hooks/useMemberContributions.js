@@ -1,10 +1,10 @@
 import { useMemo } from "react";
-import { useMemberContributions } from "@/features/contributions/hooks/useContributions";
+import { useMyContributions } from "@/features/contributions/hooks/useContributions";
 import { computeContributionStats } from "@/features/contributions/utils/contribution-helpers";
 import { CONTRIBUTION_STATUS } from "@/features/contributions/constants/contribution.constants";
 
-export const useMemberContributionsDashboard = (organizationId, membershipId, filters = {}) => {
-  const query = useMemberContributions(organizationId, membershipId, filters);
+export const useMemberContributionsDashboard = (organizationId, filters = {}) => {
+  const query = useMyContributions(organizationId, filters);
 
   const contributions = useMemo(
     () => query.data?.contributions || [],

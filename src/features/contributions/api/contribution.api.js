@@ -39,6 +39,15 @@ const rawContributionApi = {
       `/contributions/${organizationId}/members/${membershipId}/contributions`,
       { params }
     ),
+
+      /**
+   * Récupérer les cotisations d'un membre
+   */
+  getMyContributions: async (organizationId, params = {}) =>
+    await api.get(
+      `/contributions/${organizationId}/my-contributions`,
+      { params }
+    ),
 };
 
 export const contributionApi = createApiWithExtraction(rawContributionApi);
