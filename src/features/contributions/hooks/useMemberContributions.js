@@ -1,13 +1,19 @@
 import { useMemo } from "react";
-import { useMemberContributions } from "./useContributions";
-import { computeContributionStats } from "../utils/contribution-helpers";
-import { CONTRIBUTION_STATUS } from "../constants/contribution.constants";
+import { useMemberContributions } from "@/features/contributions/hooks/useContributions";
+import { computeContributionStats } from "@/features/contributions/utils/contribution-helpers";
+import { CONTRIBUTION_STATUS } from "@/features/contributions/constants/contribution.constants";
 
 export const useMemberContributionsDashboard = (organizationId, membershipId, filters = {}) => {
   const query = useMemberContributions(organizationId, membershipId, filters);
 
-  const contributions = useMemo(() => query.data?.contributions || [], [query.data?.contributions]);
-  const totals = useMemo(() => query.data?.totals || { totalAmount: 0, totalPaid: 0, totalRemaining: 0 }, [query.data?.totals]);
+  const contributions = useMemo(
+    () => query.data?.contributions || [],
+    [query.data?.contributions]
+  );
+  const totals = useMemo(
+    () => query.data?.totals || { totalAmount: 0, totalPaid: 0, totalRemaining: 0 },
+    [query.data?.totals]
+  );
   const pagination = query.data?.pagination;
 
   // Stats globales
@@ -43,5 +49,6 @@ export const useMemberContributionsDashboard = (organizationId, membershipId, fi
     pagination,
     isLoading: query.isLoading,
     isError: query.isError,
+    refetch: query.refetch,
   };
 };

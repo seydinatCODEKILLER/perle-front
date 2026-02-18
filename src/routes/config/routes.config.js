@@ -37,6 +37,7 @@ export const ORGANIZATION_ROUTES = {
   SETTINGS: "settings",
   PERSONAL_DASHBOARD: "me/dashboard",
   PERSONAL_CONTRIBUTIONS: "me/contributions",
+  PERSONAL_TRANSACTIONS: "me/transactions",
   PERSONAL_DEBTS: "me/debts",
   PERSONAL_HISTORY: "me/history",
 };
