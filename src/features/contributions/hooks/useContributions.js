@@ -7,21 +7,46 @@ export const useContributions = (organizationId, filters = {}) =>
     queryKey: ["contributions", organizationId, filters],
     queryFn: () => contributionApi.getContributions(organizationId, filters),
     enabled: !!organizationId,
-    onError: (error) => handleContributionError(error, "Impossible de charger les cotisations"),
+    onError: (error) =>
+      handleContributionError(error, "Impossible de charger les cotisations"),
   });
 
 export const useContribution = (organizationId, contributionId) =>
   useQuery({
     queryKey: ["contribution", organizationId, contributionId],
-    queryFn: () => contributionApi.getContribution(organizationId, contributionId),
+    queryFn: () =>
+      contributionApi.getContribution(organizationId, contributionId),
     enabled: !!(organizationId && contributionId),
-    onError: (error) => handleContributionError(error, "Impossible de charger la cotisation"),
+    onError: (error) =>
+      handleContributionError(error, "Impossible de charger la cotisation"),
   });
 
-export const useMemberContributions = (organizationId, membershipId, filters = {}) =>
+export const useMemberContributions = (
+  organizationId,
+  membershipId,
+  filters = {},
+) =>
   useQuery({
     queryKey: ["member-contributions", organizationId, membershipId, filters],
-    queryFn: () => contributionApi.getMemberContributions(organizationId, membershipId, filters),
+    queryFn: () =>
+      contributionApi.getMemberContributions(
+        organizationId,
+        membershipId,
+        filters,
+      ),
     enabled: !!(organizationId && membershipId),
-    onError: (error) => handleContributionError(error, "Impossible de charger les cotisations du membre"),
+    onError: (error) =>
+      handleContributionError(
+        error,
+        "Impossible de charger les cotisations du membre",
+      ),
+  });
+
+export const useMyContributions = (organizationId, filters = {}) =>
+  useQuery({
+    queryKey: ["my-contributions", organizationId, filters],
+    queryFn: () => contributionApi.getMyContributions(organizationId, filters),
+    enabled: !!organizationId,
+    onError: (error) =>
+      handleContributionError(error, "Impossible de charger mes cotisations"),
   });
