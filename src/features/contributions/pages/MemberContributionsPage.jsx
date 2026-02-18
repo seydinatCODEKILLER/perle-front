@@ -15,12 +15,11 @@ import { MemberStatsCards } from "../components/MemberStatsCards";
 import { MemberContributionCard } from "../components/MemberContributionCard";
 import { MemberHistoryList } from "../components/MemberHistoryList";
 import { MemberContributionDetailModal } from "../components/MemberContributionDetailModal";
-import { useCurrentMembershipId } from "@/features/auth";
 import { useMemberContributionsDashboard } from "../hooks/useMemberContributions";
 
 export const MemberContributionsPage = () => {
   const { organizationId } = useParams();
-  const membershipId = useCurrentMembershipId(organizationId);
+  
 
   // Filtres
   const [searchTerm, setSearchTerm] = useState("");
@@ -47,7 +46,7 @@ export const MemberContributionsPage = () => {
     pagination,
     isLoading,
     refetch,
-  } = useMemberContributionsDashboard(organizationId, membershipId, filters);
+  } = useMemberContributionsDashboard(organizationId, filters);
 
   // Filtrage côté client par recherche (nom du plan)
   const filteredContributions = useMemo(() => {
