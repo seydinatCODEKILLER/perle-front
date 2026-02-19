@@ -16,7 +16,7 @@ import { useReactivateOrganization } from "../hooks/useReactivateOrganizations";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { TrashModal } from "../components/TrashModal";
-import { FloatLogoutWithConfirm } from "@/components/layout/FloatLogoutWithConfirm";
+import { UserMenuDropdown } from "../components/UserMenuDropdown";
 
 export const Organizations = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,7 +31,6 @@ export const Organizations = () => {
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
-  // Utiliser search API avec pagination et filtres
   const searchParams = {
     search: debouncedSearch || undefined,
     type: selectedType !== "all" ? selectedType : undefined,
@@ -89,7 +88,6 @@ export const Organizations = () => {
   const handleReactivate = (organizationId) => {
     reactivateMutation.mutate(organizationId, {
       onSuccess: () => {
-        // Réinitialiser la page de la corbeille si c'était le dernier élément
         if (trashData?.organizations?.length === 1 && trashPage > 1) {
           setTrashPage(trashPage - 1);
         }
@@ -108,25 +106,30 @@ export const Organizations = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
-      <PageHeader
-        title="Mes Organisations"
-        description="Gérez toutes vos organisations, dahiras et associations"
-        actions={
+      {/* ✅ Header avec menu utilisateur */}
+      <div className="flex items-center justify-between mb-6">
+        <PageHeader
+          title="Mes Organisations"
+          description="Gérez toutes vos organisations, dahiras et associations"
+        />
+        <div className="flex items-center gap-3">
           <Button
             variant="outline"
             onClick={() => setIsTrashModalOpen(true)}
             className="gap-2"
           >
             <Trash2 className="w-4 h-4" />
-            Corbeille
+            <span className="hidden sm:inline">Corbeille</span>
             {trashData?.pagination?.total > 0 && (
-              <span className="ml-1 px-2 py-0.5 text-xs bg-destructive text-destructive-foreground rounded-full">
+              <span className="px-2 py-0.5 text-xs bg-destructive text-destructive-foreground rounded-full">
                 {trashData.pagination.total}
               </span>
             )}
           </Button>
-        }
-      />
+          {/* ✅ Menu utilisateur */}
+          <UserMenuDropdown />
+        </div>
+      </div>
 
       <OrganizationsGrid
         organizations={organizations}
@@ -141,7 +144,7 @@ export const Organizations = () => {
         pagination={pagination}
         onPageChange={setCurrentPage}
       />
-      {/* Modal de création */}
+
       <OrganizationFormModal
         open={isCreateModalOpen}
         onOpenChange={setIsCreateModalOpen}
@@ -150,7 +153,6 @@ export const Organizations = () => {
         isPending={createMutation.isPending}
       />
 
-      {/* Modal de modification */}
       <OrganizationFormModal
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
@@ -160,7 +162,6 @@ export const Organizations = () => {
         isPending={updateMutation.isPending}
       />
 
-      {/* Modal de confirmation de suppression (RÉUTILISABLE) */}
       <ConfirmationModal
         open={!!orgToDelete}
         onClose={() => setOrgToDelete(null)}
@@ -173,7 +174,6 @@ export const Organizations = () => {
         isLoading={deleteMutation.isPending}
       />
 
-      {/* Modal de la corbeille */}
       <TrashModal
         open={isTrashModalOpen}
         onOpenChange={setIsTrashModalOpen}
@@ -185,7 +185,7 @@ export const Organizations = () => {
         onPageChange={setTrashPage}
       />
 
-      <FloatLogoutWithConfirm />
+      {/* <FloatLogoutWithConfirm /> */}
     </div>
   );
 };

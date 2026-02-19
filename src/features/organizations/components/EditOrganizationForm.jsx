@@ -189,7 +189,7 @@ export const EditOrganizationForm = ({
               <Textarea
                 id="description"
                 {...form.register("description")}
-                className="w-full min-h-[100px]"
+                className="w-full min-h-25"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Optionnel</span>
