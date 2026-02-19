@@ -22,6 +22,8 @@ import { ContributionsPage } from "@/features/contributions/pages/ContributionsP
 import { MemberContributionsPage } from "@/features/contributions/pages/MemberContributionsPage";
 import { AdminTransactionsPage } from "@/features/transactions/pages/AdminTransactionsPage";
 import { MemberTransactionsPage } from "@/features/transactions/pages/MemberTransactionsPage";
+import { AdminDebtsPage } from "@/features/dettes/pages/AdminDebtsPage";
+import { MemberDebtsPage } from "@/features/dettes/pages/MemberDebtsPage";
 
 // Loader pour le lazy loading
 const PageLoader = () => (
@@ -102,7 +104,7 @@ export const AppRoutes = () => {
           />
           <Route path="contributions" element={<ContributionsPage />} />
           <Route path="transactions" element={<AdminTransactionsPage />} />
-          <Route path="debts" element={<div>Dettes</div>} />
+          <Route path="debts" element={<AdminDebtsPage />} />
           <Route path="settings" element={<div>Paramètres</div>} />
 
           {/* Routes personnelles (personal space) */}
@@ -111,7 +113,7 @@ export const AppRoutes = () => {
             path="me/contributions"
             element={<MemberContributionsPage />}
           />
-          <Route path="me/debts" element={<div>Mes dettes</div>} />
+          <Route path="me/debts" element={<MemberDebtsPage />} />
           <Route path="me/transactions" element={<MemberTransactionsPage />} />
           <Route path="me/history" element={<div>Mon historique</div>} />
         </Route>
