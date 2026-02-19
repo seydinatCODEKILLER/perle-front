@@ -57,13 +57,6 @@ export const OrganizationFormModal = ({
                 {getDescription()}
               </DialogDescription>
             </div>
-            <button
-              onClick={() => onOpenChange(false)}
-              className="rounded-full p-2 hover:bg-accent transition-colors"
-              disabled={isPending}
-            >
-              <X className="h-4 w-4" />
-            </button>
           </div>
         </DialogHeader>
 

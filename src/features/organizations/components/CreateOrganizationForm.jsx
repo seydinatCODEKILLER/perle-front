@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -36,8 +36,9 @@ export const CreateOrganizationForm = ({ onSubmit, isPending, onCancel }) => {
     },
   });
 
-  const selectedLogo = form.watch("logo");
-  const selectedType = form.watch("type");
+  const selectedLogo = useWatch({ control: form.control, name: "logo" });
+  const selectedType = useWatch({ control: form.control, name: "type" });
+  const descriptionValue = useWatch({ control: form.control, name: "description" });
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
@@ -92,7 +93,7 @@ export const CreateOrganizationForm = ({ onSubmit, isPending, onCancel }) => {
               <div className="space-y-2">
                 <Label htmlFor="type">Type d'organisation *</Label>
                 <Select
-                  value={form.watch("type")}
+                  value={selectedType}
                   onValueChange={(value) => form.setValue("type", value)}
                 >
                   <SelectTrigger>
@@ -122,12 +123,12 @@ export const CreateOrganizationForm = ({ onSubmit, isPending, onCancel }) => {
               <Textarea
                 id="description"
                 placeholder="Décrivez votre organisation, ses objectifs et ses activités..."
-                className="min-h-[100px]"
+                className="min-h-25"
                 {...form.register("description")}
               />
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Optionnel</span>
-                <span>{form.watch("description")?.length || 0}/500</span>
+                <span>{descriptionValue?.length || 0}/500</span>
               </div>
             </div>
 

@@ -10,6 +10,7 @@ export const ROUTES = {
   // Routes protégées
   ORGANIZATION: "/organizations",
   ORGANIZATION_DETAIL: "/organizations/:organizationId",
+  PROFILE: "/profile", 
 
   // Routes d'erreur
   NOT_FOUND: "*",
