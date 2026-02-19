@@ -146,21 +146,27 @@ const OrganizationDashboard = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <FinancialOverviewCard
-              financialOverview={financialOverview}
-              currency={data.currency || "XOF"}
-            />
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <SubscriptionCard subscription={subscription} />
-          </motion.div>
+          {/* ✅ Wrapper avec overflow-hidden pour contenir le scale */}
+          <div className="overflow-hidden rounded-lg">
+            <motion.div
+              whileHover={{ scale: 1.01 }} // Réduire à 1.01 au lieu de 1.02
+              transition={{ duration: 0.2 }}
+            >
+              <FinancialOverviewCard
+                financialOverview={financialOverview}
+                currency={data.currency || "XOF"}
+              />
+            </motion.div>
+          </div>
+
+          <div className="overflow-hidden rounded-lg">
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              transition={{ duration: 0.2 }}
+            >
+              <SubscriptionCard subscription={subscription} />
+            </motion.div>
+          </div>
         </motion.div>
       </motion.div>
     </motion.div>
