@@ -24,6 +24,7 @@ import { AdminTransactionsPage } from "@/features/transactions/pages/AdminTransa
 import { MemberTransactionsPage } from "@/features/transactions/pages/MemberTransactionsPage";
 import { AdminDebtsPage } from "@/features/dettes/pages/AdminDebtsPage";
 import { MemberDebtsPage } from "@/features/dettes/pages/MemberDebtsPage";
+import { ProfilePage } from "@/features/profile/pages/ProfilePage";
 
 // Loader pour le lazy loading
 const PageLoader = () => (
@@ -86,6 +87,15 @@ export const AppRoutes = () => {
           }
         />
 
+        <Route
+          path={ROUTES.PROFILE}
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Routes de l'organisation avec layout */}
         <Route
           path={ROUTES.ORGANIZATION_DETAIL}
@@ -115,7 +125,6 @@ export const AppRoutes = () => {
           />
           <Route path="me/debts" element={<MemberDebtsPage />} />
           <Route path="me/transactions" element={<MemberTransactionsPage />} />
-          <Route path="me/history" element={<div>Mon historique</div>} />
         </Route>
 
         {/* Route 404 */}

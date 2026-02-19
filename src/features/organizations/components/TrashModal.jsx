@@ -39,14 +39,6 @@ export const TrashModal = ({
                 </DialogDescription>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onOpenChange(false)}
-              className="h-8 w-8"
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
         </DialogHeader>
 
@@ -78,7 +70,7 @@ export const TrashModal = ({
                 </AlertDescription>
               </Alert>
 
-              <ScrollArea className="h-[500px] pr-4">
+              <ScrollArea className="h-125 pr-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {organizations.map((org) => (
                     <InactiveOrganizationCard
