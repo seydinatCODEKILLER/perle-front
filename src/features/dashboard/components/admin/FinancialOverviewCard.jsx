@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "../../utils/dashboard.utils";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
@@ -63,10 +62,9 @@ export const FinancialOverviewCard = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 + 0.3, duration: 0.3 }}
-      whileHover={{ scale: 1.02 }}
       className="h-full"
     >
-      <Card className="h-full hover:shadow-lg transition-shadow duration-300">
+      <Card className="h-full hover:shadow-lg transition-shadow duration-300 overflow-hidden">
         <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6 pt-3 sm:pt-4">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
@@ -80,7 +78,6 @@ export const FinancialOverviewCard = ({
 
         <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6 pb-4 sm:pb-6">
           {/* Taux de collecte avec animation */}
-          {/* Taux de collecte */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -96,13 +93,17 @@ export const FinancialOverviewCard = ({
               </span>
             </div>
 
-            <div className="w-full overflow-hidden rounded-full bg-muted h-2">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${collectionRate}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="h-full bg-primary rounded-full"
-              />
+            {/* ✅ CORRECTION : Conteneur avec max-width pour empêcher le débordement */}
+            <div className="w-full">
+              <div className="relative w-full overflow-hidden rounded-full bg-muted h-2">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${collectionRate}%` }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="absolute top-0 left-0 h-full bg-primary rounded-full"
+                  style={{ maxWidth: "100%" }}
+                />
+              </div>
             </div>
           </motion.div>
 
