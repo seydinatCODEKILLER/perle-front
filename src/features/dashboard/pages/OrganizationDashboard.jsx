@@ -7,6 +7,8 @@ import { KPICard } from "../components/admin/KPICard";
 import { MemberStatusChart } from "../components/admin/MemberStatusChart";
 import { RecentActivities } from "../components/admin/RecentActivities";
 import { FinancialOverviewCard } from "../components/admin/FinancialOverviewCard";
+import { WalletOverviewCard } from "../components/admin/WalletOverviewCard";
+import { ExpensesOverviewCard } from "../components/admin/ExpenseOverviewCard";
 import { SubscriptionCard } from "../components/admin/SubscriptionCard";
 import { useManagementDashboard } from "../hooks/useDashboard";
 
@@ -50,10 +52,19 @@ const OrganizationDashboard = () => {
     );
   }
 
-  const { kpis, financialOverview, charts, subscription, recentActivities } =
-    data;
+  const { 
+    kpis, 
+    financialOverview, 
+    charts, 
+    subscription, 
+    recentActivities 
+  } = data;
 
   const kpiEntries = Object.entries(kpis);
+
+  // ✅ NOUVEAU : Extraire wallet et expenses du financialOverview
+  const wallet = financialOverview?.wallet;
+  const expenses = financialOverview?.expenses;
 
   return (
     <motion.div
@@ -116,6 +127,42 @@ const OrganizationDashboard = () => {
         </AnimatePresence>
       </motion.div>
 
+      {/* ✅ NOUVELLE SECTION : Wallet & Expenses */}
+      <motion.div
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        {/* Wallet Overview */}
+        <div className="overflow-hidden rounded-lg">
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+          >
+            <WalletOverviewCard
+              wallet={wallet}
+              currency={data.currency || "XOF"}
+              index={0}
+            />
+          </motion.div>
+        </div>
+
+        {/* Expenses Overview */}
+        <div className="overflow-hidden rounded-lg">
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ExpensesOverviewCard
+              expenses={expenses}
+              currency={data.currency || "XOF"}
+              index={1}
+            />
+          </motion.div>
+        </div>
+      </motion.div>
+
       {/* Deuxième ligne avec animations */}
       <motion.div
         className="grid grid-cols-1 lg:grid-cols-3 gap-6"
@@ -146,10 +193,10 @@ const OrganizationDashboard = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.6 }}
         >
-          {/* ✅ Wrapper avec overflow-hidden pour contenir le scale */}
+          {/* Financial Overview */}
           <div className="overflow-hidden rounded-lg">
             <motion.div
-              whileHover={{ scale: 1.01 }} // Réduire à 1.01 au lieu de 1.02
+              whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.2 }}
             >
               <FinancialOverviewCard
@@ -159,6 +206,7 @@ const OrganizationDashboard = () => {
             </motion.div>
           </div>
 
+          {/* Subscription */}
           <div className="overflow-hidden rounded-lg">
             <motion.div
               whileHover={{ scale: 1.01 }}

@@ -1,3 +1,5 @@
+// constants/dashboard.constants.js
+
 export const DASHBOARD_CONSTANTS = {
   ICONS: {
     MEMBERS: "👥",
@@ -5,6 +7,9 @@ export const DASHBOARD_CONSTANTS = {
     PENDING: "⏳",
     DEBT: "⚠️",
     OVERDUE: "📅",
+    WALLET: "💼", // ✅ NOUVEAU
+    EXPENSE: "💸", // ✅ NOUVEAU
+    BALANCE: "⚖️", // ✅ NOUVEAU
   },
   
   COLORS: {
@@ -19,6 +24,23 @@ export const DASHBOARD_CONSTANTS = {
     XOF: "F CFA",
     EUR: "€",
     USD: "$",
+  },
+
+  // ✅ NOUVEAU : Statuts de santé du wallet
+  WALLET_HEALTH: {
+    HEALTHY: { label: "Sain", color: "bg-green-500", icon: "✓" },
+    WARNING: { label: "Attention", color: "bg-amber-500", icon: "⚠" },
+    CRITICAL: { label: "Critique", color: "bg-red-500", icon: "✗" },
+    UNKNOWN: { label: "Inconnu", color: "bg-gray-500", icon: "?" },
+  },
+
+  // ✅ NOUVEAU : Statuts des dépenses
+  EXPENSE_STATUS: {
+    PENDING: { label: "En attente", color: "bg-blue-500" },
+    APPROVED: { label: "Approuvé", color: "bg-green-500" },
+    REJECTED: { label: "Rejeté", color: "bg-red-500" },
+    PAID: { label: "Payé", color: "bg-emerald-500" },
+    CANCELLED: { label: "Annulé", color: "bg-gray-500" },
   },
 };
 

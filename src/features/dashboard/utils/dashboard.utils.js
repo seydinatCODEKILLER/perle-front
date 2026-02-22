@@ -1,3 +1,5 @@
+// utils/dashboard.utils.js
+
 import { DASHBOARD_CONSTANTS } from "../constants/dashboard.constants";
 
 /**
@@ -114,4 +116,58 @@ export const calculateDebtProgress = (debt) => {
   const paid =
     debt.initialAmount - (debt.remainingAmount || debt.initialAmount);
   return Math.round((paid / debt.initialAmount) * 100);
+};
+
+// ✅ NOUVELLES FONCTIONS WALLET
+
+/**
+ * Obtenir le statut de santé du wallet
+ */
+export const getWalletHealthStatus = (wallet) => {
+  if (!wallet || !wallet.exists) {
+    return DASHBOARD_CONSTANTS.WALLET_HEALTH.UNKNOWN;
+  }
+
+  const { currentBalance, totalIncome } = wallet;
+  
+  if (totalIncome === 0) {
+    return DASHBOARD_CONSTANTS.WALLET_HEALTH.UNKNOWN;
+  }
+
+  const ratio = (currentBalance / totalIncome) * 100;
+  
+  if (ratio >= 50) return DASHBOARD_CONSTANTS.WALLET_HEALTH.HEALTHY;
+  if (ratio >= 25) return DASHBOARD_CONSTANTS.WALLET_HEALTH.WARNING;
+  return DASHBOARD_CONSTANTS.WALLET_HEALTH.CRITICAL;
+};
+
+/**
+ * Calculer le taux de dépenses par rapport aux revenus
+ */
+export const calculateExpenseRate = (wallet) => {
+  if (!wallet || !wallet.totalIncome || wallet.totalIncome === 0) return 0;
+  return Math.round((wallet.totalExpenses / wallet.totalIncome) * 100);
+};
+
+/**
+ * Formater le statut de dépense
+ */
+export const getExpenseStatusLabel = (status) => {
+  return DASHBOARD_CONSTANTS.EXPENSE_STATUS[status]?.label || status;
+};
+
+/**
+ * Obtenir la couleur du statut de dépense
+ */
+export const getExpenseStatusColor = (status) => {
+  return DASHBOARD_CONSTANTS.EXPENSE_STATUS[status]?.color || "bg-gray-500";
+};
+
+/**
+ * Calculer le pourcentage du budget dépensé
+ */
+export const calculateBudgetUsage = (expenses, budget) => {
+  if (!budget || budget === 0) return 0;
+  const totalExpenses = expenses?.total?.amount || 0;
+  return Math.round((totalExpenses / budget) * 100);
 };
