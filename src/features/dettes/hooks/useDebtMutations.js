@@ -58,3 +58,22 @@ export const useUpdateDebtStatus = () => {
     onError: (error) => handleDebtError(error, "Échec de la mise à jour du statut"),
   });
 };
+
+export const useCancelDebt = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["debt", "cancel"],
+    mutationFn: async ({ organizationId, debtId, reason }) =>
+      await debtApi.cancelDebt(organizationId, debtId, reason),
+    onSuccess: (_, variables) => {
+      toast.success("Dette annulée", {
+        description: "La dette a été annulée avec succès",
+      });
+      queryClient.invalidateQueries({ queryKey: ["debts", variables.organizationId] });
+      queryClient.invalidateQueries({ queryKey: ["debt", variables.organizationId, variables.debtId] });
+      queryClient.invalidateQueries({ queryKey: ["debt-summary", variables.organizationId] });
+    },
+    onError: (error) => handleDebtError(error, "Échec de l'annulation"),
+  });
+};

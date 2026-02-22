@@ -1,8 +1,10 @@
+// components/DebtCard.jsx
+
 import { memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Eye, DollarSign, Plus } from "lucide-react";
+import { Eye, Plus, XCircle } from "lucide-react";
 import { DebtStatusBadge } from "./DebtStatusBadge";
 import { DebtProgressBar } from "./DebtProgressBar";
 import { formatDebt, isDebtEditable } from "../utils/debt-helpers";
@@ -12,10 +14,12 @@ export const DebtCard = memo(({
   debt, 
   onViewDetail, 
   onAddRepayment,
+  onCancel, // ✅ NOUVEAU
   showMemberInfo = true,
 }) => {
   const formatted = formatDebt(debt);
   const editable = isDebtEditable(debt);
+  const isCancelled = debt.status === "CANCELLED";
 
   return (
     <Card className={cn(
@@ -64,13 +68,15 @@ export const DebtCard = memo(({
         </div>
 
         {/* Progression */}
-        <div className="space-y-1">
-          <div className="flex justify-between text-[10px] text-muted-foreground">
-            <span>Progression</span>
-            <span>{formatted.progressPercent}%</span>
+        {!isCancelled && (
+          <div className="space-y-1">
+            <div className="flex justify-between text-[10px] text-muted-foreground">
+              <span>Progression</span>
+              <span>{formatted.progressPercent}%</span>
+            </div>
+            <DebtProgressBar percent={formatted.progressPercent} />
           </div>
-          <DebtProgressBar percent={formatted.progressPercent} />
-        </div>
+        )}
 
         {/* Échéance */}
         {debt.dueDate && (
@@ -90,7 +96,7 @@ export const DebtCard = memo(({
             <Eye className="w-3.5 h-3.5 mr-1.5" />
             Détails
           </Button>
-          {editable && onAddRepayment && (
+          {editable && !isCancelled && onAddRepayment && (
             <Button
               size="sm"
               className="flex-1 h-8 text-xs bg-green-600 hover:bg-green-700"
@@ -98,6 +104,18 @@ export const DebtCard = memo(({
             >
               <Plus className="w-3.5 h-3.5 mr-1.5" />
               Rembourser
+            </Button>
+          )}
+          {/* ✅ NOUVEAU : Bouton d'annulation */}
+          {editable && !isCancelled && onCancel && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+              onClick={() => onCancel(debt)}
+              title="Annuler"
+            >
+              <XCircle className="w-3.5 h-3.5" />
             </Button>
           )}
         </div>
