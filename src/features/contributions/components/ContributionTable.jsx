@@ -2,11 +2,10 @@ import { memo } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Eye, CreditCard, Coins } from "lucide-react";
+import { Eye, CreditCard, Coins, XCircle } from "lucide-react";
 import { ContributionStatusBadge } from "./ContributionStatusBadge";
 import { ContributionProgressBar } from "./ContributionProgressBar";
-import { formatContribution } from "../utils/contribution-helpers";
-import { isContributionEditable } from "../utils/contribution-helpers";
+import { formatContribution, isContributionEditable } from "../utils/contribution-helpers";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const ContributionTable = memo(({
@@ -14,6 +13,7 @@ export const ContributionTable = memo(({
   onViewDetail,
   onMarkPaid,
   onPartialPayment,
+  onCancel, // ✅ NOUVEAU
   isLoading = false,
 }) => {
   if (isLoading) return <ContributionTableSkeleton />;
@@ -43,6 +43,7 @@ export const ContributionTable = memo(({
                 onViewDetail={onViewDetail}
                 onMarkPaid={onMarkPaid}
                 onPartialPayment={onPartialPayment}
+                onCancel={onCancel} // ✅ NOUVEAU
               />
             ))}
           </TableBody>
@@ -54,9 +55,16 @@ export const ContributionTable = memo(({
 
 ContributionTable.displayName = "ContributionTable";
 
-const ContributionRow = memo(({ contribution, onViewDetail, onMarkPaid, onPartialPayment }) => {
+const ContributionRow = memo(({ 
+  contribution, 
+  onViewDetail, 
+  onMarkPaid, 
+  onPartialPayment,
+  onCancel // ✅ NOUVEAU
+}) => {
   const formatted = formatContribution(contribution);
   const editable = isContributionEditable(contribution);
+  const isCancelled = contribution.status === "CANCELLED";
 
   return (
     <TableRow className="hover:bg-muted/30">
@@ -128,7 +136,7 @@ const ContributionRow = memo(({ contribution, onViewDetail, onMarkPaid, onPartia
           >
             <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </Button>
-          {editable && (
+          {editable && !isCancelled && (
             <>
               <Button
                 variant="ghost"
@@ -147,6 +155,16 @@ const ContributionRow = memo(({ contribution, onViewDetail, onMarkPaid, onPartia
                 title="Paiement partiel"
               >
                 <Coins className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </Button>
+              {/* ✅ NOUVEAU : Bouton d'annulation */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-7 h-7 sm:w-8 sm:h-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={() => onCancel(contribution)}
+                title="Annuler la cotisation"
+              >
+                <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Button>
             </>
           )}

@@ -11,7 +11,9 @@ const rawContributionApi = {
    * Récupérer une cotisation par ID
    */
   getContribution: async (organizationId, contributionId) =>
-    await api.get(`/contributions/${organizationId}/contribution/${contributionId}`),
+    await api.get(
+      `/contributions/${organizationId}/contribution/${contributionId}`,
+    ),
 
   /**
    * Marquer une cotisation comme payée
@@ -19,7 +21,7 @@ const rawContributionApi = {
   markAsPaid: async (organizationId, contributionId, paymentData) =>
     await api.patch(
       `/contributions/${organizationId}/contribution/${contributionId}/mark-paid`,
-      paymentData
+      paymentData,
     ),
 
   /**
@@ -28,7 +30,7 @@ const rawContributionApi = {
   addPartialPayment: async (organizationId, contributionId, paymentData) =>
     await api.post(
       `/contributions/${organizationId}/contribution/${contributionId}/partial-payment`,
-      paymentData
+      paymentData,
     ),
 
   /**
@@ -37,16 +39,24 @@ const rawContributionApi = {
   getMemberContributions: async (organizationId, membershipId, params = {}) =>
     await api.get(
       `/contributions/${organizationId}/members/${membershipId}/contributions`,
-      { params }
+      { params },
     ),
 
-      /**
+  /**
    * Récupérer les cotisations d'un membre
    */
   getMyContributions: async (organizationId, params = {}) =>
-    await api.get(
-      `/contributions/${organizationId}/my-contributions`,
-      { params }
+    await api.get(`/contributions/${organizationId}/my-contributions`, {
+      params,
+    }),
+
+  /**
+   * ✅ NOUVEAU : Annuler une cotisation
+   */
+  cancelContribution: async (organizationId, contributionId, reason) =>
+    await api.put(
+      `/contributions/${organizationId}/${contributionId}/cancel`,
+      { reason },
     ),
 };
 
