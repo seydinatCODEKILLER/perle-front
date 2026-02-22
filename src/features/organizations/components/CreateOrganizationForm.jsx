@@ -13,9 +13,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Image, Upload, X } from "lucide-react";
+import { Image, Upload, X, Wallet } from "lucide-react";
 import { organizationCreateSchema } from "../validators/organization.schema";
 import { cn } from "@/lib/utils";
 
@@ -33,12 +32,25 @@ export const CreateOrganizationForm = ({ onSubmit, isPending, onCancel }) => {
       address: "",
       city: "",
       country: "Sénégal",
+      wallet: {
+        initialBalance: 0,
+      },
+      settings: {
+        allowPartialPayments: true,
+        autoReminders: true,
+        reminderDays: [1, 3, 7],
+        emailNotifications: true,
+        smsNotifications: false,
+        whatsappNotifications: false,
+        sessionTimeout: 60,
+      },
     },
   });
 
   const selectedLogo = useWatch({ control: form.control, name: "logo" });
   const selectedType = useWatch({ control: form.control, name: "type" });
   const descriptionValue = useWatch({ control: form.control, name: "description" });
+  const initialBalance = useWatch({ control: form.control, name: "wallet.initialBalance" });
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
@@ -182,6 +194,51 @@ export const CreateOrganizationForm = ({ onSubmit, isPending, onCancel }) => {
               {form.formState.errors.logo && (
                 <p className="text-sm text-destructive">
                   {form.formState.errors.logo.message}
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ✅ NOUVEAU : Configuration du Wallet */}
+        <Card>
+          <CardContent className="pt-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold">Portefeuille initial</h3>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="initialBalance">
+                Solde initial (optionnel)
+              </Label>
+              <div className="relative">
+                <Input
+                  id="initialBalance"
+                  type="number"
+                  min="0"
+                  step="1000"
+                  placeholder="0"
+                  {...form.register("wallet.initialBalance", {
+                    setValueAs: (v) => (v === "" ? 0 : parseFloat(v)),
+                  })}
+                  className="pr-16"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  FCFA
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Montant disponible dans le portefeuille au démarrage de l'organisation
+                {initialBalance > 0 && (
+                  <span className="block mt-1 text-primary">
+                    ✓ Solde initial: {new Intl.NumberFormat('fr-FR').format(initialBalance)} FCFA
+                  </span>
+                )}
+              </p>
+              {form.formState.errors.wallet?.initialBalance && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.wallet.initialBalance.message}
                 </p>
               )}
             </div>
