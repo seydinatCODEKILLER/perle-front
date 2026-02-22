@@ -8,7 +8,7 @@ export const organizationCreateSchema = z.object({
     .string()
     .min(2, "Le nom doit contenir au moins 2 caractères")
     .max(100, "Le nom ne doit pas dépasser 100 caractères")
-    .regex(/^[a-zA-Z0-9\s\-_&]+$/, "Caractères spéciaux non autorisés"),
+    .regex(/^[a-zA-Z0-9\s\-_&àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ]+$/, "Caractères spéciaux non autorisés"),
 
   description: z
     .string()
@@ -41,6 +41,72 @@ export const organizationCreateSchema = z.object({
       "Format de fichier non supporté. Utilisez JPG, PNG, WEBP ou SVG"
     )
     .optional(),
+
+  // ✅ NOUVEAU : Wallet initial balance
+  wallet: z
+    .object({
+      initialBalance: z
+        .number()
+        .nonnegative("Le solde initial doit être positif ou nul")
+        .default(0),
+    })
+    .optional(),
+
+  // ✅ Settings (optionnel, le backend a des valeurs par défaut)
+  settings: z
+    .object({
+      allowPartialPayments: z.boolean().default(false),
+      autoReminders: z.boolean().default(true),
+      reminderDays: z.array(z.number().int().min(1).max(30)).default([1, 3, 7]),
+      emailNotifications: z.boolean().default(true),
+      smsNotifications: z.boolean().default(false),
+      whatsappNotifications: z.boolean().default(false),
+      sessionTimeout: z.number().int().min(5).max(480).default(60),
+    })
+    .optional(),
+});
+
+/**
+ * Schema pour la mise à jour d'organisation
+ */
+export const organizationUpdateSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Le nom doit contenir au moins 2 caractères")
+    .max(100, "Le nom ne doit pas dépasser 100 caractères")
+    .regex(/^[a-zA-Z0-9\s\-_&àâäéèêëïîôùûüÿçÀÂÄÉÈÊËÏÎÔÙÛÜŸÇ]+$/, "Caractères spéciaux non autorisés")
+    .optional(),
+
+  description: z
+    .string()
+    .max(500, "La description ne doit pas dépasser 500 caractères")
+    .optional(),
+
+  type: z.enum(["DAHIRA", "ASSOCIATION", "TONTINE", "GROUPEMENT"]).optional(),
+
+  currency: z.string().optional(),
+
+  address: z.string().optional(),
+
+  city: z.string().optional(),
+
+  country: z.string().optional(),
+
+  logo: z
+    .instanceof(File)
+    .refine(
+      (file) => file.size <= 5 * 1024 * 1024,
+      "La taille du logo ne doit pas dépasser 5MB"
+    )
+    .refine(
+      (file) =>
+        ["image/jpeg", "image/png", "image/webp", "image/svg+xml"].includes(
+          file.type
+        ),
+      "Format de fichier non supporté. Utilisez JPG, PNG, WEBP ou SVG"
+    )
+    .optional()
+    .nullable(),
 });
 
 /**
@@ -76,49 +142,6 @@ export const organizationSettingsSchema = z.object({
   smsNotifications: z.boolean(),
   whatsappNotifications: z.boolean(),
   sessionTimeout: z.number().int().min(5).max(360),
-});
-
-/**
- * Schema pour la mise à jour d'organisation
- */
-export const organizationUpdateSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Le nom doit contenir au moins 2 caractères")
-    .max(100, "Le nom ne doit pas dépasser 100 caractères")
-    .regex(/^[a-zA-Z0-9\s\-_&]+$/, "Caractères spéciaux non autorisés")
-    .optional(),
-
-  description: z
-    .string()
-    .max(500, "La description ne doit pas dépasser 500 caractères")
-    .optional(),
-
-  type: z.enum(["DAHIRA", "ASSOCIATION", "TONTINE", "GROUPEMENT"]).optional(),
-
-  currency: z.string().optional(),
-
-  address: z.string().optional(),
-
-  city: z.string().optional(),
-
-  country: z.string().optional(),
-
-  logo: z
-    .instanceof(File)
-    .refine(
-      (file) => file.size <= 5 * 1024 * 1024,
-      "La taille du logo ne doit pas dépasser 5MB"
-    )
-    .refine(
-      (file) =>
-        ["image/jpeg", "image/png", "image/webp", "image/svg+xml"].includes(
-          file.type
-        ),
-      "Format de fichier non supporté. Utilisez JPG, PNG, WEBP ou SVG"
-    )
-    .optional()
-    .nullable(),
 });
 
 /**

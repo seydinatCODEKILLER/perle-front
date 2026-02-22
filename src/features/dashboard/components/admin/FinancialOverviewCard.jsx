@@ -14,8 +14,13 @@ export const FinancialOverviewCard = ({
 
   if (!summary) return null;
 
-  const { expectedAmount, collectedAmount, remainingAmount, remainingDebts } =
-    summary;
+  const { 
+    expectedAmount, 
+    collectedAmount, 
+    remainingAmount, 
+    remainingDebts,
+    netBalance
+  } = summary;
 
   const collectionRate =
     expectedAmount > 0
@@ -93,7 +98,6 @@ export const FinancialOverviewCard = ({
               </span>
             </div>
 
-            {/* ✅ CORRECTION : Conteneur avec max-width pour empêcher le débordement */}
             <div className="w-full">
               <div className="relative w-full overflow-hidden rounded-full bg-muted h-2">
                 <motion.div
@@ -151,6 +155,26 @@ export const FinancialOverviewCard = ({
               </motion.div>
             ))}
           </motion.div>
+
+          {/* ✅ NOUVEAU : Balance nette */}
+          {netBalance !== undefined && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              transition={{ delay: index * 0.1 + 0.7 }}
+              className="pt-3 border-t"
+            >
+              <div className="flex justify-between items-center p-3 rounded-lg bg-linear-to-r from-primary/5 to-primary/10">
+                <span className="text-sm font-medium">Balance nette</span>
+                <span className={cn(
+                  "text-lg sm:text-xl font-bold",
+                  netBalance >= 0 ? "text-green-600" : "text-red-600"
+                )}>
+                  {formatCurrency(netBalance, currency)}
+                </span>
+              </div>
+            </motion.div>
+          )}
 
           {/* Méthodes de paiement avec animation */}
           {paymentMethods.length > 0 && (
