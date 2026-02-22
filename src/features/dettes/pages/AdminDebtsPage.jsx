@@ -1,3 +1,5 @@
+// pages/AdminDebtsPage.jsx
+
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useDebounce } from "@/shared/hooks/useDebounce";
@@ -7,12 +9,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, RefreshCw, Plus } from "lucide-react";
 import { useOrganizationDebts } from "../hooks/useDebts";
-import { useCreateDebt, useAddRepayment } from "../hooks/useDebtMutations";
+import { 
+  useCreateDebt, 
+  useAddRepayment,
+  useCancelDebt // ✅ NOUVEAU
+} from "../hooks/useDebtMutations";
 import { DebtStatsCards } from "../components/DebtStatsCards";
 import { DebtFilters } from "../components/DebtFilters";
+import { DebtViewToggle } from "../components/DebtViewToggle"; // ✅ NOUVEAU
 import { DebtCard } from "../components/DebtCard";
+import { DebtTableView } from "../components/DebtTableView"; // ✅ NOUVEAU
 import { CreateDebtModal } from "../components/CreateDebtModal";
 import { AddRepaymentModal } from "../components/AddRepaymentModal";
+import { CancelDebtModal } from "../components/CancelDebtModal"; // ✅ NOUVEAU
 import { DebtDetailModal } from "../components/DebtDetailModal";
 import { computeDebtStats } from "../utils/debt-helpers";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,10 +33,12 @@ export const AdminDebtsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [view, setView] = useState("card"); // ✅ NOUVEAU : "table" ou "card"
 
   // Modals
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isRepaymentModalOpen, setIsRepaymentModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false); // ✅ NOUVEAU
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedDebt, setSelectedDebt] = useState(null);
 
@@ -43,6 +54,7 @@ export const AdminDebtsPage = () => {
   const { data, isLoading, refetch } = useOrganizationDebts(organizationId, filters);
   const createMutation = useCreateDebt();
   const repaymentMutation = useAddRepayment();
+  const cancelMutation = useCancelDebt(); // ✅ NOUVEAU
 
   const debts = useMemo(() => data?.debts || [], [data?.debts]);
   const pagination = data?.pagination;
@@ -50,6 +62,7 @@ export const AdminDebtsPage = () => {
   // Stats
   const stats = useMemo(() => computeDebtStats(debts), [debts]);
 
+  // Handlers
   const handleViewDetail = (debt) => {
     setSelectedDebt(debt);
     setIsDetailModalOpen(true);
@@ -58,6 +71,12 @@ export const AdminDebtsPage = () => {
   const handleAddRepayment = (debt) => {
     setSelectedDebt(debt);
     setIsRepaymentModalOpen(true);
+  };
+
+  // ✅ NOUVEAU : Handler pour annulation
+  const handleCancel = (debt) => {
+    setSelectedDebt(debt);
+    setIsCancelModalOpen(true);
   };
 
   const handleCreateDebt = (debtData) => {
@@ -77,6 +96,19 @@ export const AdminDebtsPage = () => {
       {
         onSuccess: () => {
           setIsRepaymentModalOpen(false);
+          setSelectedDebt(null);
+        },
+      }
+    );
+  };
+
+  // ✅ NOUVEAU : Handler pour soumettre l'annulation
+  const handleCancelSubmit = ({ debtId, reason }) => {
+    cancelMutation.mutate(
+      { organizationId, debtId, reason },
+      {
+        onSuccess: () => {
+          setIsCancelModalOpen(false);
           setSelectedDebt(null);
         },
       }
@@ -125,21 +157,30 @@ export const AdminDebtsPage = () => {
       {/* Stats */}
       <DebtStatsCards stats={stats} isLoading={isLoading} />
 
-      {/* Filtres */}
-      <DebtFilters
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
-        onStatusChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}
-        onClearFilters={handleClearFilters}
-        totalResults={pagination?.total ?? debts.length}
-      />
-
-      {/* Grille ou état vide */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => <DebtCardSkeleton key={i} />)}
+      {/* ✅ Filtres avec toggle de vue */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="flex-1 w-full">
+          <DebtFilters
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            statusFilter={statusFilter}
+            onStatusChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}
+            onClearFilters={handleClearFilters}
+            totalResults={pagination?.total ?? debts.length}
+          />
         </div>
+        <DebtViewToggle view={view} onViewChange={setView} />
+      </div>
+
+      {/* ✅ Vue conditionnelle : Table ou Card */}
+      {isLoading ? (
+        view === "card" ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[...Array(6)].map((_, i) => <DebtCardSkeleton key={i} />)}
+          </div>
+        ) : (
+          <DebtTableView isLoading={true} debts={[]} />
+        )
       ) : isEmpty ? (
         <Card>
           <CardContent className="py-12 text-center">
@@ -166,17 +207,29 @@ export const AdminDebtsPage = () => {
         </Card>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {debts.map((debt) => (
-              <DebtCard
-                key={debt.id}
-                debt={debt}
-                onViewDetail={handleViewDetail}
-                onAddRepayment={handleAddRepayment}
-                showMemberInfo={true}
-              />
-            ))}
-          </div>
+          {view === "table" ? (
+            <DebtTableView
+              debts={debts}
+              onViewDetail={handleViewDetail}
+              onAddRepayment={handleAddRepayment}
+              onCancel={handleCancel}
+              isLoading={isLoading}
+            />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {debts.map((debt) => (
+                <DebtCard
+                  key={debt.id}
+                  debt={debt}
+                  onViewDetail={handleViewDetail}
+                  onAddRepayment={handleAddRepayment}
+                  onCancel={handleCancel}
+                  showMemberInfo={true}
+                />
+              ))}
+            </div>
+          )}
+
           {pagination?.pages > 1 && (
             <div className="flex justify-center pt-4">
               <Pagination
@@ -206,6 +259,17 @@ export const AdminDebtsPage = () => {
         debt={selectedDebt}
         onSubmit={handleSubmitRepayment}
         isPending={repaymentMutation.isPending}
+      />
+      {/* ✅ NOUVEAU : Modal d'annulation */}
+      <CancelDebtModal
+        open={isCancelModalOpen}
+        onClose={() => {
+          setIsCancelModalOpen(false);
+          setSelectedDebt(null);
+        }}
+        debt={selectedDebt}
+        onSubmit={handleCancelSubmit}
+        isPending={cancelMutation.isPending}
       />
       <DebtDetailModal
         open={isDetailModalOpen}
