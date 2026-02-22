@@ -38,3 +38,21 @@ export const useAddPartialPayment = () => {
     onError: (error) => handleContributionError(error, "Échec du paiement partiel"),
   });
 };
+
+export const useCancelContribution = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["contribution", "cancel"],
+    mutationFn: async ({ organizationId, contributionId, reason }) =>
+      await contributionApi.cancelContribution(organizationId, contributionId, reason),
+    onSuccess: (_, variables) => {
+      toast.success("Cotisation annulée", {
+        description: "La cotisation a été annulée avec succès",
+      });
+      queryClient.invalidateQueries({ queryKey: ["contributions", variables.organizationId] });
+      queryClient.invalidateQueries({ queryKey: ["contribution", variables.organizationId, variables.contributionId] });
+    },
+    onError: (error) => handleContributionError(error, "Échec de l'annulation"),
+  });
+};
