@@ -1,23 +1,34 @@
 import { DEBT_STATUS_OPTIONS } from "../constants/debt.constants";
 
-export const formatDebt = (debt) => ({
-  ...debt,
-  memberFullName: debt.membership?.user
-    ? `${debt.membership.user.prenom} ${debt.membership.user.nom}`.trim()
-    : "Inconnu",
-  formattedInitialAmount: formatAmount(debt.initialAmount),
-  formattedRemainingAmount: formatAmount(debt.remainingAmount),
-  formattedRepaidAmount: formatAmount(debt.initialAmount - debt.remainingAmount),
-  progressPercent: debt.initialAmount > 0
-    ? Math.round(((debt.initialAmount - debt.remainingAmount) / debt.initialAmount) * 100)
-    : 0,
-  formattedDueDate: debt.dueDate
-    ? new Date(debt.dueDate).toLocaleDateString('fr-FR')
-    : 'Non définie',
-  formattedCreatedAt: debt.createdAt
-    ? new Date(debt.createdAt).toLocaleDateString('fr-FR')
-    : '-',
-});
+export const formatDebt = (debt) => {
+  if (!debt) return null;
+
+  const memberFullName = debt.membership
+    ? `${debt.membership.user?.prenom || ""} ${debt.membership.user?.nom || ""}`.trim()
+    : "Inconnu";
+
+  const repaidAmount = debt.initialAmount - debt.remainingAmount;
+  const progressPercent = debt.initialAmount > 0 
+    ? Math.round((repaidAmount / debt.initialAmount) * 100)
+    : 0;
+
+  return {
+    ...debt,
+    memberFullName,
+    repaidAmount,
+    progressPercent,
+    formattedInitialAmount: formatAmount(debt.initialAmount),
+    formattedRemainingAmount: formatAmount(debt.remainingAmount),
+    formattedRepaidAmount: formatAmount(repaidAmount),
+    formattedDueDate: debt.dueDate 
+      ? new Date(debt.dueDate).toLocaleDateString("fr-FR", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : null,
+  };
+};
 
 export const formatAmount = (amount) =>
   new Intl.NumberFormat('fr-FR', {
@@ -29,8 +40,10 @@ export const formatAmount = (amount) =>
 export const getDebtStatusOption = (status) =>
   DEBT_STATUS_OPTIONS.find((o) => o.value === status) || DEBT_STATUS_OPTIONS[0];
 
-export const isDebtEditable = (debt) =>
-  debt.status !== "PAID" && debt.status !== "CANCELLED";
+export const isDebtEditable = (debt) => {
+  if (!debt) return false;
+  return debt.status !== "PAID" && debt.status !== "CANCELLED";
+};
 
 export const computeDebtStats = (debts = []) => {
   const total = debts.length;

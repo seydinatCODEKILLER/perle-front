@@ -35,19 +35,33 @@ const rawDebtApi = {
    * Ajouter un remboursement (ADMIN/FINANCIAL_MANAGER)
    */
   addRepayment: async (organizationId, debtId, repaymentData) =>
-    await api.post(`/debts/${organizationId}/debt/${debtId}/add-repayment`, repaymentData),
+    await api.post(
+      `/debts/${organizationId}/debt/${debtId}/add-repayment`,
+      repaymentData,
+    ),
 
   /**
    * Mettre à jour le statut (ADMIN)
    */
   updateDebtStatus: async (organizationId, debtId, statusData) =>
-    await api.patch(`/debts/${organizationId}/debt/${debtId}/status`, statusData),
+    await api.patch(
+      `/debts/${organizationId}/debt/${debtId}/status`,
+      statusData,
+    ),
+
+  /**
+   * Annuler une dette (ADMIN)
+   */
+  cancelDebt: async (organizationId, debtId, reason) =>
+    await api.put(`/debts/${organizationId}/${debtId}/cancel`, { reason }),
 
   /**
    * Dettes d'un membre spécifique (ADMIN ou le membre lui-même)
    */
   getMemberDebts: async (organizationId, membershipId, params = {}) =>
-    await api.get(`/debts/${organizationId}/members/${membershipId}/debt`, { params }),
+    await api.get(`/debts/${organizationId}/members/${membershipId}/debt`, {
+      params,
+    }),
 
   /**
    * ✅ NOUVELLE : Mes dettes personnelles (MEMBER)
