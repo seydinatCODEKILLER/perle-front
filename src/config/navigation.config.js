@@ -11,6 +11,11 @@ export const NAVIGATION_CONFIG = {
       { label: "Mon dashboard", path: "me/dashboard", icon: "LayoutDashboard" },
       { label: "Mes cotisations", path: "me/contributions", icon: "Coins" },
       { label: "Mes dettes", path: "me/debts", icon: "CreditCard" },
+      {
+        label: "Mes Transactions",
+        path: "me/transactions",
+        icon: "CreditCard",
+      },
     ],
     management: [
       { label: "Dashboard", path: "dashboard", icon: "LayoutDashboard" },
@@ -25,6 +30,11 @@ export const NAVIGATION_CONFIG = {
       { label: "Mon dashboard", path: "me/dashboard", icon: "LayoutDashboard" },
       { label: "Mes cotisations", path: "me/contributions", icon: "Coins" },
       { label: "Mes dettes", path: "me/debts", icon: "CreditCard" },
+      {
+        label: "Mes Transactions",
+        path: "me/transactions",
+        icon: "CreditCard",
+      },
     ],
     management: [
       { label: "Dashboard", path: "dashboard", icon: "LayoutDashboard" },
