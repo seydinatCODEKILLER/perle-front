@@ -37,8 +37,8 @@ export const NAVIGATION_CONFIG = {
       { label: "Cotisations", path: "contributions", icon: "Coins" },
       { label: "Transactions", path: "transactions", icon: "ArrowLeftRight" },
       { label: "Dettes", path: "debts", icon: "CreditCard" },
-      { label: "Paramètres", path: "settings", icon: "Settings" },
       { label: "Dépenses", path: "expenses", icon: "Receipt" },
+      { label: "Paramètres", path: "settings", icon: "Settings" },
     ],
   },
 };
