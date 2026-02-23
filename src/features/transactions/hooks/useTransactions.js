@@ -33,3 +33,12 @@ export const useMemberTransactions = (organizationId, membershipId, filters = {}
     enabled: !!(organizationId && membershipId),
     onError: (error) => handleTransactionError(error, "Impossible de charger les transactions"),
   });
+
+
+export const useMyTransactions = (organizationId, filters = {}) =>
+  useQuery({
+    queryKey: ["my-transactions", organizationId, filters],
+    queryFn: () => transactionApi.getMyTransactions(organizationId, filters),
+    enabled: !!organizationId,
+    onError: (error) => handleTransactionError(error, "Impossible de charger vos transactions"),
+  });

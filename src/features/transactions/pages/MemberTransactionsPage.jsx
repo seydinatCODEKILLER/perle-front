@@ -1,3 +1,5 @@
+// pages/MemberTransactionsPage.jsx
+
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useDebounce } from "@/shared/hooks/useDebounce";
@@ -6,98 +8,92 @@ import { Pagination } from "@/components/ui/pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Receipt, RefreshCw, Search, Filter } from "lucide-react";
-import { useCurrentMembershipId } from "@/features/auth";
-import { useMemberTransactions } from "../hooks/useTransactions";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { RefreshCw, Search, Filter, Receipt, Download } from "lucide-react";
+import { useMyTransactions } from "../hooks/useTransactions";
 import { TransactionStatsCards } from "../components/TransactionStatsCards";
-import { TransactionTable } from "../components/TransactionTable";
+import { TransactionCard } from "../components/TransactionCard";
 import { TransactionDetailModal } from "../components/TransactionDetailModal";
-import { computeTransactionStats } from "../utils/transaction-helpers";
 import { TRANSACTION_TYPE_OPTIONS, PAYMENT_STATUS_OPTIONS } from "../constants/transaction.constants";
+import { computeTransactionStats } from "../utils/transaction-helpers";
 
 export const MemberTransactionsPage = () => {
   const { organizationId } = useParams();
-  const membershipId = useCurrentMembershipId(organizationId);
 
   // Filtres
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [dateRange, setDateRange] = useState({ from: null, to: null });
   const [currentPage, setCurrentPage] = useState(1);
 
   // Modal
   const [selectedTransaction, setSelectedTransaction] = useState(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
   const filters = {
     type: typeFilter !== "all" ? typeFilter : undefined,
-    paymentStatus: statusFilter !== "all" ? statusFilter : undefined,
+    status: statusFilter !== "all" ? statusFilter : undefined,
+    from: dateRange.from,
+    to: dateRange.to,
     page: currentPage,
     limit: 12,
   };
 
-  const { data, isLoading, refetch } = useMemberTransactions(
-    organizationId,
-    membershipId,
-    filters
-  );
+  const { data, isLoading, refetch } = useMyTransactions(organizationId, filters);
 
+  const transactions = useMemo(() => data?.transactions || [], [data?.transactions]);
+  const totals = useMemo(
+    () => data?.totals || { 
+      totalAmount: 0, 
+      totalIncoming: 0, 
+      totalOutgoing: 0,
+      totalCount: 0 
+    },
+    [data?.totals]
+  );
   const pagination = data?.pagination;
 
-  // Filtrage côté client par recherche (référence)
+  // Filtrage côté client par recherche (référence/description)
   const filteredTransactions = useMemo(() => {
-    const transactions = data?.transactions || [];
     if (!debouncedSearch) return transactions;
     const search = debouncedSearch.toLowerCase();
     return transactions.filter((t) =>
       t.reference?.toLowerCase().includes(search) ||
-      t.description?.toLowerCase().includes(search)
+      t.description?.toLowerCase().includes(search) ||
+      t.type?.toLowerCase().includes(search)
     );
-  }, [data?.transactions, debouncedSearch]);
+  }, [transactions, debouncedSearch]);
 
   // Stats
-  const stats = useMemo(() => {
-    const totals = data?.totals || { totalAmount: 0, totalCount: 0 };
-    return {
-      ...computeTransactionStats(filteredTransactions),
-      totalAmount: totals.totalAmount,
-      total: totals.totalCount,
-    };
-  }, [filteredTransactions, data?.totals]);
+  const stats = useMemo(() => ({
+    ...computeTransactionStats(filteredTransactions),
+    ...totals,
+  }), [filteredTransactions, totals]);
 
   const handleViewDetail = (transaction) => {
     setSelectedTransaction(transaction);
-    setIsDetailOpen(true);
-  };
-
-  const handleCloseDetail = () => {
-    setIsDetailOpen(false);
-    setSelectedTransaction(null);
+    setIsDetailModalOpen(true);
   };
 
   const handleClearFilters = () => {
     setSearchTerm("");
     setTypeFilter("all");
     setStatusFilter("all");
+    setDateRange({ from: null, to: null });
     setCurrentPage(1);
   };
 
-  const hasFilters = searchTerm || typeFilter !== "all" || statusFilter !== "all";
+  const hasFilters = searchTerm || typeFilter !== "all" || statusFilter !== "all" || dateRange.from;
   const isEmpty = filteredTransactions.length === 0 && !isLoading;
-
-  // Guard : membershipId non trouvé
-  if (!membershipId) {
-    return (
-      <div className="flex items-center justify-center h-48">
-        <p className="text-sm text-muted-foreground">
-          Vous n'êtes pas membre de cette organisation.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -105,40 +101,50 @@ export const MemberTransactionsPage = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
         <PageHeader
           title="Mes transactions"
-          description="Historique de toutes vos transactions"
+          description="Consultez l'historique de vos transactions"
         />
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => refetch()}
-          disabled={isLoading}
-          className="gap-1.5 sm:gap-2 w-full sm:w-auto shrink-0"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          <span className="text-xs sm:text-sm">Actualiser</span>
-        </Button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isLoading}
+            className="gap-1.5 sm:gap-2 flex-1 sm:flex-none"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <span className="text-xs sm:text-sm">Actualiser</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 sm:gap-2 flex-1 sm:flex-none"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="text-xs sm:text-sm">Exporter</span>
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
       <TransactionStatsCards stats={stats} isLoading={isLoading} />
 
-      {/* Filtres simplifiés membre */}
+      {/* Filtres */}
       <div className="space-y-3 sm:space-y-4">
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           {/* Recherche */}
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground w-3.5 h-3.5" />
             <Input
-              placeholder="Rechercher par référence..."
+              placeholder="Rechercher par référence, description..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8 h-9 text-sm"
             />
           </div>
 
-          {/* Filtre type */}
+          {/* Filtre par type */}
           <Select value={typeFilter} onValueChange={(v) => { setTypeFilter(v); setCurrentPage(1); }}>
-            <SelectTrigger className="w-full sm:w-35 h-9 text-sm">
+            <SelectTrigger className="w-full sm:w-32 h-9 text-sm">
               <Filter className="w-3.5 h-3.5 mr-1.5 sm:mr-2" />
               <SelectValue placeholder="Type" />
             </SelectTrigger>
@@ -152,9 +158,10 @@ export const MemberTransactionsPage = () => {
             </SelectContent>
           </Select>
 
-          {/* Filtre statut */}
+          {/* Filtre par statut */}
           <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}>
-            <SelectTrigger className="w-full sm:w-30 h-9 text-sm">
+            <SelectTrigger className="w-full sm:w-32 h-9 text-sm">
+              <Filter className="w-3.5 h-3.5 mr-1.5 sm:mr-2" />
               <SelectValue placeholder="Statut" />
             </SelectTrigger>
             <SelectContent>
@@ -177,6 +184,7 @@ export const MemberTransactionsPage = () => {
           )}
         </div>
 
+        {/* Résumé */}
         <div className="flex items-center justify-between">
           <p className="text-xs sm:text-sm text-muted-foreground">
             {filteredTransactions.length > 0
@@ -186,7 +194,7 @@ export const MemberTransactionsPage = () => {
         </div>
       </div>
 
-      {/* Tableau ou état vide */}
+      {/* Grille ou état vide */}
       {isEmpty ? (
         <Card>
           <CardContent className="py-12 text-center">
@@ -197,10 +205,13 @@ export const MemberTransactionsPage = () => {
             <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
               {hasFilters
                 ? "Modifiez vos critères de recherche"
-                : "Vos transactions apparaîtront ici au fur et à mesure"}
+                : "Aucune transaction n'a été enregistrée pour le moment"}
             </p>
             {hasFilters && (
-              <button onClick={handleClearFilters} className="text-sm text-primary hover:underline">
+              <button 
+                onClick={handleClearFilters} 
+                className="text-sm text-primary hover:underline"
+              >
                 Effacer les filtres
               </button>
             )}
@@ -208,11 +219,16 @@ export const MemberTransactionsPage = () => {
         </Card>
       ) : (
         <>
-          <TransactionTable
-            transactions={filteredTransactions}
-            onViewDetail={handleViewDetail}
-            isLoading={isLoading}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredTransactions.map((transaction) => (
+              <TransactionCard
+                key={transaction.id}
+                transaction={transaction}
+                onViewDetail={handleViewDetail}
+              />
+            ))}
+          </div>
+
           {pagination?.pages > 1 && (
             <div className="flex justify-center pt-4">
               <Pagination
@@ -225,10 +241,13 @@ export const MemberTransactionsPage = () => {
         </>
       )}
 
-      {/* Modal */}
+      {/* Modal détail */}
       <TransactionDetailModal
-        open={isDetailOpen}
-        onClose={handleCloseDetail}
+        open={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedTransaction(null);
+        }}
         transaction={selectedTransaction}
       />
     </div>
