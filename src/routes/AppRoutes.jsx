@@ -26,6 +26,7 @@ import { AdminDebtsPage } from "@/features/dettes/pages/AdminDebtsPage";
 import { MemberDebtsPage } from "@/features/dettes/pages/MemberDebtsPage";
 import { ProfilePage } from "@/features/profile/pages/ProfilePage";
 import { ExpensesPage } from "@/features/depense/pages/ExpensesPage";
+import { OrganizationSettingsPage } from "@/features/parametres/pages/OrganizationSettingsPage";
 
 // Loader pour le lazy loading
 const PageLoader = () => (
@@ -117,7 +118,7 @@ export const AppRoutes = () => {
           <Route path="transactions" element={<AdminTransactionsPage />} />
           <Route path="debts" element={<AdminDebtsPage />} />
           <Route path="expenses" element={<ExpensesPage />} />
-          <Route path="settings" element={<div>Paramètres</div>} />
+          <Route path="settings" element={<OrganizationSettingsPage />} />
 
           {/* Routes personnelles (personal space) */}
           <Route path="me/dashboard" element={<PersonalDashboard />} />
