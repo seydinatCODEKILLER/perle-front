@@ -21,6 +21,7 @@ import {
   ResizablePanel,
   ResizableHandle,
 } from "@/components/ui/resizable";
+import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
 
 export const MembersPage = () => {
   const { organizationId } = useParams();
@@ -53,7 +54,7 @@ export const MembersPage = () => {
   // ✅ Solution 1: useMemo pour calculer le membre sélectionné
   const selectedMember = useMemo(() => {
     if (!selectedMemberId) return null;
-    return members.find(m => m.id === selectedMemberId) || null;
+    return members.find((m) => m.id === selectedMemberId) || null;
   }, [selectedMemberId, members]);
 
   // Handlers
@@ -67,7 +68,7 @@ export const MembersPage = () => {
             setSelectedMemberId(newMember.id);
           }
         },
-      }
+      },
     );
   };
 
@@ -79,7 +80,7 @@ export const MembersPage = () => {
           setIsEditModalOpen(false);
           // React Query invalidera automatiquement et rechargera la liste
         },
-      }
+      },
     );
   };
 
@@ -92,7 +93,7 @@ export const MembersPage = () => {
           setMemberToSuspend(null);
           setMemberToActive(null);
         },
-      }
+      },
     );
   };
 
@@ -103,7 +104,7 @@ export const MembersPage = () => {
         onSuccess: () => {
           setIsEditModalOpen(false);
         },
-      }
+      },
     );
   };
 
@@ -121,7 +122,7 @@ export const MembersPage = () => {
             setMemberToDelete(null);
             setSelectedMemberId(null);
           },
-        }
+        },
       );
     }
   };
@@ -154,91 +155,93 @@ export const MembersPage = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] w-full overflow-hidden">
-      <ResizablePanelGroup direction="horizontal" className="h-full w-full">
-        <ResizablePanel defaultSize={30} minSize={20} maxSize="50%">
-          <MemberSidebar
-            members={members}
-            selectedMember={selectedMember}
-            onSelectMember={handleSelectMember}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            statusFilter={statusFilter}
-            onStatusChange={setStatusFilter}
-            onClearFilters={handleClearFilters}
-            onAddMember={() => setIsAddModalOpen(true)}
-            isLoading={isLoading}
-          />
-        </ResizablePanel>
+    <PageWithBackButton backTo={`/organizations/${organizationId}/dashboard`}>
+      <div className="h-[calc(100vh-4rem)] w-full overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" className="h-full w-full">
+          <ResizablePanel defaultSize={30} minSize={20} maxSize="50%">
+            <MemberSidebar
+              members={members}
+              selectedMember={selectedMember}
+              onSelectMember={handleSelectMember}
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              statusFilter={statusFilter}
+              onStatusChange={setStatusFilter}
+              onClearFilters={handleClearFilters}
+              onAddMember={() => setIsAddModalOpen(true)}
+              isLoading={isLoading}
+            />
+          </ResizablePanel>
 
-        <ResizableHandle withHandle />
+          <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize={70} minSize={50}>
-          <MemberDetailView
-            member={selectedMember}
-            onEdit={handleEditClick}
-            onDelete={(member) => setMemberToDelete(member)}
-            onSuspend={(member) => setMemberToSuspend(member)}
-            onActive={(member) => setMemberToActive(member)}
-          />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+          <ResizablePanel defaultSize={70} minSize={50}>
+            <MemberDetailView
+              member={selectedMember}
+              onEdit={handleEditClick}
+              onDelete={(member) => setMemberToDelete(member)}
+              onSuspend={(member) => setMemberToSuspend(member)}
+              onActive={(member) => setMemberToActive(member)}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
 
-      <AddMemberModal
-        open={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSubmit={handleAddMember}
-        isPending={createMutation.isPending}
-        organizationName="votre organisation"
-      />
+        <AddMemberModal
+          open={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onSubmit={handleAddMember}
+          isPending={createMutation.isPending}
+          organizationName="votre organisation"
+        />
 
-      <EditMemberModal
-        open={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        member={selectedMember}
-        onUpdateRole={handleUpdateRole}
-        onUpdateStatus={handleUpdateStatus}
-        onUpdateMember={handleUpdateMember}
-        isUpdatingRole={updateRoleMutation.isPending}
-        isUpdatingStatus={updateStatusMutation.isPending}
-        isUpdatingMember={updateMemberMutation.isPending}
-      />
+        <EditMemberModal
+          open={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          member={selectedMember}
+          onUpdateRole={handleUpdateRole}
+          onUpdateStatus={handleUpdateStatus}
+          onUpdateMember={handleUpdateMember}
+          isUpdatingRole={updateRoleMutation.isPending}
+          isUpdatingStatus={updateStatusMutation.isPending}
+          isUpdatingMember={updateMemberMutation.isPending}
+        />
 
-      <ConfirmationModal
-        open={!!memberToDelete}
-        onClose={() => setMemberToDelete(null)}
-        onConfirm={handleDeleteConfirm}
-        title={`Supprimer ${memberToDelete?.user?.prenom} ${memberToDelete?.user?.nom}`}
-        description="Cette action est irréversible. Le membre sera définitivement retiré de l'organisation."
-        variant="destructive"
-        confirmText="Supprimer définitivement"
-        cancelText="Annuler"
-        isLoading={deleteMutation.isPending}
-      />
+        <ConfirmationModal
+          open={!!memberToDelete}
+          onClose={() => setMemberToDelete(null)}
+          onConfirm={handleDeleteConfirm}
+          title={`Supprimer ${memberToDelete?.user?.prenom} ${memberToDelete?.user?.nom}`}
+          description="Cette action est irréversible. Le membre sera définitivement retiré de l'organisation."
+          variant="destructive"
+          confirmText="Supprimer définitivement"
+          cancelText="Annuler"
+          isLoading={deleteMutation.isPending}
+        />
 
-      <ConfirmationModal
-        open={!!memberToSuspend}
-        onClose={() => setMemberToSuspend(null)}
-        onConfirm={handleSuspendConfirm}
-        title={`Suspendre ${memberToSuspend?.user?.prenom} ${memberToSuspend?.user?.nom}`}
-        description="Le membre sera temporairement suspendu et ne pourra plus accéder à l'organisation."
-        variant="warning"
-        confirmText="Suspendre"
-        cancelText="Annuler"
-        isLoading={updateStatusMutation.isPending}
-      />
+        <ConfirmationModal
+          open={!!memberToSuspend}
+          onClose={() => setMemberToSuspend(null)}
+          onConfirm={handleSuspendConfirm}
+          title={`Suspendre ${memberToSuspend?.user?.prenom} ${memberToSuspend?.user?.nom}`}
+          description="Le membre sera temporairement suspendu et ne pourra plus accéder à l'organisation."
+          variant="warning"
+          confirmText="Suspendre"
+          cancelText="Annuler"
+          isLoading={updateStatusMutation.isPending}
+        />
 
-      <ConfirmationModal
-        open={!!memberToActive}
-        onClose={() => setMemberToActive(null)}
-        onConfirm={handleActiveConfirm}
-        title={`Réactiver ${memberToActive?.user?.prenom} ${memberToActive?.user?.nom}`}
-        description="Le membre sera réactivé et pourra à nouveau accéder à l'organisation."
-        variant="success"
-        confirmText="Réactiver"
-        cancelText="Annuler"
-        isLoading={updateStatusMutation.isPending}
-      />
-    </div>
+        <ConfirmationModal
+          open={!!memberToActive}
+          onClose={() => setMemberToActive(null)}
+          onConfirm={handleActiveConfirm}
+          title={`Réactiver ${memberToActive?.user?.prenom} ${memberToActive?.user?.nom}`}
+          description="Le membre sera réactivé et pourra à nouveau accéder à l'organisation."
+          variant="success"
+          confirmText="Réactiver"
+          cancelText="Annuler"
+          isLoading={updateStatusMutation.isPending}
+        />
+      </div>
+    </PageWithBackButton>
   );
 };

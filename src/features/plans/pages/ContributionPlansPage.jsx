@@ -20,19 +20,20 @@ import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 import { AssignPlanToMemberModal } from "@/features/plans/components/AssignPlanToMemberModal";
 import { GenerateContributionsModal } from "@/features/plans/components/GenerateContributionsModal";
 import { useTogglePlanStatus } from "../hooks/useTogglePlanStatus";
+import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
 
 export const ContributionPlansPage = () => {
   const { organizationId } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   // Modals states
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  
+
   // Selected items
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [planToToggle, setPlanToToggle] = useState(null);
@@ -151,157 +152,159 @@ export const ContributionPlansPage = () => {
   const isEmpty = plans.length === 0 && !isLoading;
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Plans de cotisation"
-        description="Gérez les plans de cotisation de votre organisation"
-        actions={
-          <Button onClick={() => setIsAddModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Créer un plan
-          </Button>
-        }
-      />
+    <PageWithBackButton backTo={`/organizations/${organizationId}/dashboard`}>
+      <div className="space-y-6">
+        <PageHeader
+          title="Plans de cotisation"
+          description="Gérez les plans de cotisation de votre organisation"
+          actions={
+            <Button onClick={() => setIsAddModalOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Créer un plan
+            </Button>
+          }
+        />
 
-      {/* Filtres */}
-      <ContributionPlanFilters
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        onClearFilters={handleClearFilters}
-        totalResults={pagination?.total || plans.length}
-      />
+        {/* Filtres */}
+        <ContributionPlanFilters
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          onClearFilters={handleClearFilters}
+          totalResults={pagination?.total || plans.length}
+        />
 
-      {/* Contenu */}
-      {isLoading ? (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <CardSkeleton key={i} />
-            ))}
-          </div>
-
-          {pagination?.pages > 1 && (
-            <div className="flex justify-center pt-6">
-              <Skeleton className="h-10 w-64 rounded-lg" />
+        {/* Contenu */}
+        {isLoading ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <CardSkeleton key={i} />
+              ))}
             </div>
-          )}
-        </div>
-      ) : isEmpty ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <DollarSign className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              {hasFilters ? "Aucun plan trouvé" : "Aucun plan"}
-            </h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              {hasFilters
-                ? "Essayez de modifier vos critères de recherche"
-                : "Commencez par créer votre premier plan de cotisation"}
-            </p>
-            {hasFilters ? (
-              <Button variant="outline" onClick={handleClearFilters}>
-                Effacer les filtres
-              </Button>
-            ) : (
-              <Button onClick={() => setIsAddModalOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Créer un plan
-              </Button>
+
+            {pagination?.pages > 1 && (
+              <div className="flex justify-center pt-6">
+                <Skeleton className="h-10 w-64 rounded-lg" />
+              </div>
             )}
-          </CardContent>
-        </Card>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {plans.map((plan) => (
-              <ContributionPlanCard
-                key={plan.id}
-                plan={plan}
-                onEdit={handleEditClick}
-                onToggleStatus={handleToggleClick}
-                onGenerate={handleGenerateClick}
-                onAssign={handleAssignClick}
-              />
-            ))}
           </div>
-
-          {pagination?.pages > 1 && (
-            <div className="flex justify-center pt-6">
-              <Pagination
-                currentPage={pagination.page}
-                totalPages={pagination.pages}
-                onPageChange={setCurrentPage}
-              />
+        ) : isEmpty ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <DollarSign className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">
+                {hasFilters ? "Aucun plan trouvé" : "Aucun plan"}
+              </h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                {hasFilters
+                  ? "Essayez de modifier vos critères de recherche"
+                  : "Commencez par créer votre premier plan de cotisation"}
+              </p>
+              {hasFilters ? (
+                <Button variant="outline" onClick={handleClearFilters}>
+                  Effacer les filtres
+                </Button>
+              ) : (
+                <Button onClick={() => setIsAddModalOpen(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Créer un plan
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {plans.map((plan) => (
+                <ContributionPlanCard
+                  key={plan.id}
+                  plan={plan}
+                  onEdit={handleEditClick}
+                  onToggleStatus={handleToggleClick}
+                  onGenerate={handleGenerateClick}
+                  onAssign={handleAssignClick}
+                />
+              ))}
             </div>
-          )}
-        </>
-      )}
 
-      {/* Modal d'ajout */}
-      <AddContributionPlanModal
-        open={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSubmit={handleAddPlan}
-        isPending={createMutation.isPending}
-        organizationName="votre organisation"
-      />
+            {pagination?.pages > 1 && (
+              <div className="flex justify-center pt-6">
+                <Pagination
+                  currentPage={pagination.page}
+                  totalPages={pagination.pages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
+          </>
+        )}
 
-      {/* Modal d'édition */}
-      <EditContributionPlanModal
-        open={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setSelectedPlan(null);
-        }}
-        plan={selectedPlan}
-        onUpdate={handleUpdatePlan}
-        isUpdating={updateMutation.isPending}
-      />
+        {/* Modal d'ajout */}
+        <AddContributionPlanModal
+          open={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onSubmit={handleAddPlan}
+          isPending={createMutation.isPending}
+          organizationName="votre organisation"
+        />
 
-      {/* Modal de génération */}
-      <GenerateContributionsModal
-        open={isGenerateModalOpen}
-        onClose={() => {
-          setIsGenerateModalOpen(false);
-          setPlanToGenerate(null);
-        }}
-        plan={planToGenerate}
-        onGenerate={handleGenerate}
-        isGenerating={generateMutation.isPending}
-      />
+        {/* Modal d'édition */}
+        <EditContributionPlanModal
+          open={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedPlan(null);
+          }}
+          plan={selectedPlan}
+          onUpdate={handleUpdatePlan}
+          isUpdating={updateMutation.isPending}
+        />
 
-      {/* Modal d'assignation */}
-      <AssignPlanToMemberModal
-        open={isAssignModalOpen}
-        onClose={() => {
-          setIsAssignModalOpen(false);
-          setPlanToAssign(null);
-        }}
-        plan={planToAssign}
-        organizationId={organizationId}
-        onAssign={handleAssign}
-        isAssigning={assignMutation.isPending}
-      />
+        {/* Modal de génération */}
+        <GenerateContributionsModal
+          open={isGenerateModalOpen}
+          onClose={() => {
+            setIsGenerateModalOpen(false);
+            setPlanToGenerate(null);
+          }}
+          plan={planToGenerate}
+          onGenerate={handleGenerate}
+          isGenerating={generateMutation.isPending}
+        />
 
-      {/* Modal de confirmation toggle status */}
-      <ConfirmationModal
-        open={!!planToToggle}
-        onClose={() => setPlanToToggle(null)}
-        onConfirm={handleToggleConfirm}
-        title={`${planToToggle?.isActive ? "Désactiver" : "Activer"} ${planToToggle?.name}`}
-        description={
-          planToToggle?.isActive
-            ? "Les membres ne pourront plus cotiser à ce plan. Vous pourrez le réactiver plus tard."
-            : "Les membres pourront à nouveau cotiser à ce plan."
-        }
-        variant={planToToggle?.isActive ? "destructive" : "default"}
-        confirmText={planToToggle?.isActive ? "Désactiver" : "Activer"}
-        cancelText="Annuler"
-        isLoading={toggleStatusMutation.isPending}
-      />
-    </div>
+        {/* Modal d'assignation */}
+        <AssignPlanToMemberModal
+          open={isAssignModalOpen}
+          onClose={() => {
+            setIsAssignModalOpen(false);
+            setPlanToAssign(null);
+          }}
+          plan={planToAssign}
+          organizationId={organizationId}
+          onAssign={handleAssign}
+          isAssigning={assignMutation.isPending}
+        />
+
+        {/* Modal de confirmation toggle status */}
+        <ConfirmationModal
+          open={!!planToToggle}
+          onClose={() => setPlanToToggle(null)}
+          onConfirm={handleToggleConfirm}
+          title={`${planToToggle?.isActive ? "Désactiver" : "Activer"} ${planToToggle?.name}`}
+          description={
+            planToToggle?.isActive
+              ? "Les membres ne pourront plus cotiser à ce plan. Vous pourrez le réactiver plus tard."
+              : "Les membres pourront à nouveau cotiser à ce plan."
+          }
+          variant={planToToggle?.isActive ? "destructive" : "default"}
+          confirmText={planToToggle?.isActive ? "Désactiver" : "Activer"}
+          cancelText="Annuler"
+          isLoading={toggleStatusMutation.isPending}
+        />
+      </div>
+    </PageWithBackButton>
   );
 };
 

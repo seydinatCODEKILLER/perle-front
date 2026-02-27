@@ -11,11 +11,14 @@ import { WalletOverviewCard } from "../components/admin/WalletOverviewCard";
 import { ExpensesOverviewCard } from "../components/admin/ExpenseOverviewCard";
 import { SubscriptionCard } from "../components/admin/SubscriptionCard";
 import { useManagementDashboard } from "../hooks/useDashboard";
+import { DashboardHeader } from "@/components/layout/DashboardHeader";
 
 const OrganizationDashboard = () => {
-  const { data, isLoading, error, refetch } = useManagementDashboard();
+  const { data, isLoading, error, refetch, isRefetching } =
+    useManagementDashboard();
 
   if (isLoading) {
+    <DashboardHeader onRefresh={refetch} isRefreshing={isRefetching} />;
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -31,6 +34,7 @@ const OrganizationDashboard = () => {
   }
 
   if (error || !data) {
+    <DashboardHeader onRefresh={refetch} isRefreshing={isRefetching} />;
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -52,13 +56,8 @@ const OrganizationDashboard = () => {
     );
   }
 
-  const { 
-    kpis, 
-    financialOverview, 
-    charts, 
-    subscription, 
-    recentActivities 
-  } = data;
+  const { kpis, financialOverview, charts, subscription, recentActivities } =
+    data;
 
   const kpiEntries = Object.entries(kpis);
 
@@ -67,157 +66,161 @@ const OrganizationDashboard = () => {
   const expenses = financialOverview?.expenses;
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-6"
-    >
-      {/* En-tête avec animation */}
+    <>
+      {/* ✅ Header avec navigation - uniquement sur dashboard */}
+      <DashboardHeader onRefresh={refetch} isRefreshing={isRefetching} />
       <motion.div
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
-      >
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
-            <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 w-fit">
-              <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight wrap-break-word">
-              Dashboard Administrateur
-            </h1>
-          </div>
-          <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Vue d'ensemble de votre organisation •
-            <span className="hidden sm:inline"> </span>
-            Mis à jour le{" "}
-            {new Date(data.generatedAt).toLocaleDateString("fr-FR", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => refetch()}
-          className="gap-1.5 sm:gap-2 w-full sm:w-auto shrink-0"
-        >
-          <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          <span className="text-xs sm:text-sm">Actualiser</span>
-        </Button>
-      </motion.div>
-
-      {/* KPI Grid avec animations en cascade */}
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-6 p-4 lg:p-0"
       >
-        <AnimatePresence>
-          {kpiEntries.map(([key, kpi], index) => (
-            <KPICard key={key} kpi={kpi} index={index} />
-          ))}
-        </AnimatePresence>
-      </motion.div>
-
-      {/* ✅ NOUVELLE SECTION : Wallet & Expenses */}
-      <motion.div
-        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        {/* Wallet Overview */}
-        <div className="overflow-hidden rounded-lg">
-          <motion.div
-            whileHover={{ scale: 1.01 }}
-            transition={{ duration: 0.2 }}
-          >
-            <WalletOverviewCard
-              wallet={wallet}
-              currency={data.currency || "XOF"}
-              index={0}
-            />
-          </motion.div>
-        </div>
-
-        {/* Expenses Overview */}
-        <div className="overflow-hidden rounded-lg">
-          <motion.div
-            whileHover={{ scale: 1.01 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ExpensesOverviewCard
-              expenses={expenses}
-              currency={data.currency || "XOF"}
-              index={1}
-            />
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Deuxième ligne avec animations */}
-      <motion.div
-        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
-        {/* Chart + Activités */}
-        <div className="lg:col-span-2 space-y-6">
-          <motion.div
-            whileHover={{ scale: 1.01 }}
-            transition={{ duration: 0.2 }}
-          >
-            <MemberStatusChart memberStatus={charts?.memberStatus} />
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.01 }}
-            transition={{ duration: 0.2 }}
-          >
-            <RecentActivities activities={recentActivities} />
-          </motion.div>
-        </div>
-
-        {/* Sidebar avec animations */}
+        {/* En-tête avec animation */}
         <motion.div
-          className="space-y-6"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.6 }}
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
         >
-          {/* Financial Overview */}
+          <div className="hidden md:flex-1 min-w-0">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 w-fit">
+                <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+              </div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight wrap-break-word">
+                Dashboard Administrateur
+              </h1>
+            </div>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">
+              Vue d'ensemble de votre organisation •
+              <span className="hidden sm:inline"> </span>
+              Mis à jour le{" "}
+              {new Date(data.generatedAt).toLocaleDateString("fr-FR", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="gap-1.5 sm:gap-2 w-full sm:w-auto shrink-0"
+          >
+            <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="text-xs sm:text-sm">Actualiser</span>
+          </Button>
+        </motion.div>
+
+        {/* KPI Grid avec animations en cascade */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <AnimatePresence>
+            {kpiEntries.map(([key, kpi], index) => (
+              <KPICard key={key} kpi={kpi} index={index} />
+            ))}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* ✅ NOUVELLE SECTION : Wallet & Expenses */}
+        <motion.div
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          {/* Wallet Overview */}
           <div className="overflow-hidden rounded-lg">
             <motion.div
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.2 }}
             >
-              <FinancialOverviewCard
-                financialOverview={financialOverview}
+              <WalletOverviewCard
+                wallet={wallet}
                 currency={data.currency || "XOF"}
+                index={0}
               />
             </motion.div>
           </div>
 
-          {/* Subscription */}
+          {/* Expenses Overview */}
           <div className="overflow-hidden rounded-lg">
             <motion.div
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.2 }}
             >
-              <SubscriptionCard subscription={subscription} />
+              <ExpensesOverviewCard
+                expenses={expenses}
+                currency={data.currency || "XOF"}
+                index={1}
+              />
             </motion.div>
           </div>
         </motion.div>
+
+        {/* Deuxième ligne avec animations */}
+        <motion.div
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          {/* Chart + Activités */}
+          <div className="lg:col-span-2 space-y-6">
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              transition={{ duration: 0.2 }}
+            >
+              <MemberStatusChart memberStatus={charts?.memberStatus} />
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.01 }}
+              transition={{ duration: 0.2 }}
+            >
+              <RecentActivities activities={recentActivities} />
+            </motion.div>
+          </div>
+
+          {/* Sidebar avec animations */}
+          <motion.div
+            className="space-y-6"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+            {/* Financial Overview */}
+            <div className="overflow-hidden rounded-lg">
+              <motion.div
+                whileHover={{ scale: 1.01 }}
+                transition={{ duration: 0.2 }}
+              >
+                <FinancialOverviewCard
+                  financialOverview={financialOverview}
+                  currency={data.currency || "XOF"}
+                />
+              </motion.div>
+            </div>
+
+            {/* Subscription */}
+            <div className="overflow-hidden rounded-lg">
+              <motion.div
+                whileHover={{ scale: 1.01 }}
+                transition={{ duration: 0.2 }}
+              >
+                <SubscriptionCard subscription={subscription} />
+              </motion.div>
+            </div>
+          </motion.div>
+        </motion.div>
       </motion.div>
-    </motion.div>
+    </>
   );
 };
 

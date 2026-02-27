@@ -30,6 +30,40 @@ import {
 import { cn } from "@/lib/utils";
 import { useOrganizationNavigation } from "@/shared/hooks/useOrganizationNavigation";
 import { ConfirmationModal } from "../modal/ConfirmationModal";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { SPACES } from "@/config/navigation.config";
+
+// Ajouter ce composant dans le sidebar
+export const SpaceSwitch = ({ currentSpace, onSpaceChange }) => {
+  const isPersonalSpace = currentSpace === SPACES.PERSONAL;
+
+  return (
+    <div className="px-3 py-2 border-t">
+      <div className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50">
+        <div className="flex items-center gap-2">
+          <User className="h-4 w-4 text-muted-foreground" />
+          <Label htmlFor="sidebar-space-switch" className="text-sm cursor-pointer">
+            Personnel
+          </Label>
+        </div>
+        <Switch
+          id="sidebar-space-switch"
+          checked={!isPersonalSpace}
+          onCheckedChange={(checked) =>
+            onSpaceChange(checked ? SPACES.MANAGEMENT : SPACES.PERSONAL)
+          }
+        />
+        <div className="flex items-center gap-2">
+          <Label htmlFor="sidebar-space-switch" className="text-sm cursor-pointer">
+            Gestion
+          </Label>
+          <Building2 className="h-4 w-4 text-muted-foreground" />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Mapping des icônes
 const ICON_MAP = {

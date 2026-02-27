@@ -9,10 +9,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, RefreshCw, Plus } from "lucide-react";
 import { useOrganizationDebts } from "../hooks/useDebts";
-import { 
-  useCreateDebt, 
+import {
+  useCreateDebt,
   useAddRepayment,
-  useCancelDebt // ✅ NOUVEAU
+  useCancelDebt, // ✅ NOUVEAU
 } from "../hooks/useDebtMutations";
 import { DebtStatsCards } from "../components/DebtStatsCards";
 import { DebtFilters } from "../components/DebtFilters";
@@ -25,6 +25,7 @@ import { CancelDebtModal } from "../components/CancelDebtModal"; // ✅ NOUVEAU
 import { DebtDetailModal } from "../components/DebtDetailModal";
 import { computeDebtStats } from "../utils/debt-helpers";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
 
 export const AdminDebtsPage = () => {
   const { organizationId } = useParams();
@@ -51,7 +52,10 @@ export const AdminDebtsPage = () => {
     limit: 12,
   };
 
-  const { data, isLoading, refetch } = useOrganizationDebts(organizationId, filters);
+  const { data, isLoading, refetch } = useOrganizationDebts(
+    organizationId,
+    filters,
+  );
   const createMutation = useCreateDebt();
   const repaymentMutation = useAddRepayment();
   const cancelMutation = useCancelDebt(); // ✅ NOUVEAU
@@ -86,7 +90,7 @@ export const AdminDebtsPage = () => {
         onSuccess: () => {
           setIsCreateModalOpen(false);
         },
-      }
+      },
     );
   };
 
@@ -98,7 +102,7 @@ export const AdminDebtsPage = () => {
           setIsRepaymentModalOpen(false);
           setSelectedDebt(null);
         },
-      }
+      },
     );
   };
 
@@ -111,7 +115,7 @@ export const AdminDebtsPage = () => {
           setIsCancelModalOpen(false);
           setSelectedDebt(null);
         },
-      }
+      },
     );
   };
 
@@ -125,161 +129,173 @@ export const AdminDebtsPage = () => {
   const isEmpty = debts.length === 0 && !isLoading;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-        <PageHeader
-          title="Gestion des dettes"
-          description="Suivez et gérez les dettes de l'organisation"
-        />
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isLoading}
-            className="gap-1.5 flex-1 sm:flex-none"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            <span className="text-xs sm:text-sm">Actualiser</span>
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => setIsCreateModalOpen(true)}
-            className="gap-1.5 flex-1 sm:flex-none"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span className="text-xs sm:text-sm">Créer</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <DebtStatsCards stats={stats} isLoading={isLoading} />
-
-      {/* ✅ Filtres avec toggle de vue */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex-1 w-full">
-          <DebtFilters
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            statusFilter={statusFilter}
-            onStatusChange={(v) => { setStatusFilter(v); setCurrentPage(1); }}
-            onClearFilters={handleClearFilters}
-            totalResults={pagination?.total ?? debts.length}
+    <PageWithBackButton backTo={`/organizations/${organizationId}/dashboard`}>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <PageHeader
+            title="Gestion des dettes"
+            description="Suivez et gérez les dettes de l'organisation"
           />
-        </div>
-        <DebtViewToggle view={view} onViewChange={setView} />
-      </div>
-
-      {/* ✅ Vue conditionnelle : Table ou Card */}
-      {isLoading ? (
-        view === "card" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => <DebtCardSkeleton key={i} />)}
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isLoading}
+              className="gap-1.5 flex-1 sm:flex-none"
+            >
+              <RefreshCw
+                className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
+              />
+              <span className="text-xs sm:text-sm">Actualiser</span>
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setIsCreateModalOpen(true)}
+              className="gap-1.5 flex-1 sm:flex-none"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span className="text-xs sm:text-sm">Créer</span>
+            </Button>
           </div>
-        ) : (
-          <DebtTableView isLoading={true} debts={[]} />
-        )
-      ) : isEmpty ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50" />
-            <h3 className="text-base sm:text-lg font-semibold mb-2">
-              {hasFilters ? "Aucune dette trouvée" : "Aucune dette"}
-            </h3>
-            <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
-              {hasFilters
-                ? "Modifiez vos critères de recherche"
-                : "Commencez par créer une dette pour un membre"}
-            </p>
-            {hasFilters ? (
-              <button onClick={handleClearFilters} className="text-sm text-primary hover:underline">
-                Effacer les filtres
-              </button>
-            ) : (
-              <Button onClick={() => setIsCreateModalOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Créer une dette
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <>
-          {view === "table" ? (
-            <DebtTableView
-              debts={debts}
-              onViewDetail={handleViewDetail}
-              onAddRepayment={handleAddRepayment}
-              onCancel={handleCancel}
-              isLoading={isLoading}
+        </div>
+
+        {/* Stats */}
+        <DebtStatsCards stats={stats} isLoading={isLoading} />
+
+        {/* ✅ Filtres avec toggle de vue */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="flex-1 w-full">
+            <DebtFilters
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              statusFilter={statusFilter}
+              onStatusChange={(v) => {
+                setStatusFilter(v);
+                setCurrentPage(1);
+              }}
+              onClearFilters={handleClearFilters}
+              totalResults={pagination?.total ?? debts.length}
             />
-          ) : (
+          </div>
+          <DebtViewToggle view={view} onViewChange={setView} />
+        </div>
+
+        {/* ✅ Vue conditionnelle : Table ou Card */}
+        {isLoading ? (
+          view === "card" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {debts.map((debt) => (
-                <DebtCard
-                  key={debt.id}
-                  debt={debt}
-                  onViewDetail={handleViewDetail}
-                  onAddRepayment={handleAddRepayment}
-                  onCancel={handleCancel}
-                  showMemberInfo={true}
-                />
+              {[...Array(6)].map((_, i) => (
+                <DebtCardSkeleton key={i} />
               ))}
             </div>
-          )}
-
-          {pagination?.pages > 1 && (
-            <div className="flex justify-center pt-4">
-              <Pagination
-                currentPage={pagination.page}
-                totalPages={pagination.pages}
-                onPageChange={setCurrentPage}
+          ) : (
+            <DebtTableView isLoading={true} debts={[]} />
+          )
+        ) : isEmpty ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50" />
+              <h3 className="text-base sm:text-lg font-semibold mb-2">
+                {hasFilters ? "Aucune dette trouvée" : "Aucune dette"}
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
+                {hasFilters
+                  ? "Modifiez vos critères de recherche"
+                  : "Commencez par créer une dette pour un membre"}
+              </p>
+              {hasFilters ? (
+                <button
+                  onClick={handleClearFilters}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Effacer les filtres
+                </button>
+              ) : (
+                <Button onClick={() => setIsCreateModalOpen(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Créer une dette
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {view === "table" ? (
+              <DebtTableView
+                debts={debts}
+                onViewDetail={handleViewDetail}
+                onAddRepayment={handleAddRepayment}
+                onCancel={handleCancel}
+                isLoading={isLoading}
               />
-            </div>
-          )}
-        </>
-      )}
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {debts.map((debt) => (
+                  <DebtCard
+                    key={debt.id}
+                    debt={debt}
+                    onViewDetail={handleViewDetail}
+                    onAddRepayment={handleAddRepayment}
+                    onCancel={handleCancel}
+                    showMemberInfo={true}
+                  />
+                ))}
+              </div>
+            )}
 
-      {/* Modals */}
-      <CreateDebtModal
-        open={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        organizationId={organizationId}
-        onSubmit={handleCreateDebt}
-        isPending={createMutation.isPending}
-      />
-      <AddRepaymentModal
-        open={isRepaymentModalOpen}
-        onClose={() => {
-          setIsRepaymentModalOpen(false);
-          setSelectedDebt(null);
-        }}
-        debt={selectedDebt}
-        onSubmit={handleSubmitRepayment}
-        isPending={repaymentMutation.isPending}
-      />
-      {/* ✅ NOUVEAU : Modal d'annulation */}
-      <CancelDebtModal
-        open={isCancelModalOpen}
-        onClose={() => {
-          setIsCancelModalOpen(false);
-          setSelectedDebt(null);
-        }}
-        debt={selectedDebt}
-        onSubmit={handleCancelSubmit}
-        isPending={cancelMutation.isPending}
-      />
-      <DebtDetailModal
-        open={isDetailModalOpen}
-        onClose={() => {
-          setIsDetailModalOpen(false);
-          setSelectedDebt(null);
-        }}
-        debt={selectedDebt}
-      />
-    </div>
+            {pagination?.pages > 1 && (
+              <div className="flex justify-center pt-4">
+                <Pagination
+                  currentPage={pagination.page}
+                  totalPages={pagination.pages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Modals */}
+        <CreateDebtModal
+          open={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          organizationId={organizationId}
+          onSubmit={handleCreateDebt}
+          isPending={createMutation.isPending}
+        />
+        <AddRepaymentModal
+          open={isRepaymentModalOpen}
+          onClose={() => {
+            setIsRepaymentModalOpen(false);
+            setSelectedDebt(null);
+          }}
+          debt={selectedDebt}
+          onSubmit={handleSubmitRepayment}
+          isPending={repaymentMutation.isPending}
+        />
+        {/* ✅ NOUVEAU : Modal d'annulation */}
+        <CancelDebtModal
+          open={isCancelModalOpen}
+          onClose={() => {
+            setIsCancelModalOpen(false);
+            setSelectedDebt(null);
+          }}
+          debt={selectedDebt}
+          onSubmit={handleCancelSubmit}
+          isPending={cancelMutation.isPending}
+        />
+        <DebtDetailModal
+          open={isDetailModalOpen}
+          onClose={() => {
+            setIsDetailModalOpen(false);
+            setSelectedDebt(null);
+          }}
+          debt={selectedDebt}
+        />
+      </div>
+    </PageWithBackButton>
   );
 };
 
