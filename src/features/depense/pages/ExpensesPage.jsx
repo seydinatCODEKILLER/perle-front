@@ -26,6 +26,7 @@ import { CancelExpenseModal } from "../components/CancelExpenseModal";
 import { ExpenseDetailModal } from "../components/ExpenseDetailModal";
 import { computeExpenseStats } from "../utils/expense-helpers";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
 
 export const ExpensesPage = () => {
   const { organizationId } = useParams();
@@ -100,7 +101,7 @@ export const ExpensesPage = () => {
         onSuccess: () => {
           setIsCreateModalOpen(false);
         },
-      }
+      },
     );
   };
 
@@ -112,7 +113,7 @@ export const ExpensesPage = () => {
           setIsRejectModalOpen(false);
           setSelectedExpense(null);
         },
-      }
+      },
     );
   };
 
@@ -124,7 +125,7 @@ export const ExpensesPage = () => {
           setIsPayModalOpen(false);
           setSelectedExpense(null);
         },
-      }
+      },
     );
   };
 
@@ -136,7 +137,7 @@ export const ExpensesPage = () => {
           setIsCancelModalOpen(false);
           setSelectedExpense(null);
         },
-      }
+      },
     );
   };
 
@@ -147,189 +148,194 @@ export const ExpensesPage = () => {
     setCurrentPage(1);
   };
 
-  const hasFilters = searchTerm || statusFilter !== "all" || categoryFilter !== "all";
+  const hasFilters =
+    searchTerm || statusFilter !== "all" || categoryFilter !== "all";
   const isEmpty = expenses.length === 0 && !isLoading;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-        <PageHeader
-          title="Gestion des dépenses"
-          description="Suivez et gérez les dépenses de l'organisation"
-        />
-        <div className="flex gap-2 w-full sm:w-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isLoading}
-            className="gap-1.5 flex-1 sm:flex-none"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
-            <span className="text-xs sm:text-sm">Actualiser</span>
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => setIsCreateModalOpen(true)}
-            className="gap-1.5 flex-1 sm:flex-none"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span className="text-xs sm:text-sm">Créer</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <ExpenseStatsCards stats={stats} isLoading={isLoading} />
-
-      {/* Filtres avec toggle de vue */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex-1 w-full">
-          <ExpenseFilters
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            statusFilter={statusFilter}
-            onStatusChange={(v) => {
-              setStatusFilter(v);
-              setCurrentPage(1);
-            }}
-            categoryFilter={categoryFilter}
-            onCategoryChange={(v) => {
-              setCategoryFilter(v);
-              setCurrentPage(1);
-            }}
-            onClearFilters={handleClearFilters}
-            totalResults={pagination?.total ?? expenses.length}
+    <PageWithBackButton backTo={`/organizations/${organizationId}/dashboard`}>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <PageHeader
+            title="Gestion des dépenses"
+            description="Suivez et gérez les dépenses de l'organisation"
           />
-        </div>
-        <ExpenseViewToggle view={view} onViewChange={setView} />
-      </div>
-
-      {/* Vue conditionnelle : Table ou Card */}
-      {isLoading ? (
-        view === "card" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <ExpenseCardSkeleton key={i} />
-            ))}
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isLoading}
+              className="gap-1.5 flex-1 sm:flex-none"
+            >
+              <RefreshCw
+                className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
+              />
+              <span className="text-xs sm:text-sm">Actualiser</span>
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setIsCreateModalOpen(true)}
+              className="gap-1.5 flex-1 sm:flex-none"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span className="text-xs sm:text-sm">Créer</span>
+            </Button>
           </div>
-        ) : (
-          <ExpenseTableView isLoading={true} expenses={[]} />
-        )
-      ) : isEmpty ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Receipt className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50" />
-            <h3 className="text-base sm:text-lg font-semibold mb-2">
-              {hasFilters ? "Aucune dépense trouvée" : "Aucune dépense"}
-            </h3>
-            <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
-              {hasFilters
-                ? "Modifiez vos critères de recherche"
-                : "Commencez par créer une dépense"}
-            </p>
-            {hasFilters ? (
-              <button
-                onClick={handleClearFilters}
-                className="text-sm text-primary hover:underline"
-              >
-                Effacer les filtres
-              </button>
-            ) : (
-              <Button onClick={() => setIsCreateModalOpen(true)}>
-                <Plus className="w-4 h-4 mr-2" />
-                Créer une dépense
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      ) : (
-        <>
-          {view === "table" ? (
-            <ExpenseTableView
-              expenses={expenses}
-              onViewDetail={handleViewDetail}
-              onApprove={handleApprove}
-              onReject={handleReject}
-              onPay={handlePay}
-              onCancel={handleCancel}
-              isLoading={isLoading}
+        </div>
+
+        {/* Stats */}
+        <ExpenseStatsCards stats={stats} isLoading={isLoading} />
+
+        {/* Filtres avec toggle de vue */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="flex-1 w-full">
+            <ExpenseFilters
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              statusFilter={statusFilter}
+              onStatusChange={(v) => {
+                setStatusFilter(v);
+                setCurrentPage(1);
+              }}
+              categoryFilter={categoryFilter}
+              onCategoryChange={(v) => {
+                setCategoryFilter(v);
+                setCurrentPage(1);
+              }}
+              onClearFilters={handleClearFilters}
+              totalResults={pagination?.total ?? expenses.length}
             />
-          ) : (
+          </div>
+          <ExpenseViewToggle view={view} onViewChange={setView} />
+        </div>
+
+        {/* Vue conditionnelle : Table ou Card */}
+        {isLoading ? (
+          view === "card" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {expenses.map((expense) => (
-                <ExpenseCard
-                  key={expense.id}
-                  expense={expense}
-                  onViewDetail={handleViewDetail}
-                  onApprove={handleApprove}
-                  onReject={handleReject}
-                  onPay={handlePay}
-                  onCancel={handleCancel}
-                />
+              {[...Array(6)].map((_, i) => (
+                <ExpenseCardSkeleton key={i} />
               ))}
             </div>
-          )}
-
-          {pagination?.pages > 1 && (
-            <div className="flex justify-center pt-4">
-              <Pagination
-                currentPage={pagination.page}
-                totalPages={pagination.pages}
-                onPageChange={setCurrentPage}
+          ) : (
+            <ExpenseTableView isLoading={true} expenses={[]} />
+          )
+        ) : isEmpty ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <Receipt className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50" />
+              <h3 className="text-base sm:text-lg font-semibold mb-2">
+                {hasFilters ? "Aucune dépense trouvée" : "Aucune dépense"}
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
+                {hasFilters
+                  ? "Modifiez vos critères de recherche"
+                  : "Commencez par créer une dépense"}
+              </p>
+              {hasFilters ? (
+                <button
+                  onClick={handleClearFilters}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Effacer les filtres
+                </button>
+              ) : (
+                <Button onClick={() => setIsCreateModalOpen(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Créer une dépense
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <>
+            {view === "table" ? (
+              <ExpenseTableView
+                expenses={expenses}
+                onViewDetail={handleViewDetail}
+                onApprove={handleApprove}
+                onReject={handleReject}
+                onPay={handlePay}
+                onCancel={handleCancel}
+                isLoading={isLoading}
               />
-            </div>
-          )}
-        </>
-      )}
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {expenses.map((expense) => (
+                  <ExpenseCard
+                    key={expense.id}
+                    expense={expense}
+                    onViewDetail={handleViewDetail}
+                    onApprove={handleApprove}
+                    onReject={handleReject}
+                    onPay={handlePay}
+                    onCancel={handleCancel}
+                  />
+                ))}
+              </div>
+            )}
 
-      {/* Modals */}
-      <CreateExpenseModal
-        open={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={handleCreateExpense}
-        isPending={createMutation.isPending}
-      />
-      <PayExpenseModal
-        open={isPayModalOpen}
-        onClose={() => {
-          setIsPayModalOpen(false);
-          setSelectedExpense(null);
-        }}
-        expense={selectedExpense}
-        onSubmit={handlePaySubmit}
-        isPending={payMutation.isPending}
-      />
-      <RejectExpenseModal
-        open={isRejectModalOpen}
-        onClose={() => {
-          setIsRejectModalOpen(false);
-          setSelectedExpense(null);
-        }}
-        expense={selectedExpense}
-        onSubmit={handleRejectSubmit}
-        isPending={rejectMutation.isPending}
-      />
-      <CancelExpenseModal
-        open={isCancelModalOpen}
-        onClose={() => {
-          setIsCancelModalOpen(false);
-          setSelectedExpense(null);
-        }}
-        expense={selectedExpense}
-        onSubmit={handleCancelSubmit}
-        isPending={cancelMutation.isPending}
-      />
-      <ExpenseDetailModal
-        open={isDetailModalOpen}
-        onClose={() => {
-          setIsDetailModalOpen(false);
-          setSelectedExpense(null);
-        }}
-        expense={selectedExpense}
-      />
-    </div>
+            {pagination?.pages > 1 && (
+              <div className="flex justify-center pt-4">
+                <Pagination
+                  currentPage={pagination.page}
+                  totalPages={pagination.pages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Modals */}
+        <CreateExpenseModal
+          open={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={handleCreateExpense}
+          isPending={createMutation.isPending}
+        />
+        <PayExpenseModal
+          open={isPayModalOpen}
+          onClose={() => {
+            setIsPayModalOpen(false);
+            setSelectedExpense(null);
+          }}
+          expense={selectedExpense}
+          onSubmit={handlePaySubmit}
+          isPending={payMutation.isPending}
+        />
+        <RejectExpenseModal
+          open={isRejectModalOpen}
+          onClose={() => {
+            setIsRejectModalOpen(false);
+            setSelectedExpense(null);
+          }}
+          expense={selectedExpense}
+          onSubmit={handleRejectSubmit}
+          isPending={rejectMutation.isPending}
+        />
+        <CancelExpenseModal
+          open={isCancelModalOpen}
+          onClose={() => {
+            setIsCancelModalOpen(false);
+            setSelectedExpense(null);
+          }}
+          expense={selectedExpense}
+          onSubmit={handleCancelSubmit}
+          isPending={cancelMutation.isPending}
+        />
+        <ExpenseDetailModal
+          open={isDetailModalOpen}
+          onClose={() => {
+            setIsDetailModalOpen(false);
+            setSelectedExpense(null);
+          }}
+          expense={selectedExpense}
+        />
+      </div>
+    </PageWithBackButton>
   );
 };
 

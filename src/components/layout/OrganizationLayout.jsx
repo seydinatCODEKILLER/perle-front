@@ -1,44 +1,49 @@
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { OrganizationSidebar } from "@/components/layout/OrganizationSidebar";
 import { OrganizationRouter } from "@/features/organizations/routes/OrganizationRouter";
 import { FloatLogoutWithConfirm } from "@/components/layout/FloatLogoutWithConfirm";
-import { 
-  SidebarProvider, 
-  SidebarInset, 
-  SidebarTrigger 
-} from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { useOrganization } from "@/features/organizations/hooks/useOrganizations";
+import { useNavigationSpace } from "@/features/organizations/hooks/useNavigationSpace";
+import { useParams } from "react-router-dom";
 
-/**
- * Layout principal des organisations
- * La logique de routing est déléguée à OrganizationRouter
- */
 export const OrganizationLayout = () => {
   const { organizationId } = useParams();
   const { data: organization } = useOrganization(organizationId);
 
-  // OrganizationRouter gère le chargement et les redirections
+  const { currentSpace, setSpace } = useNavigationSpace(organizationId);
+
+  const userRole = organization?.userRole || "MEMBER";
+
   return (
     <OrganizationRouter>
       <SidebarProvider defaultOpen>
         <div className="flex h-screen w-full">
-          <OrganizationSidebar 
-            organization={organization} 
-            userRole={organization?.userRole} 
-          />
+          {/* Sidebar Desktop uniquement */}
+          <div className="hidden lg:block">
+            <OrganizationSidebar
+              organization={organization}
+              userRole={userRole}
+              currentSpace={currentSpace}
+              onSpaceChange={setSpace}
+            />
+          </div>
 
-          <SidebarInset>
-            <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+          <SidebarInset className="flex-1">
+            {/* Header Desktop uniquement */}
+            <header className="sticky top-0 z-10 hidden lg:flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
               <SidebarTrigger />
             </header>
-            
-            <main className="flex-1 overflow-auto">
-              <div className="p-4 md:p-6">
+
+            {/* Contenu principal - SANS header ni nav mobile */}
+            <main className="flex-1 overflow-auto bg-background lg:bg-muted">
+              <div className="p-0 lg:p-6">
                 <Outlet />
               </div>
             </main>
           </SidebarInset>
 
+          {/* Bouton de déconnexion */}
           <FloatLogoutWithConfirm />
         </div>
       </SidebarProvider>

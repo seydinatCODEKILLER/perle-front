@@ -15,6 +15,7 @@ import { ReminderSettings } from "../components/ReminderSettings";
 import { NotificationSettings } from "../components/NotificationSettings";
 import { SecuritySettings } from "../components/SecuritySettings";
 import { useOrganization } from "@/features/organizations/hooks/useOrganizations";
+import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
 
 export const OrganizationSettingsPage = () => {
   const { organizationId } = useParams();
@@ -39,12 +40,14 @@ export const OrganizationSettingsPage = () => {
   useEffect(() => {
     if (organization?.settings) {
       form.reset({
-        allowPartialPayments: organization.settings.allowPartialPayments ?? true,
+        allowPartialPayments:
+          organization.settings.allowPartialPayments ?? true,
         autoReminders: organization.settings.autoReminders ?? true,
         reminderDays: organization.settings.reminderDays ?? [1, 3, 7],
         emailNotifications: organization.settings.emailNotifications ?? true,
         smsNotifications: organization.settings.smsNotifications ?? false,
-        whatsappNotifications: organization.settings.whatsappNotifications ?? false,
+        whatsappNotifications:
+          organization.settings.whatsappNotifications ?? false,
         sessionTimeout: organization.settings.sessionTimeout ?? 60,
       });
     }
@@ -86,7 +89,9 @@ export const OrganizationSettingsPage = () => {
         <Card>
           <CardContent className="py-12 text-center">
             <Settings className="w-12 h-12 mx-auto text-muted-foreground mb-4 opacity-50" />
-            <h3 className="text-lg font-semibold mb-2">Organisation introuvable</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Organisation introuvable
+            </h3>
             <p className="text-muted-foreground mb-4">
               Cette organisation n'existe pas ou vous n'y avez pas accès
             </p>
@@ -101,62 +106,67 @@ export const OrganizationSettingsPage = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <PageHeader
-          title="Paramètres de l'organisation"
-          description={organization.name}
-        />
-        <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Retour
-        </Button>
+    <PageWithBackButton backTo={`/organizations/${organizationId}/dashboard`}>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <PageHeader
+            title="Paramètres de l'organisation"
+            description={organization.name}
+          />
+          <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Retour
+          </Button>
+        </div>
+        {/* Formulaire */}
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-6"
+          >
+            {/* Paiements */}
+            <PaymentSettings form={form} />
+
+            {/* Rappels */}
+            <ReminderSettings form={form} />
+
+            {/* Notifications */}
+            {/* <NotificationSettings form={form} /> */}
+
+            {/* Sécurité */}
+            <SecuritySettings form={form} />
+
+            {/* Boutons d'action */}
+            <div className="flex items-center justify-end gap-3 pt-4 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => form.reset()}
+                disabled={!hasChanges || updateMutation.isPending}
+              >
+                Annuler
+              </Button>
+              <Button
+                type="submit"
+                disabled={!hasChanges || updateMutation.isPending}
+              >
+                {updateMutation.isPending ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
+                    Enregistrement...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Enregistrer les modifications
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </div>
-      {/* Formulaire */}
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          {/* Paiements */}
-          <PaymentSettings form={form} />
-
-          {/* Rappels */}
-          <ReminderSettings form={form} />
-
-          {/* Notifications */}
-          {/* <NotificationSettings form={form} /> */}
-
-          {/* Sécurité */}
-          <SecuritySettings form={form} />
-
-          {/* Boutons d'action */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => form.reset()}
-              disabled={!hasChanges || updateMutation.isPending}
-            >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              disabled={!hasChanges || updateMutation.isPending}
-            >
-              {updateMutation.isPending ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
-                  Enregistrement...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Enregistrer les modifications
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </div>
+    </PageWithBackButton>
   );
 };
