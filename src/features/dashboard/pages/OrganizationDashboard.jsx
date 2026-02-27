@@ -82,7 +82,7 @@ const OrganizationDashboard = () => {
           transition={{ duration: 0.5 }}
           className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
         >
-          <div className="hidden md:flex-1 min-w-0">
+          <div className="lg:flex-1 min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
               <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 w-fit">
                 <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />

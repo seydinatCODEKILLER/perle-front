@@ -1,5 +1,3 @@
-// components/dashboard/DashboardHeader.jsx
-
 import { OrgHeaderWithSwitch } from "@/components/layout/OrgHeaderWithSwitch";
 import { HorizontalNav } from "@/components/layout/HorizontalNav";
 import { useOrganization } from "@/features/organizations/hooks/useOrganizations";
