@@ -16,6 +16,7 @@ import { MemberContributionCard } from "../components/MemberContributionCard";
 import { MemberHistoryList } from "../components/MemberHistoryList";
 import { MemberContributionDetailModal } from "../components/MemberContributionDetailModal";
 import { useMemberContributionsDashboard } from "../hooks/useMemberContributions";
+import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
 
 export const MemberContributionsPage = () => {
   const { organizationId } = useParams();
@@ -84,6 +85,7 @@ export const MemberContributionsPage = () => {
   const hasFilters = searchTerm || statusFilter !== "all";
 
   return (
+    <PageWithBackButton backTo={`/organizations/${organizationId}/me/dashboard`}>
     <div className="space-y-6">
       {/* Header avec bouton actualiser */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
@@ -238,6 +240,7 @@ export const MemberContributionsPage = () => {
         contribution={selectedContribution}
       />
     </div>
+    </PageWithBackButton>
   );
 };
 
