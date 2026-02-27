@@ -227,7 +227,7 @@ export const MembersPage = () => {
         {/* Vue desktop : Panels resizable */}
         <div className="hidden lg:block h-[calc(100vh-12rem)]">
           <ResizablePanelGroup direction="horizontal" className="h-full w-full">
-            <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
+            <ResizablePanel defaultSize={30} minSize={20} maxSize='50%'>
               <MemberSidebar
                 members={members}
                 selectedMember={selectedMember}
