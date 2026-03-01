@@ -14,80 +14,102 @@ import { useManagementDashboard } from "../hooks/useDashboard";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
 
 const OrganizationDashboard = () => {
-  const { data, isLoading, error, refetch, isRefetching } =
-    useManagementDashboard();
+  const { data, isLoading, error, refetch, isRefetching } = useManagementDashboard();
 
   if (isLoading) {
-    <DashboardHeader onRefresh={refetch} isRefreshing={isRefetching} />;
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex items-center justify-center h-64"
-      >
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Chargement du dashboard...</p>
-        </div>
-      </motion.div>
+      <>
+        {/* Header même pendant le chargement */}
+        <DashboardHeader 
+          onRefresh={refetch} 
+          isRefreshing={isRefetching}
+          wallet={null}
+          memberCount={0}
+        />
+        
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex items-center justify-center h-64 p-4"
+        >
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Chargement du dashboard...</p>
+          </div>
+        </motion.div>
+      </>
     );
   }
 
   if (error || !data) {
-    <DashboardHeader onRefresh={refetch} isRefreshing={isRefetching} />;
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex items-center justify-center h-64"
-      >
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Erreur de chargement</h3>
-          <p className="text-muted-foreground mb-4">
-            Impossible de charger les données du dashboard
-          </p>
-          <Button onClick={() => refetch()} variant="outline">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Réessayer
-          </Button>
-        </div>
-      </motion.div>
+      <>
+        {/* Header même en cas d'erreur */}
+        <DashboardHeader 
+          onRefresh={refetch} 
+          isRefreshing={isRefetching}
+          wallet={null}
+          memberCount={0}
+        />
+        
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex items-center justify-center h-64 p-4"
+        >
+          <div className="text-center">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Erreur de chargement</h3>
+            <p className="text-muted-foreground mb-4">
+              Impossible de charger les données du dashboard
+            </p>
+            <Button onClick={() => refetch()} variant="outline">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Réessayer
+            </Button>
+          </div>
+        </motion.div>
+      </>
     );
   }
 
-  const { kpis, financialOverview, charts, subscription, recentActivities } =
-    data;
-
+  const { kpis, financialOverview, charts, subscription, recentActivities } = data;
   const kpiEntries = Object.entries(kpis);
-
-  // ✅ NOUVEAU : Extraire wallet et expenses du financialOverview
   const wallet = financialOverview?.wallet;
   const expenses = financialOverview?.expenses;
+  const memberCount = kpis?.members?.value || 0;
 
   return (
     <>
-      {/* ✅ Header avec navigation - uniquement sur dashboard */}
-      <DashboardHeader onRefresh={refetch} isRefreshing={isRefetching} />
+      {/* ✅ Header mobile avec Wallet + Navigation - NON FIXE, scrollable */}
+      <DashboardHeader 
+        onRefresh={refetch} 
+        isRefreshing={isRefetching}
+        wallet={wallet}
+        memberCount={memberCount}
+        currency={data.currency}
+      />
+
+      {/* ✅ Contenu du dashboard */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
         className="space-y-6 p-4 lg:p-0"
       >
-        {/* En-tête avec animation */}
+        {/* En-tête Desktop uniquement */}
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+          className="hidden lg:flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
         >
-          <div className="lg:flex-1 min-w-0">
+          <div className="flex-1 min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
               <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 w-fit">
                 <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight wrap-break-word">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
                 Dashboard Administrateur
               </h1>
             </div>
@@ -115,9 +137,9 @@ const OrganizationDashboard = () => {
           </Button>
         </motion.div>
 
-        {/* KPI Grid avec animations en cascade */}
+        {/* KPI Grid - Desktop uniquement */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="hidden lg:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
@@ -129,14 +151,13 @@ const OrganizationDashboard = () => {
           </AnimatePresence>
         </motion.div>
 
-        {/* ✅ NOUVELLE SECTION : Wallet & Expenses */}
+        {/* Wallet & Expenses - Desktop uniquement */}
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+          className="hidden lg:grid grid-cols-1 lg:grid-cols-2 gap-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          {/* Wallet Overview */}
           <div className="overflow-hidden rounded-lg">
             <motion.div
               whileHover={{ scale: 1.01 }}
@@ -150,7 +171,6 @@ const OrganizationDashboard = () => {
             </motion.div>
           </div>
 
-          {/* Expenses Overview */}
           <div className="overflow-hidden rounded-lg">
             <motion.div
               whileHover={{ scale: 1.01 }}
@@ -165,14 +185,13 @@ const OrganizationDashboard = () => {
           </div>
         </motion.div>
 
-        {/* Deuxième ligne avec animations */}
+        {/* Charts & Sidebar - Desktop uniquement */}
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+          className="hidden lg:grid grid-cols-1 lg:grid-cols-3 gap-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          {/* Chart + Activités */}
           <div className="lg:col-span-2 space-y-6">
             <motion.div
               whileHover={{ scale: 1.01 }}
@@ -188,14 +207,12 @@ const OrganizationDashboard = () => {
             </motion.div>
           </div>
 
-          {/* Sidebar avec animations */}
           <motion.div
             className="space-y-6"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.6 }}
           >
-            {/* Financial Overview */}
             <div className="overflow-hidden rounded-lg">
               <motion.div
                 whileHover={{ scale: 1.01 }}
@@ -208,7 +225,6 @@ const OrganizationDashboard = () => {
               </motion.div>
             </div>
 
-            {/* Subscription */}
             <div className="overflow-hidden rounded-lg">
               <motion.div
                 whileHover={{ scale: 1.01 }}
@@ -218,6 +234,16 @@ const OrganizationDashboard = () => {
               </motion.div>
             </div>
           </motion.div>
+        </motion.div>
+
+        {/* ✅ MOBILE : Uniquement les activités récentes */}
+        <motion.div
+          className="lg:hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <RecentActivities activities={recentActivities} />
         </motion.div>
       </motion.div>
     </>
