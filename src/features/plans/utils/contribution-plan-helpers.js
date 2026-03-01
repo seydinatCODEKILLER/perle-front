@@ -15,6 +15,20 @@ export const formatPlan = (plan) => {
   };
 };
 
+export const formatPlanAmounts = (plan) => {
+  if (plan.amountMale && plan.amountFemale) {
+    return {
+      hasDifferentiation: true,
+      maleAmount: formatAmount(plan.amountMale),
+      femaleAmount: formatAmount(plan.amountFemale),
+    };
+  }
+  return {
+    hasDifferentiation: false,
+    amount: formatAmount(plan.amount),
+  };
+};
+
 /**
  * Formater le montant en FCFA
  */

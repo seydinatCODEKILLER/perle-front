@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 export const ExpenseStatsCards = ({ stats, isLoading = false }) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
           <Card key={i}>
             <CardHeader className="pb-2">
@@ -66,7 +66,7 @@ export const ExpenseStatsCards = ({ stats, isLoading = false }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       {cards.map((card, index) => (
         <motion.div
           key={card.title}
@@ -84,7 +84,7 @@ export const ExpenseStatsCards = ({ stats, isLoading = false }) => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-bold ${card.color}`}>
+              <div className={`text-md md:text-2xl font-bold ${card.color}`}>
                 {card.value}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
