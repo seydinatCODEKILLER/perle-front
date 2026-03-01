@@ -77,7 +77,7 @@ const OrganizationDashboard = () => {
   const kpiEntries = Object.entries(kpis);
   const wallet = financialOverview?.wallet;
   const expenses = financialOverview?.expenses;
-  const memberCount = kpis?.members?.value || 0;
+  const memberCount = kpis?.activeMembers?.value || 0;  
 
   return (
     <>
