@@ -17,17 +17,13 @@ export const OrgHeaderWithSwitch = ({
   canSwitchSpace = true,
 }) => {
   const isPersonalSpace = currentSpace === SPACES.PERSONAL;
-
-  // Nom complet de l'utilisateur
   const userName = user
     ? `${user.prenom || ""} ${user.nom || ""}`.trim() || user.email
     : "Utilisateur";
-
-  // Nom de l'organisation
   const orgName = organization?.name || "Organisation";
 
   return (
-    <div className="w-full bg-background border-b rounded-t-3xl">
+    <div className="w-full bg-card/50 dark:bg-card/80 backdrop-blur-sm border-b border-border/50 rounded-t-3xl">
       <div className="px-4 py-4 space-y-3">
         {/* Titre + Refresh */}
         <div className="flex items-center justify-between">
@@ -50,7 +46,7 @@ export const OrgHeaderWithSwitch = ({
               size="sm"
               onClick={onRefresh}
               disabled={isRefreshing}
-              className="h-8 px-3 shrink-0 ml-2"
+              className="h-8 px-3 shrink-0 ml-2 bg-background/50 dark:bg-background/30"
             >
               <RefreshCw
                 className={cn("w-3.5 h-3.5", isRefreshing && "animate-spin")}
@@ -59,9 +55,9 @@ export const OrgHeaderWithSwitch = ({
           )}
         </div>
 
-        {/* Switch de vue - Version minimale */}
+        {/* Switch de vue */}
         {canSwitchSpace && (
-          <div className="flex items-center justify-center gap-3 p-2.5 rounded-lg border bg-muted/30">
+          <div className="flex items-center justify-center gap-3 p-2.5 rounded-lg border border-border/50 bg-muted/50 dark:bg-muted/30">
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-muted-foreground" />
               <Label htmlFor="space-toggle" className="text-sm cursor-pointer">
