@@ -22,7 +22,7 @@ import { AvatarUploadModal } from "../components/AvatarUploadModal";
 import { useUpdateProfile } from "../hooks/useUpdateProfile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/routes";
-import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
+import { prepareMultipartData } from "@/shared/utils/form-data.utils";
 
 export const ProfilePage = () => {
   const navigate = useNavigate();
@@ -42,12 +42,15 @@ export const ProfilePage = () => {
   };
 
   const handleUpdateAvatar = (avatarFile) => {
-    updateMutation.mutate(
-      { avatarFile },
+    const formData = prepareMultipartData(
       {
-        onSuccess: () => setIsAvatarModalOpen(false),
+        avatar: avatarFile,
       },
+      ["avatar"],
     );
+    updateMutation.mutate(formData, {
+      onSuccess: () => setIsAvatarModalOpen(false),
+    });
   };
 
   const getInitials = () => {
@@ -80,7 +83,6 @@ export const ProfilePage = () => {
   }
 
   return (
-    <PageWithBackButton backTo={`/organizations/${organizationId}/dashboard`}>
       <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
         {/* Header avec retour */}
         <div className="flex items-center gap-4 mb-6">
@@ -305,11 +307,9 @@ export const ProfilePage = () => {
           isPending={updateMutation.isPending}
         />
       </div>
-    </PageWithBackButton>
   );
 };
 
-// Composant pour afficher une ligne d'info
 // eslint-disable-next-line no-unused-vars
 const InfoRow = ({ icon: Icon, label, value }) => (
   <div className="flex items-center justify-between py-2">

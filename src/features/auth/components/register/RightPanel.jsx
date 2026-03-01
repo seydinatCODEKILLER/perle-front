@@ -9,6 +9,7 @@ import { SubmitButton } from "./ui/SubmitButton";
 import { SecurityNotice } from "./ui/SecurityNotice";
 import { LoginLink } from "./ui/LoginLink";
 import { Form } from "@/components/ui/form";
+import { GenderField } from "./fields/GenderField";
 
 /**
  * Panneau droit - Formulaire
@@ -30,6 +31,7 @@ export const RightPanel = ({ form, onSubmit, isPending }) => (
           <NameFields control={form.control} />
           <EmailField control={form.control} />
           <PhoneField control={form.control} />
+          <GenderField control={form.control} />
           <PasswordField
             control={form.control}
             name="password"
