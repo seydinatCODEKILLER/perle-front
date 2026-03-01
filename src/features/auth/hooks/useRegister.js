@@ -16,7 +16,6 @@ export const useRegister = () => {
     mutationKey: ["register"],
 
     mutationFn: async (credentials) => {
-      // Nettoyer le numéro de téléphone
       const cleanedCredentials = {
         ...credentials,
         phone: credentials.phone.replace(/[\s.-]/g, ''),

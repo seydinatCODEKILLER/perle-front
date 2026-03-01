@@ -5,6 +5,7 @@
  * @property {string} email
  * @property {string} phone
  * @property {string} password
+ * @property {string} gender
  * @property {File} [avatar]
  */
 

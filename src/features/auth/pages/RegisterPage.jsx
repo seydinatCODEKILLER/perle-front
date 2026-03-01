@@ -18,6 +18,7 @@ export const RegisterPage = () => {
       nom: "",
       email: "",
       phone: "",
+      gender: undefined,
       password: "",
       confirmPassword: "",
       avatar: undefined,
