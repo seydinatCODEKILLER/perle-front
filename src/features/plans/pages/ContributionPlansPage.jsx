@@ -123,26 +123,6 @@ export const ContributionPlansPage = () => {
     );
   };
 
-  // Click handlers
-  const handleEditClick = (plan) => {
-    setSelectedPlan(plan);
-    setIsEditModalOpen(true);
-  };
-
-  const handleToggleClick = (plan) => {
-    setPlanToToggle(plan);
-  };
-
-  const handleGenerateClick = (plan) => {
-    setPlanToGenerate(plan);
-    setIsGenerateModalOpen(true);
-  };
-
-  const handleAssignClick = (plan) => {
-    setPlanToAssign(plan);
-    setIsAssignModalOpen(true);
-  };
-
   const handleClearFilters = () => {
     setSearchTerm("");
     setStatusFilter("all");
@@ -216,21 +196,30 @@ export const ContributionPlansPage = () => {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {plans.map((plan) => (
                 <ContributionPlanCard
                   key={plan.id}
                   plan={plan}
-                  onEdit={handleEditClick}
-                  onToggleStatus={handleToggleClick}
-                  onGenerate={handleGenerateClick}
-                  onAssign={handleAssignClick}
+                  onEdit={(p) => {
+                    setSelectedPlan(p);
+                    setIsEditModalOpen(true);
+                  }}
+                  onToggleStatus={setPlanToToggle}
+                  onGenerate={(p) => {
+                    setPlanToGenerate(p);
+                    setIsGenerateModalOpen(true);
+                  }}
+                  onAssign={(p) => {
+                    setPlanToAssign(p);
+                    setIsAssignModalOpen(true);
+                  }}
                 />
               ))}
             </div>
 
             {pagination?.pages > 1 && (
-              <div className="flex justify-center pt-6">
+              <div className="flex justify-center pt-2">
                 <Pagination
                   currentPage={pagination.page}
                   totalPages={pagination.pages}
