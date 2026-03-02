@@ -42,7 +42,7 @@ export const DashboardHeader = ({
 
       {/* Wallet Progress Card */}
       {wallet && (
-        <div className="px-4 pb-3">
+        <div className="px-2 py-2">
           <WalletProgressCard
             wallet={wallet}
             memberCount={memberCount}
