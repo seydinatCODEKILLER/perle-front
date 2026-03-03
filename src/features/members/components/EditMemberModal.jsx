@@ -7,13 +7,33 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updateMemberSchema, updateMemberRoleSchema, updateMemberStatusSchema } from "../validators/member.schema";
-import { MEMBER_ROLE_OPTIONS, MEMBER_STATUS_OPTIONS } from "../constants/member.constants";
+import {
+  updateMemberSchema,
+  updateMemberRoleSchema,
+  updateMemberStatusSchema,
+} from "../validators/member.schema";
+import {
+  MEMBER_ROLE_OPTIONS,
+  MEMBER_STATUS_OPTIONS,
+} from "../constants/member.constants";
 import { formatRole, formatStatus } from "../utils/member-helpers";
 import { User, Shield, Activity } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -94,7 +114,11 @@ export const EditMemberModal = ({
             <div>
               <DialogTitle>Modifier le membre</DialogTitle>
               <DialogDescription>
-                {member?.user?.prenom} {member?.user?.nom}
+                {member?.user
+                  ? `${member.user.prenom} ${member.user.nom}`
+                  : member?.displayInfo
+                    ? `${member.displayInfo.firstName} ${member.displayInfo.lastName}`
+                    : "Nom non disponible"}
               </DialogDescription>
             </div>
           </div>
@@ -119,14 +143,20 @@ export const EditMemberModal = ({
           {/* Onglet Rôle */}
           <TabsContent value="role" className="space-y-4 pt-4">
             <Form {...roleForm}>
-              <form onSubmit={roleForm.handleSubmit(handleRoleSubmit)} className="space-y-4">
+              <form
+                onSubmit={roleForm.handleSubmit(handleRoleSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={roleForm.control}
                   name="role"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Rôle du membre</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionner un rôle" />
@@ -147,7 +177,10 @@ export const EditMemberModal = ({
                       </Select>
                       <FormMessage />
                       <p className="text-sm text-muted-foreground mt-2">
-                        Rôle actuel : <span className="font-medium">{formatRole(member?.role)}</span>
+                        Rôle actuel :{" "}
+                        <span className="font-medium">
+                          {formatRole(member?.role)}
+                        </span>
                       </p>
                     </FormItem>
                   )}
@@ -159,14 +192,20 @@ export const EditMemberModal = ({
           {/* Onglet Statut */}
           <TabsContent value="status" className="space-y-4 pt-4">
             <Form {...statusForm}>
-              <form onSubmit={statusForm.handleSubmit(handleStatusSubmit)} className="space-y-4">
+              <form
+                onSubmit={statusForm.handleSubmit(handleStatusSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={statusForm.control}
                   name="status"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Statut du membre</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionner un statut" />
@@ -176,11 +215,15 @@ export const EditMemberModal = ({
                           {MEMBER_STATUS_OPTIONS.map((option) => (
                             <SelectItem key={option.value} value={option.value}>
                               <div className="flex items-center">
-                                <div className={`w-2 h-2 rounded-full mr-2 ${
-                                  option.value === "ACTIVE" ? "bg-green-500" :
-                                  option.value === "INACTIVE" ? "bg-yellow-500" :
-                                  "bg-red-500"
-                                }`} />
+                                <div
+                                  className={`w-2 h-2 rounded-full mr-2 ${
+                                    option.value === "ACTIVE"
+                                      ? "bg-green-500"
+                                      : option.value === "INACTIVE"
+                                        ? "bg-yellow-500"
+                                        : "bg-red-500"
+                                  }`}
+                                />
                                 {option.label}
                               </div>
                             </SelectItem>
@@ -189,7 +232,10 @@ export const EditMemberModal = ({
                       </Select>
                       <FormMessage />
                       <p className="text-sm text-muted-foreground mt-2">
-                        Statut actuel : <span className="font-medium">{formatStatus(member?.status)}</span>
+                        Statut actuel :{" "}
+                        <span className="font-medium">
+                          {formatStatus(member?.status)}
+                        </span>
                       </p>
                     </FormItem>
                   )}
@@ -201,14 +247,20 @@ export const EditMemberModal = ({
           {/* Onglet Membre */}
           <TabsContent value="member" className="space-y-4 pt-4">
             <Form {...memberForm}>
-              <form onSubmit={memberForm.handleSubmit(handleMemberSubmit)} className="space-y-4">
+              <form
+                onSubmit={memberForm.handleSubmit(handleMemberSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={memberForm.control}
                   name="role"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Rôle</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionner un rôle" />
@@ -234,10 +286,7 @@ export const EditMemberModal = ({
                     <FormItem>
                       <FormLabel>Numéro de membre</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Ex: MBR001" 
-                          {...field} 
-                        />
+                        <Input placeholder="Ex: MBR001" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -252,12 +301,15 @@ export const EditMemberModal = ({
           <Button variant="outline" onClick={onClose} disabled={isUpdating}>
             Annuler
           </Button>
-          
+
           <Button
             onClick={() => {
-              if (activeTab === "role") roleForm.handleSubmit(handleRoleSubmit)();
-              if (activeTab === "status") statusForm.handleSubmit(handleStatusSubmit)();
-              if (activeTab === "member") memberForm.handleSubmit(handleMemberSubmit)();
+              if (activeTab === "role")
+                roleForm.handleSubmit(handleRoleSubmit)();
+              if (activeTab === "status")
+                statusForm.handleSubmit(handleStatusSubmit)();
+              if (activeTab === "member")
+                memberForm.handleSubmit(handleMemberSubmit)();
             }}
             disabled={isUpdating}
           >
