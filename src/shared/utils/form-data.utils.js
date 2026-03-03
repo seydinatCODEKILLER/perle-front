@@ -1,3 +1,5 @@
+// lib/form-utils.js
+
 /**
  * Convertir un objet en FormData
  * @param {Object} data - Objet à convertir
@@ -8,21 +10,26 @@ export const objectToFormData = (data, options = {}) => {
   const {
     excludeNull = true,
     excludeUndefined = true,
+    excludeEmpty = true,
     fileFields = [],
   } = options;
 
   const formData = new FormData();
 
   Object.entries(data).forEach(([key, value]) => {
-    // Ignorer les valeurs null/undefined si spécifié
+    // Ignorer les valeurs null/undefined/empty si spécifié
     if (excludeNull && value === null) return;
     if (excludeUndefined && value === undefined) return;
+    if (excludeEmpty && value === "") return;
 
     // Gestion des fichiers
     if (fileFields.includes(key) && value instanceof File) {
       formData.append(key, value);
       return;
     }
+
+    // Ignorer si la valeur est null/undefined après les checks de fichier
+    if (value === null || value === undefined) return;
 
     // Gestion des tableaux
     if (Array.isArray(value)) {
@@ -36,9 +43,16 @@ export const objectToFormData = (data, options = {}) => {
       return;
     }
 
-    // Gestion des objets (conversion en JSON)
-    if (typeof value === 'object' && !(value instanceof File)) {
-      formData.append(key, JSON.stringify(value));
+    // ✅ Gestion des objets imbriqués (pour provisionalData)
+    if (typeof value === 'object' && !(value instanceof File) && !(value instanceof Blob)) {
+      Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+        // Ignorer les valeurs null/undefined/empty dans les objets imbriqués
+        if (excludeNull && nestedValue === null) return;
+        if (excludeUndefined && nestedValue === undefined) return;
+        if (excludeEmpty && nestedValue === "") return;
+
+        formData.append(`${key}[${nestedKey}]`, nestedValue);
+      });
       return;
     }
 
@@ -59,6 +73,7 @@ export const prepareMultipartData = (data, fileFields = []) => {
   return objectToFormData(data, {
     excludeNull: true,
     excludeUndefined: true,
+    excludeEmpty: true,
     fileFields,
   });
 };

@@ -12,10 +12,9 @@ import { useDeleteMember } from "../hooks/useDeleteMember";
 import { AddMemberModal } from "../components/AddMemberModal";
 import { EditMemberModal } from "../components/EditMemberModal";
 import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
-import { MemberSidebar } from "../components/MemberSidebar";
-import { MemberDetailView } from "../components/MemberDetailView";
+import { MemberCard } from "../components/MemberCard";
+import { MemberActionDrawer } from "../components/MemberActionDrawer";
 import { MemberMobileList } from "../components/MemberMobileList";
-import { MemberDetailDrawer } from "../components/MemberDetailDrawer";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -27,21 +26,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from "@/components/ui/resizable";
 import { Search, Plus, RefreshCw } from "lucide-react";
+import { MemberDetailDrawer } from "../components/MemberDetailDrawer";
 
 export const MembersPage = () => {
   const { organizationId } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedMemberId, setSelectedMemberId] = useState(null);
+  const [selectedMember, setSelectedMember] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDetailDrawerOpen, setIsDetailDrawerOpen] = useState(false);
+  const [isActionDrawerOpen, setIsActionDrawerOpen] = useState(false);
+  const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
   const [memberToSuspend, setMemberToSuspend] = useState(null);
   const [memberToActive, setMemberToActive] = useState(null);
@@ -54,7 +50,10 @@ export const MembersPage = () => {
     limit: 1000,
   };
 
-  const { data, isLoading, refetch } = useOrganizationMembers(organizationId, filters);
+  const { data, isLoading, refetch } = useOrganizationMembers(
+    organizationId,
+    filters,
+  );
   const createMutation = useCreateMember();
   const updateRoleMutation = useUpdateMemberRole();
   const updateStatusMutation = useUpdateMemberStatus();
@@ -63,30 +62,37 @@ export const MembersPage = () => {
 
   const members = useMemo(() => data?.members || [], [data?.members]);
 
-  const selectedMember = useMemo(() => {
-    if (!selectedMemberId) return null;
-    return members.find((m) => m.id === selectedMemberId) || null;
-  }, [selectedMemberId, members]);
-
   // Handlers...
   const handleAddMember = (memberData) => {
     createMutation.mutate(
       { organizationId, memberData },
       {
-        onSuccess: (newMember) => {
+        onSuccess: () => {
           setIsAddModalOpen(false);
-          if (newMember?.id) {
-            setSelectedMemberId(newMember.id);
-          }
         },
-      }
+      },
     );
+  };
+
+  const handleCardClick = (member) => {
+    setSelectedMember(member);
+    setIsActionDrawerOpen(true);
+  };
+
+  const handleCardClickMobile = (member) => {
+    setSelectedMember(member);
+    setIsDetailsDrawerOpen(true);
+  };
+
+  const handleEditFromDrawer = (member) => {
+    setSelectedMember(member);
+    setIsEditModalOpen(true);
   };
 
   const handleUpdateRole = ({ membershipId, role }) => {
     updateRoleMutation.mutate(
       { organizationId, membershipId, role },
-      { onSuccess: () => setIsEditModalOpen(false) }
+      { onSuccess: () => setIsEditModalOpen(false) },
     );
   };
 
@@ -99,23 +105,16 @@ export const MembersPage = () => {
           setMemberToSuspend(null);
           setMemberToActive(null);
         },
-      }
+      },
     );
   };
 
   const handleUpdateMember = ({ membershipId, updateData }) => {
     updateMemberMutation.mutate(
       { organizationId, membershipId, updateData },
-      { onSuccess: () => setIsEditModalOpen(false) }
+      { onSuccess: () => setIsEditModalOpen(false) },
     );
   };
-
-  const handleViewDetails = (member) => {
-    setSelectedMemberId(member.id);
-    setIsDetailDrawerOpen(true);
-  };
-
-  const handleEditClick = () => setIsEditModalOpen(true);
 
   const handleDeleteConfirm = () => {
     if (memberToDelete) {
@@ -124,9 +123,9 @@ export const MembersPage = () => {
         {
           onSuccess: () => {
             setMemberToDelete(null);
-            setSelectedMemberId(null);
+            setSelectedMember(null);
           },
-        }
+        },
       );
     }
   };
@@ -149,15 +148,6 @@ export const MembersPage = () => {
     }
   };
 
-  const handleClearFilters = () => {
-    setSearchTerm("");
-    setStatusFilter("all");
-  };
-
-  const handleSelectMember = (member) => {
-    setSelectedMemberId(member.id);
-  };
-
   return (
     <PageWithBackButton backTo={`/organizations/${organizationId}/dashboard`}>
       <div className="space-y-4">
@@ -177,15 +167,19 @@ export const MembersPage = () => {
               <RefreshCw className="w-4 h-4" />
               <span className="hidden sm:inline">Actualiser</span>
             </Button>
-            <Button size="sm" onClick={() => setIsAddModalOpen(true)} className="gap-2">
+            <Button
+              size="sm"
+              onClick={() => setIsAddModalOpen(true)}
+              className="gap-2"
+            >
               <Plus className="w-4 h-4" />
               Ajouter
             </Button>
           </div>
         </div>
 
-        {/* Filtres mobiles */}
-        <div className="lg:hidden flex flex-col sm:flex-row gap-3">
+        {/* Filtres */}
+        <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
@@ -212,11 +206,8 @@ export const MembersPage = () => {
         <div className="lg:hidden">
           <MemberMobileList
             members={members}
-            onViewDetails={handleViewDetails}
-            onEdit={(member) => {
-              setSelectedMemberId(member.id);
-              setIsEditModalOpen(true);
-            }}
+            onViewDetails={handleCardClickMobile}
+            onEdit={handleEditFromDrawer}
             onDelete={setMemberToDelete}
             onSuspend={setMemberToSuspend}
             onActivate={setMemberToActive}
@@ -224,39 +215,35 @@ export const MembersPage = () => {
           />
         </div>
 
-        {/* Vue desktop : Panels resizable */}
-        <div className="hidden lg:block h-[calc(100vh-12rem)]">
-          <ResizablePanelGroup direction="horizontal" className="h-full w-full">
-            <ResizablePanel defaultSize={30} minSize={20} maxSize='50%'>
-              <MemberSidebar
-                members={members}
-                selectedMember={selectedMember}
-                onSelectMember={handleSelectMember}
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                statusFilter={statusFilter}
-                onStatusChange={setStatusFilter}
-                onClearFilters={handleClearFilters}
-                onAddMember={() => setIsAddModalOpen(true)}
-                isLoading={isLoading}
-              />
-            </ResizablePanel>
-
-            <ResizableHandle withHandle />
-
-            <ResizablePanel defaultSize={70} minSize={50}>
-              <MemberDetailView
-                member={selectedMember}
-                onEdit={handleEditClick}
-                onDelete={setMemberToDelete}
-                onSuspend={setMemberToSuspend}
-                onActive={setMemberToActive}
-              />
-            </ResizablePanel>
-          </ResizablePanelGroup>
+        {/* ✅ Vue desktop : Grille de cartes */}
+        <div className="hidden lg:block">
+          {isLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-48 bg-card/50 rounded-lg animate-pulse"
+                />
+              ))}
+            </div>
+          ) : members.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Aucun membre trouvé</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {members.map((member) => (
+                <MemberCard
+                  key={member.id}
+                  member={member}
+                  onClick={handleCardClick}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Modals */}
+        {/* Modals & Drawers */}
         <AddMemberModal
           open={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
@@ -277,9 +264,19 @@ export const MembersPage = () => {
           isUpdatingMember={updateMemberMutation.isPending}
         />
 
+        <MemberActionDrawer
+          open={isActionDrawerOpen}
+          onClose={() => setIsActionDrawerOpen(false)}
+          member={selectedMember}
+          onEdit={handleEditFromDrawer}
+          onDelete={setMemberToDelete}
+          onSuspend={setMemberToSuspend}
+          onActivate={setMemberToActive}
+        />
+
         <MemberDetailDrawer
-          open={isDetailDrawerOpen}
-          onClose={() => setIsDetailDrawerOpen(false)}
+          open={isDetailsDrawerOpen}
+          onClose={() => setIsDetailsDrawerOpen(false)}
           member={selectedMember}
         />
 
@@ -287,7 +284,7 @@ export const MembersPage = () => {
           open={!!memberToDelete}
           onClose={() => setMemberToDelete(null)}
           onConfirm={handleDeleteConfirm}
-          title={`Supprimer ${memberToDelete?.user?.prenom} ${memberToDelete?.user?.nom}`}
+          title={`Supprimer ${memberToDelete?.displayInfo?.firstName} ${memberToDelete?.displayInfo?.lastName}`}
           description="Cette action est irréversible. Le membre sera définitivement retiré de l'organisation."
           variant="destructive"
           confirmText="Supprimer"
@@ -299,7 +296,7 @@ export const MembersPage = () => {
           open={!!memberToSuspend}
           onClose={() => setMemberToSuspend(null)}
           onConfirm={handleSuspendConfirm}
-          title={`Suspendre ${memberToSuspend?.user?.prenom} ${memberToSuspend?.user?.nom}`}
+          title={`Suspendre ${memberToSuspend?.displayInfo?.firstName} ${memberToSuspend?.displayInfo?.lastName}`}
           description="Le membre sera temporairement suspendu."
           variant="warning"
           confirmText="Suspendre"
@@ -311,7 +308,7 @@ export const MembersPage = () => {
           open={!!memberToActive}
           onClose={() => setMemberToActive(null)}
           onConfirm={handleActiveConfirm}
-          title={`Réactiver ${memberToActive?.user?.prenom} ${memberToActive?.user?.nom}`}
+          title={`Réactiver ${memberToActive?.displayInfo?.firstName} ${memberToActive?.displayInfo?.lastName}`}
           description="Le membre sera réactivé."
           variant="success"
           confirmText="Réactiver"
