@@ -1,95 +1,193 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Users, Phone, Mail, Calendar, Edit, Trash2 } from "lucide-react";
-import { formatMember, formatRole, formatStatus } from "../utils/member-helpers";
-import { MEMBER_ROLES } from "../constants/member.constants";
+// components/members/MemberCard.jsx
 
-export const MemberCard = ({ 
-  member, 
-  onEdit = () => {}, 
-  onDelete = () => {} 
-}) => {
-  const formattedMember = formatMember(member);
-  const isCurrentUser = member.userId === "current-user-id";
-  
-  const isAdmin = member.role === MEMBER_ROLES.ADMIN;
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Crown, Shield, Mars, Venus, UserCircle, Phone, Mail } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const STATUS_CONFIG = {
+  ACTIVE: { 
+    label: "Actif", 
+    color: "bg-green-500",
+    dotColor: "bg-green-500",
+  },
+  SUSPENDED: { 
+    label: "Suspendu", 
+    color: "bg-orange-500",
+    dotColor: "bg-orange-500",
+  },
+  PENDING: { 
+    label: "En attente", 
+    color: "bg-yellow-500",
+    dotColor: "bg-yellow-500",
+  },
+  INACTIVE: { 
+    label: "Inactif", 
+    color: "bg-gray-500",
+    dotColor: "bg-gray-500",
+  },
+};
+
+const ROLE_CONFIG = {
+  ADMIN: { 
+    icon: Crown, 
+    label: "Admin", 
+    color: "text-amber-500",
+    bgColor: "bg-amber-500/10",
+  },
+  FINANCIAL_MANAGER: { 
+    icon: Shield, 
+    label: "Gestionnaire", 
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10",
+  },
+  MEMBER: { 
+    icon: null, 
+    label: "Membre", 
+    color: "text-gray-500",
+    bgColor: "bg-gray-500/10",
+  },
+};
+
+const GENDER_CONFIG = {
+  MALE: { icon: Mars, color: "text-blue-500" },
+  FEMALE: { icon: Venus, color: "text-pink-500" },
+};
+
+export const MemberCard = ({ member, onClick }) => {
+  const displayInfo = member.displayInfo || {
+    firstName: member.user?.prenom,
+    lastName: member.user?.nom,
+    phone: member.user?.phone,
+    email: member.user?.email,
+    avatar: member.user?.avatar,
+    gender: member.user?.gender,
+    isProvisional: !member.userId,
+  };
+
+  const statusConfig = STATUS_CONFIG[member.status] || STATUS_CONFIG.ACTIVE;
+  const roleConfig = ROLE_CONFIG[member.role] || ROLE_CONFIG.MEMBER;
+  const genderConfig = displayInfo.gender ? GENDER_CONFIG[displayInfo.gender] : null;
+
+  const RoleIcon = roleConfig.icon;
+  const GenderIcon = genderConfig?.icon;
+
+  const displayName = `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() || "Sans nom";
+  const userInitials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2) || "??";
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-lg">
-              {formattedMember.fullName || "Utilisateur"}
-            </CardTitle>
-            <div className="flex gap-2 mt-2">
-              <Badge variant={member.role === "ADMIN" ? "default" : "secondary"}>
-                {formatRole(member.role)}
-              </Badge>
-              <Badge variant={member.status === "ACTIVE" ? "default" : "outline"}>
-                {formatStatus(member.status)}
+    <Card
+      onClick={() => onClick(member)}
+      className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 bg-card/50 dark:bg-card/80 backdrop-blur-sm border-border/50"
+    >
+      {/* Gradient subtil en hover */}
+      <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      <div className="relative p-4 space-y-3">
+        {/* Header avec avatar et badges */}
+        <div className="flex items-start gap-3">
+          {/* Avatar avec indicateur de statut */}
+          <div className="relative shrink-0">
+            <Avatar className="w-14 h-14 ring-2 ring-background">
+              <AvatarImage src={displayInfo.avatar} />
+              <AvatarFallback className="text-sm font-semibold">
+                {userInitials}
+              </AvatarFallback>
+            </Avatar>
+            {/* Dot de statut */}
+            <div
+              className={cn(
+                "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-background",
+                statusConfig.dotColor
+              )}
+            />
+          </div>
+
+          {/* Infos principales */}
+          <div className="flex-1 min-w-0 space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-semibold text-base truncate">
+                {displayName}
+              </h3>
+              {GenderIcon && (
+                <GenderIcon className={cn("w-4 h-4 shrink-0", genderConfig.color)} />
+              )}
+            </div>
+
+            {/* Badges */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {/* Badge rôle */}
+              {RoleIcon && (
+                <Badge 
+                  variant="secondary" 
+                  className={cn(
+                    "text-xs h-5 px-2",
+                    roleConfig.bgColor,
+                    roleConfig.color
+                  )}
+                >
+                  <RoleIcon className="w-3 h-3 mr-1" />
+                  {roleConfig.label}
+                </Badge>
+              )}
+
+              {/* Badge provisoire */}
+              {displayInfo.isProvisional && (
+                <Badge 
+                  variant="secondary" 
+                  className="text-xs h-5 px-2 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                >
+                  <UserCircle className="w-3 h-3 mr-1" />
+                  Sans compte
+                </Badge>
+              )}
+
+              {/* Badge statut */}
+              <Badge 
+                variant="secondary" 
+                className={cn(
+                  "text-xs h-5 px-2",
+                  statusConfig.color,
+                  "text-white"
+                )}
+              >
+                {statusConfig.label}
               </Badge>
             </div>
           </div>
-          {member.user?.avatar ? (
-            <img
-              src={member.user.avatar}
-              alt={formattedMember.fullName}
-              className="w-12 h-12 rounded-full object-cover"
-            />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Users className="w-6 h-6 text-primary" />
+        </div>
+
+        {/* Contact info */}
+        <div className="space-y-1.5 pl-1">
+          {displayInfo.phone && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Phone className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{displayInfo.phone}</span>
+            </div>
+          )}
+          {displayInfo.email && (
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Mail className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{displayInfo.email}</span>
             </div>
           )}
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-muted-foreground" />
-            <span>{member.user?.phone || "-"}</span>
+
+        {/* Footer avec member number */}
+        {member.memberNumber && (
+          <div className="pt-2 border-t border-border/50">
+            <p className="text-xs font-mono text-muted-foreground">
+              #{member.memberNumber}
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-muted-foreground" />
-            <span>{member.user?.email || "-"}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-muted-foreground" />
-            <span>Membre depuis {formattedMember.joinDate}</span>
-          </div>
-        </div>
-        <div className="flex gap-2 text-xs text-muted-foreground">
-          <span>{formattedMember.contributionsCount} cotisations</span>
-          <span>•</span>
-          <span>{formattedMember.debtsCount} dettes</span>
-        </div>
-        
-        {/* Boutons d'action - désactivés si le membre est ADMIN */}
-        <div className="flex gap-2 pt-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => onEdit(member)}
-            className="flex-1"
-            disabled={isAdmin}
-          >
-            <Edit className="w-4 h-4 mr-2" />
-            Modifier
-          </Button>
-          <Button 
-            variant="destructive" 
-            size="sm" 
-            onClick={() => onDelete(member)}
-            className="flex-1"
-            disabled={isCurrentUser || isAdmin}
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Supprimer
-          </Button>
-        </div>
-      </CardContent>
+        )}
+      </div>
     </Card>
   );
-}
+};
