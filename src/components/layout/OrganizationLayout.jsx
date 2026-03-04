@@ -36,7 +36,7 @@ export const OrganizationLayout = () => {
             </header>
 
             {/* Contenu principal */}
-            <main className="flex-1 overflow-y-auto bg-background dark:bg-background/95 lg:bg-muted/50 lg:dark:bg-muted/20">
+            <main className="flex-1 bg-background dark:bg-background/95 lg:bg-muted/50 lg:dark:bg-muted/20">
               <div className="lg:p-6">
                 <Outlet />
               </div>
