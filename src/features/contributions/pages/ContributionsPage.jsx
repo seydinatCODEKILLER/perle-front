@@ -23,6 +23,7 @@ import { ContributionDetailModal } from "../components/ContributionDetailModal";
 import { computeContributionStats } from "../utils/contribution-helpers";
 import { useOrganizationPlans } from "@/features/plans/hooks/useContributionPlans";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
+import { PaginationControls } from "@/components/ui/pagination-control";
 
 export const ContributionsPage = () => {
   const { organizationId } = useParams();
@@ -47,7 +48,7 @@ export const ContributionsPage = () => {
     status: statusFilter !== "all" ? statusFilter : undefined,
     contributionPlanId: planFilter !== "all" ? planFilter : undefined,
     page: currentPage,
-    limit: 15,
+    limit: 6,
   };
 
   // Data
@@ -84,6 +85,8 @@ export const ContributionsPage = () => {
     () => computeContributionStats(contributions),
     [contributions],
   );
+
+  const pagination = data?.pagination;
 
   // Handlers
   const handleViewDetail = (contribution) => {
@@ -227,12 +230,16 @@ export const ContributionsPage = () => {
               />
             )}
 
-            {data?.pagination?.pages > 1 && (
-              <div className="flex justify-center pt-4">
-                <Pagination
-                  currentPage={data?.pagination.page}
-                  totalPages={data?.pagination.pages}
-                  onPageChange={setCurrentPage}
+            {pagination && pagination.pages > 1 && (
+              <div className="overflow-x-auto">
+                <PaginationControls
+                  currentPage={pagination.page}
+                  totalPages={pagination.pages}
+                  totalItems={pagination.total}
+                  itemsPerPage={pagination.limit}
+                  onPageChange={(page) => setCurrentPage(page)}
+                  showFirstLast
+                  showInfo
                 />
               </div>
             )}
