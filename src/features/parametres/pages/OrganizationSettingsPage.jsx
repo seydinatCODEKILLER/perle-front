@@ -132,7 +132,7 @@ export const OrganizationSettingsPage = () => {
             <ReminderSettings form={form} />
 
             {/* Notifications */}
-            {/* <NotificationSettings form={form} /> */}
+            <NotificationSettings form={form} />
 
             {/* Sécurité */}
             <SecuritySettings form={form} />

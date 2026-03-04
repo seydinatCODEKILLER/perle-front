@@ -1,3 +1,5 @@
+// components/transactions/TransactionStatsCards.jsx
+
 import { memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, CheckCircle, Clock, XCircle } from "lucide-react";
@@ -17,7 +19,7 @@ const StatCard = memo(({ icon: Icon, label, value, subValue, iconClass, isLoadin
         </div>
       ) : (
         <div className="flex items-start justify-between gap-2">
-          <div className="space-y-0.5 min-w-0">
+          <div className="space-y-0.5 min-w-0 flex-1">
             <p className="text-xs text-muted-foreground">{label}</p>
             <p className="text-lg sm:text-xl font-bold truncate">{value}</p>
             {subValue && (
@@ -35,41 +37,50 @@ const StatCard = memo(({ icon: Icon, label, value, subValue, iconClass, isLoadin
 
 StatCard.displayName = "StatCard";
 
-export const TransactionStatsCards = memo(({ stats, currency = "XOF", isLoading }) => (
-  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-    <StatCard
-      icon={TrendingUp}
-      label="Total transactions"
-      value={formatAmount(stats?.totalAmount, currency)}
-      subValue={`${stats?.total ?? 0} transaction${stats?.total > 1 ? 's' : ''}`}
-      iconClass="bg-blue-500/10 text-blue-500"
-      isLoading={isLoading}
-    />
-    <StatCard
-      icon={CheckCircle}
-      label="Complétées"
-      value={stats?.completedCount ?? 0}
-      subValue="Transactions réussies"
-      iconClass="bg-green-500/10 text-green-500"
-      isLoading={isLoading}
-    />
-    <StatCard
-      icon={Clock}
-      label="En attente"
-      value={stats?.pendingCount ?? 0}
-      subValue="À traiter"
-      iconClass="bg-yellow-500/10 text-yellow-500"
-      isLoading={isLoading}
-    />
-    <StatCard
-      icon={XCircle}
-      label="Échecs"
-      value={stats?.failedCount ?? 0}
-      subValue="Transactions échouées"
-      iconClass="bg-red-500/10 text-red-500"
-      isLoading={isLoading}
-    />
-  </div>
-));
+export const TransactionStatsCards = memo(({ stats, currency = "XOF", isLoading }) => {
+  // ✅ S'assurer que totalAmount existe
+  const totalAmount = stats?.totalAmount ?? 0;
+  const total = stats?.total ?? 0;
+  const completedCount = stats?.completedCount ?? 0;
+  const pendingCount = stats?.pendingCount ?? 0;
+  const failedCount = stats?.failedCount ?? 0;
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <StatCard
+        icon={TrendingUp}
+        label="Montant total"
+        value={formatAmount(totalAmount, currency)}
+        subValue={`${total} transaction${total > 1 ? 's' : ''}`}
+        iconClass="bg-blue-500/10 text-blue-500"
+        isLoading={isLoading}
+      />
+      <StatCard
+        icon={CheckCircle}
+        label="Complétées"
+        value={completedCount}
+        subValue="Transactions réussies"
+        iconClass="bg-green-500/10 text-green-500"
+        isLoading={isLoading}
+      />
+      <StatCard
+        icon={Clock}
+        label="En attente"
+        value={pendingCount}
+        subValue="À traiter"
+        iconClass="bg-yellow-500/10 text-yellow-500"
+        isLoading={isLoading}
+      />
+      <StatCard
+        icon={XCircle}
+        label="Échecs"
+        value={failedCount}
+        subValue="Transactions échouées"
+        iconClass="bg-red-500/10 text-red-500"
+        isLoading={isLoading}
+      />
+    </div>
+  );
+});
 
 TransactionStatsCards.displayName = "TransactionStatsCards";
