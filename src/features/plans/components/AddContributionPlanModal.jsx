@@ -25,7 +25,7 @@ export const AddContributionPlanModal = ({
     defaultValues: {
       name: "",
       description: "",
-      amount: 0,
+      amount: null,
       amountMale: null,
       amountFemale: null,
       frequency: "MONTHLY",
@@ -39,12 +39,45 @@ export const AddContributionPlanModal = ({
   const differentiateByGender = form.watch("differentiateByGender");
 
   const handleSubmit = (data) => {
+    // ✅ Préparer les données selon le mode
     const submitData = {
-      ...data,
-      amountMale: data.differentiateByGender ? data.amountMale : null,
-      amountFemale: data.differentiateByGender ? data.amountFemale : null,
+      name: data.name,
+      description: data.description || "",
+      frequency: data.frequency,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      isActive: data.isActive,
+      differentiateByGender: data.differentiateByGender,
     };
+
+    if (data.differentiateByGender) {
+      // Mode différencié : envoyer amountMale et amountFemale
+      submitData.amountMale = data.amountMale;
+      submitData.amountFemale = data.amountFemale;
+      submitData.amount = null; // ✅ amount à null
+    } else {
+      // Mode unique : envoyer amount
+      submitData.amount = data.amount;
+      submitData.amountMale = null; // ✅ montants genrés à null
+      submitData.amountFemale = null;
+    }
+
     onSubmit(submitData);
+  };
+
+  // ✅ Réinitialiser les valeurs quand on toggle
+  const handleGenderToggle = (checked) => {
+    if (checked) {
+      // Passer en mode différencié
+      form.setValue("amount", null);
+      form.setValue("amountMale", null);
+      form.setValue("amountFemale", null);
+    } else {
+      // Passer en mode unique
+      form.setValue("amountMale", null);
+      form.setValue("amountFemale", null);
+      form.setValue("amount", null);
+    }
   };
 
   return (
@@ -119,7 +152,10 @@ export const AddContributionPlanModal = ({
                       <FormControl>
                         <Switch
                           checked={field.value}
-                          onCheckedChange={field.onChange}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked);
+                            handleGenderToggle(checked); // ✅ Réinitialiser les valeurs
+                          }}
                         />
                       </FormControl>
                       <FormLabel className="text-xs cursor-pointer mt-0!">
@@ -146,7 +182,11 @@ export const AddContributionPlanModal = ({
                             min="0"
                             step="100"
                             {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            value={field.value || ""}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.onChange(value ? parseFloat(value) : null);
+                            }}
                           />
                         </FormControl>
                         <FormDescription className="text-xs">
@@ -211,7 +251,10 @@ export const AddContributionPlanModal = ({
                               step="100"
                               {...field}
                               value={field.value || ""}
-                              onChange={(e) => field.onChange(parseFloat(e.target.value) || null)}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                field.onChange(value ? parseFloat(value) : null);
+                              }}
                             />
                           </FormControl>
                           <FormMessage />
@@ -236,7 +279,10 @@ export const AddContributionPlanModal = ({
                               step="100"
                               {...field}
                               value={field.value || ""}
-                              onChange={(e) => field.onChange(parseFloat(e.target.value) || null)}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                field.onChange(value ? parseFloat(value) : null);
+                              }}
                             />
                           </FormControl>
                           <FormMessage />

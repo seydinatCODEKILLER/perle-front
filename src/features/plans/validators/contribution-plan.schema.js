@@ -14,7 +14,8 @@ const planBaseSchema = z.object({
   amount: z
     .number()
     .positive("Le montant doit être positif")
-    .min(100, "Le montant minimum est de 100 FCFA"),
+    .optional()
+    .nullable(),
 
   amountMale: z.number().min(0).optional().nullable(),
   amountFemale: z.number().min(0).optional().nullable(),
@@ -34,24 +35,40 @@ const planBaseSchema = z.object({
   isActive: z.boolean().default(true),
 });
 
-
-export const createPlanSchema = planBaseSchema.refine(
-  (data) => {
-    if (data.differentiateByGender) {
-      return (
-        data.amountMale != null &&
-        data.amountMale > 0 &&
-        data.amountFemale != null &&
-        data.amountFemale > 0
-      );
+export const createPlanSchema = planBaseSchema.superRefine((data, ctx) => {
+  if (data.differentiateByGender) {
+    if (!data.amountMale || data.amountMale < 100) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Le montant homme est requis (min 100)",
+        path: ["amountMale"],
+      });
     }
-    return true;
-  },
-  {
-    message:
-      "Les montants homme et femme doivent être définis si la différenciation par genre est activée",
-    path: ["differentiateByGender"],
+
+    if (!data.amountFemale || data.amountFemale < 100) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Le montant femme est requis (min 100)",
+        path: ["amountFemale"],
+      });
+    }
+  } else {
+    if (!data.amount || data.amount < 100) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Le montant est requis (min 100)",
+        path: ["amount"],
+      });
+    }
   }
-);
+
+  if (data.endDate && data.endDate < data.startDate) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "La date de fin doit être après la date de début",
+      path: ["endDate"],
+    });
+  }
+});
 
 export const updatePlanSchema = planBaseSchema.partial();

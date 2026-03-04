@@ -1,172 +1,148 @@
-import { memo } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { User, CreditCard, Calendar, FileText, Building, Hash } from "lucide-react";
+import {
+  User,
+  CreditCard,
+  Calendar,
+  FileText,
+  Building,
+  Hash,
+  UserIcon,
+  UserCircle,
+} from "lucide-react";
 import { TransactionTypeBadge } from "./TransactionTypeBadge";
 import { TransactionStatusBadge } from "./TransactionStatusBadge";
 import { formatTransaction } from "../utils/transaction-helpers";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export const TransactionDetailModal = memo(({ open, onClose, transaction }) => {
+export const TransactionDetailModal = ({ open, onClose, transaction }) => {
   if (!transaction) return null;
 
   const formatted = formatTransaction(transaction);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh]">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between pr-6">
-            <span>Détail de la transaction</span>
+          <DialogTitle className="flex items-center justify-between">
+            Détail de la transaction
             <TransactionStatusBadge status={transaction.paymentStatus} />
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[70vh] pr-2">
+        <ScrollArea className="max-h-[60vh] pr-2">
           <div className="space-y-4">
-            {/* Référence */}
-            <div className="rounded-lg border p-4 space-y-2">
-              <h4 className="text-sm font-semibold flex items-center gap-2">
-                <Hash className="w-4 h-4" />
-                Référence
-              </h4>
-              <p className="text-sm font-mono bg-muted/30 p-2 rounded">
-                {transaction.reference || "N/A"}
-              </p>
-            </div>
+            {/* Membre */}
+            {transaction.membership && (
+              <div className="rounded-lg border p-4 space-y-3">
+                <h4 className="text-sm font-semibold flex items-center gap-2">
+                  <UserIcon className="w-4 h-4" />
+                  Membre
+                  {/* ✅ Badge provisoire */}
+                  {formatted.isProvisional && (
+                    <Badge
+                      variant="secondary"
+                      className="text-xs bg-amber-500/10 text-amber-600"
+                    >
+                      <UserCircle className="w-3 h-3 mr-1" />
+                      Sans compte
+                    </Badge>
+                  )}
+                </h4>
+
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={formatted.memberAvatar} />
+                    <AvatarFallback>
+                      {formatted.memberFullName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .slice(0, 2) || "??"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{formatted.memberFullName}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatted.memberPhone}
+                    </p>
+                    {formatted.memberEmail && formatted.memberEmail !== "-" && (
+                      <p className="text-xs text-muted-foreground">
+                        {formatted.memberEmail}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* ✅ Info membre provisoire */}
+                {formatted.isProvisional && (
+                  <Alert className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+                    <AlertDescription className="text-xs text-amber-700 dark:text-amber-300">
+                      Ce membre n'a pas encore de compte. Les informations
+                      seront synchronisées lors de son inscription.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
 
             {/* Type et montant */}
-            <div className="rounded-lg bg-muted/30 p-4 space-y-3">
+            <div className="rounded-lg border p-4 space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Type</span>
                 <TransactionTypeBadge type={transaction.type} />
               </div>
-              <Separator />
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Montant</span>
-                <span className="text-lg font-bold text-primary">
-                  {formatted.formattedAmount}
-                </span>
+                <p className="text-lg font-bold">{formatted.formattedAmount}</p>
               </div>
-            </div>
-
-            {/* Membre */}
-            {transaction.membership && (
-              <div className="rounded-lg border p-4 space-y-2">
-                <h4 className="text-sm font-semibold flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  Membre
-                </h4>
-                <div className="space-y-1.5 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Nom</span>
-                    <span className="font-medium">{formatted.memberFullName}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Téléphone</span>
-                    <span className="font-medium">{transaction.membership.user?.phone || "-"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Email</span>
-                    <span className="font-medium text-xs truncate max-w-50">
-                      {transaction.membership.user?.email || "-"}
-                    </span>
-                  </div>
+              {transaction.fees && transaction.fees > 0 && (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">Frais</span>
+                  <p className="text-sm font-medium text-red-600">
+                    {formatted.formattedFees}
+                  </p>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* Paiement */}
+            {/* Date et référence */}
             <div className="rounded-lg border p-4 space-y-2">
-              <h4 className="text-sm font-semibold flex items-center gap-2">
-                <CreditCard className="w-4 h-4" />
-                Méthode de paiement
-              </h4>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Méthode</span>
-                <Badge variant="outline" className="text-xs">
-                  {transaction.paymentMethod || "N/A"}
-                </Badge>
+                <span className="text-muted-foreground">Date</span>
+                <span className="font-medium">{formatted.formattedDate}</span>
               </div>
+              {transaction.reference && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Référence</span>
+                  <span className="font-mono text-xs">
+                    {transaction.reference}
+                  </span>
+                </div>
+              )}
+              {transaction.paymentMethod && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Méthode</span>
+                  <Badge variant="outline">{transaction.paymentMethod}</Badge>
+                </div>
+              )}
             </div>
-
-            {/* Date */}
-            <div className="rounded-lg border p-4 space-y-2">
-              <h4 className="text-sm font-semibold flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Date de transaction
-              </h4>
-              <p className="text-sm font-medium">{formatted.formattedDate}</p>
-            </div>
-
-            {/* Organisation */}
-            {transaction.organization && (
-              <div className="rounded-lg border p-4 space-y-2">
-                <h4 className="text-sm font-semibold flex items-center gap-2">
-                  <Building className="w-4 h-4" />
-                  Organisation
-                </h4>
-                <p className="text-sm font-medium">{transaction.organization.name}</p>
-              </div>
-            )}
 
             {/* Description */}
             {transaction.description && (
-              <div className="rounded-lg border p-4 space-y-2">
-                <h4 className="text-sm font-semibold flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
+              <div className="rounded-lg border p-4">
+                <p className="text-sm text-muted-foreground mb-1">
                   Description
-                </h4>
-                <p className="text-sm text-muted-foreground">{transaction.description}</p>
-              </div>
-            )}
-
-            {/* Cotisation liée */}
-            {transaction.contribution && (
-              <div className="rounded-lg border p-4 space-y-2">
-                <h4 className="text-sm font-semibold">Cotisation associée</h4>
-                <div className="space-y-1.5 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Plan</span>
-                    <span className="font-medium">
-                      {transaction.contribution.contributionPlan?.name || "N/A"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Montant</span>
-                    <span className="font-medium">
-                      {formatTransaction({ 
-                        amount: transaction.contribution.amount, 
-                        currency: transaction.currency 
-                      }).formattedAmount}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Dette liée */}
-            {transaction.repayment && (
-              <div className="rounded-lg border p-4 space-y-2">
-                <h4 className="text-sm font-semibold">Remboursement de dette</h4>
-                <div className="space-y-1.5 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Dette</span>
-                    <span className="font-medium">
-                      {transaction.repayment.debt?.title || "N/A"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Montant</span>
-                    <span className="font-medium">
-                      {formatTransaction({ 
-                        amount: transaction.repayment.amount, 
-                        currency: transaction.currency 
-                      }).formattedAmount}
-                    </span>
-                  </div>
-                </div>
+                </p>
+                <p className="text-sm">{transaction.description}</p>
               </div>
             )}
           </div>
@@ -174,6 +150,6 @@ export const TransactionDetailModal = memo(({ open, onClose, transaction }) => {
       </DialogContent>
     </Dialog>
   );
-});
+};
 
 TransactionDetailModal.displayName = "TransactionDetailModal";

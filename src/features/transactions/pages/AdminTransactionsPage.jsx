@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Pagination } from "@/components/ui/pagination";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Receipt, RefreshCw } from "lucide-react";
@@ -13,6 +12,7 @@ import { TransactionTable } from "../components/TransactionTable";
 import { TransactionDetailModal } from "../components/TransactionDetailModal";
 import { computeTransactionStats } from "../utils/transaction-helpers";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
+import { PaginationControls } from "@/components/ui/pagination-control";
 
 export const AdminTransactionsPage = () => {
   const { organizationId } = useParams();
@@ -36,7 +36,7 @@ export const AdminTransactionsPage = () => {
     paymentStatus: statusFilter !== "all" ? statusFilter : undefined,
     paymentMethod: methodFilter !== "all" ? methodFilter : undefined,
     page: currentPage,
-    limit: 15,
+    limit: 10,
   };
 
   const { data, isLoading, refetch } = useTransactions(organizationId, filters);
@@ -45,20 +45,25 @@ export const AdminTransactionsPage = () => {
     () => data?.transactions || [],
     [data?.transactions],
   );
+
   const totals = useMemo(
     () => data?.totals || { totalAmount: 0, totalCount: 0 },
     [data?.totals],
   );
+
   const pagination = data?.pagination;
+  console.log(pagination);
 
   // Stats
-  const stats = useMemo(
-    () => ({
-      ...computeTransactionStats(transactions),
-      ...totals,
-    }),
-    [transactions, totals],
-  );
+  const stats = useMemo(() => {
+    const computedStats = computeTransactionStats(transactions);
+
+    return {
+      ...computedStats,
+      totalAmount: totals.totalAmount || computedStats.totalAmount,
+      total: totals.totalCount || computedStats.total,
+    };
+  }, [transactions, totals]);
 
   const handleViewDetail = (transaction) => {
     setSelectedTransaction(transaction);
@@ -166,12 +171,16 @@ export const AdminTransactionsPage = () => {
               onViewDetail={handleViewDetail}
               isLoading={isLoading}
             />
-            {pagination?.pages > 1 && (
-              <div className="flex justify-center pt-4">
-                <Pagination
+            {pagination && pagination.pages > 1 && (
+              <div className="overflow-x-auto">
+                <PaginationControls
                   currentPage={pagination.page}
                   totalPages={pagination.pages}
-                  onPageChange={setCurrentPage}
+                  totalItems={pagination.total}
+                  itemsPerPage={pagination.limit}
+                  onPageChange={(page) => setCurrentPage(page)}
+                  showFirstLast
+                  showInfo
                 />
               </div>
             )}
