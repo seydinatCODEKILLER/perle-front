@@ -26,6 +26,7 @@ import {
 } from "../constants/transaction.constants";
 import { computeTransactionStats } from "../utils/transaction-helpers";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
+import { PaginationControls } from "@/components/ui/pagination-control";
 
 export const MemberTransactionsPage = () => {
   const { organizationId } = useParams();
@@ -49,7 +50,7 @@ export const MemberTransactionsPage = () => {
     from: dateRange.from,
     to: dateRange.to,
     page: currentPage,
-    limit: 12,
+    limit: 6,
   };
 
   const { data, isLoading, refetch } = useMyTransactions(
@@ -115,7 +116,9 @@ export const MemberTransactionsPage = () => {
   const isEmpty = filteredTransactions.length === 0 && !isLoading;
 
   return (
-    <PageWithBackButton backTo={`/organizations/${organizationId}/me/dashboard`}>
+    <PageWithBackButton
+      backTo={`/organizations/${organizationId}/me/dashboard`}
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
@@ -277,12 +280,16 @@ export const MemberTransactionsPage = () => {
               ))}
             </div>
 
-            {pagination?.pages > 1 && (
-              <div className="flex justify-center pt-4">
-                <Pagination
+            {pagination && pagination.pages > 1 && (
+              <div className="overflow-x-auto">
+                <PaginationControls
                   currentPage={pagination.page}
                   totalPages={pagination.pages}
-                  onPageChange={setCurrentPage}
+                  totalItems={pagination.total}
+                  itemsPerPage={pagination.limit}
+                  onPageChange={(page) => setCurrentPage(page)}
+                  showFirstLast
+                  showInfo
                 />
               </div>
             )}

@@ -26,6 +26,7 @@ import { DebtDetailModal } from "../components/DebtDetailModal";
 import { computeDebtStats } from "../utils/debt-helpers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
+import { PaginationControls } from "@/components/ui/pagination-control";
 
 export const AdminDebtsPage = () => {
   const { organizationId } = useParams();
@@ -49,7 +50,7 @@ export const AdminDebtsPage = () => {
     search: debouncedSearch || undefined,
     status: statusFilter !== "all" ? statusFilter : undefined,
     page: currentPage,
-    limit: 12,
+    limit: 5,
   };
 
   const { data, isLoading, refetch } = useOrganizationDebts(
@@ -245,12 +246,16 @@ export const AdminDebtsPage = () => {
               </div>
             )}
 
-            {pagination?.pages > 1 && (
-              <div className="flex justify-center pt-4">
-                <Pagination
+            {pagination && pagination.pages > 1 && (
+              <div className="overflow-x-auto">
+                <PaginationControls
                   currentPage={pagination.page}
                   totalPages={pagination.pages}
-                  onPageChange={setCurrentPage}
+                  totalItems={pagination.total}
+                  itemsPerPage={pagination.limit}
+                  onPageChange={(page) => setCurrentPage(page)}
+                  showFirstLast
+                  showInfo
                 />
               </div>
             )}

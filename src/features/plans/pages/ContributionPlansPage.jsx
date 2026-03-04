@@ -21,6 +21,7 @@ import { AssignPlanToMemberModal } from "@/features/plans/components/AssignPlanT
 import { GenerateContributionsModal } from "@/features/plans/components/GenerateContributionsModal";
 import { useTogglePlanStatus } from "../hooks/useTogglePlanStatus";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
+import { PaginationControls } from "@/components/ui/pagination-control";
 
 export const ContributionPlansPage = () => {
   const { organizationId } = useParams();
@@ -47,7 +48,7 @@ export const ContributionPlansPage = () => {
     search: debouncedSearch || undefined,
     isActive: statusFilter !== "all" ? statusFilter : undefined,
     page: currentPage,
-    limit: 20,
+    limit: 5,
   };
 
   // Hooks
@@ -218,12 +219,16 @@ export const ContributionPlansPage = () => {
               ))}
             </div>
 
-            {pagination?.pages > 1 && (
-              <div className="flex justify-center pt-2">
-                <Pagination
+            {pagination && pagination.pages > 1 && (
+              <div className="overflow-x-auto">
+                <PaginationControls
                   currentPage={pagination.page}
                   totalPages={pagination.pages}
-                  onPageChange={setCurrentPage}
+                  totalItems={pagination.total}
+                  itemsPerPage={pagination.limit}
+                  onPageChange={(page) => setCurrentPage(page)}
+                  showFirstLast
+                  showInfo
                 />
               </div>
             )}
