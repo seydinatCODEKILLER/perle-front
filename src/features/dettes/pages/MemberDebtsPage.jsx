@@ -52,6 +52,9 @@ export const MemberDebtsPage = () => {
   );
   const pagination = data?.pagination;
 
+  console.log(debts);
+  
+
   // Filtrage côté client par recherche (titre)
   const filteredDebts = useMemo(() => {
     if (!debouncedSearch) return debts;

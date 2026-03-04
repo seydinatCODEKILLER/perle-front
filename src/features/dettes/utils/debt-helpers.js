@@ -1,10 +1,26 @@
+// utils/debt-helpers.js
+
 import { DEBT_STATUS_OPTIONS } from "../constants/debt.constants";
 
+/**
+ * ✅ Formater une dette avec support des membres provisoires
+ */
 export const formatDebt = (debt) => {
   if (!debt) return null;
 
+  // ✅ Utiliser displayInfo si disponible
+  const displayInfo = debt.membership?.displayInfo || {
+    firstName: debt.membership?.user?.prenom || debt.membership?.provisionalFirstName,
+    lastName: debt.membership?.user?.nom || debt.membership?.provisionalLastName,
+    phone: debt.membership?.user?.phone || debt.membership?.provisionalPhone,
+    email: debt.membership?.user?.email || debt.membership?.provisionalEmail,
+    avatar: debt.membership?.user?.avatar || debt.membership?.provisionalAvatar,
+    gender: debt.membership?.user?.gender || debt.membership?.provisionalGender,
+    isProvisional: !debt.membership?.userId,
+  };
+
   const memberFullName = debt.membership
-    ? `${debt.membership.user?.prenom || ""} ${debt.membership.user?.nom || ""}`.trim()
+    ? `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() || "Inconnu"
     : "Inconnu";
 
   const repaidAmount = debt.initialAmount - debt.remainingAmount;
@@ -15,6 +31,11 @@ export const formatDebt = (debt) => {
   return {
     ...debt,
     memberFullName,
+    memberPhone: displayInfo.phone || "-",
+    memberEmail: displayInfo.email || "-",
+    memberAvatar: displayInfo.avatar,
+    memberGender: displayInfo.gender,
+    isProvisional: displayInfo.isProvisional,
     repaidAmount,
     progressPercent,
     formattedInitialAmount: formatAmount(debt.initialAmount),
@@ -57,6 +78,15 @@ export const computeDebtStats = (debts = []) => {
   const totalRemaining = debts.reduce((sum, d) => sum + (d.remainingAmount || 0), 0);
   const totalRepaid = totalAmount - totalRemaining;
 
+  // ✅ Stats membres provisoires
+  const provisionalDebts = debts.filter(d => 
+    d.membership && (d.isProvisional || !d.membership.userId)
+  );
+  
+  const withAccountDebts = debts.filter(d => 
+    d.membership && !d.isProvisional && d.membership.userId
+  );
+
   return {
     total,
     active,
@@ -67,5 +97,7 @@ export const computeDebtStats = (debts = []) => {
     totalAmount,
     totalRemaining,
     totalRepaid,
+    provisionalCount: provisionalDebts.length,
+    withAccountCount: withAccountDebts.length,
   };
 };
