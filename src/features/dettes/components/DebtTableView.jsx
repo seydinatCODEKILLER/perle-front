@@ -1,59 +1,79 @@
 // components/DebtTableView.jsx
 
 import { memo } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Eye, Plus, XCircle } from "lucide-react";
 import { DebtStatusBadge } from "./DebtStatusBadge";
 import { DebtProgressBar } from "./DebtProgressBar";
 import { formatDebt, isDebtEditable } from "../utils/debt-helpers";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
-export const DebtTableView = memo(({
-  debts = [],
-  onViewDetail,
-  onAddRepayment,
-  onCancel,
-  isLoading = false,
-}) => {
-  if (isLoading) return <DebtTableSkeleton />;
+export const DebtTableView = memo(
+  ({
+    debts = [],
+    onViewDetail,
+    onAddRepayment,
+    onCancel,
+    isLoading = false,
+  }) => {
+    if (isLoading) return <DebtTableSkeleton />;
 
-  if (debts.length === 0) return null;
+    if (debts.length === 0) return null;
 
-  return (
-    <div className="rounded-lg border overflow-hidden">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-xs sm:text-sm">Membre</TableHead>
-              <TableHead className="text-xs sm:text-sm">Titre</TableHead>
-              <TableHead className="text-xs sm:text-sm">Dette initiale</TableHead>
-              <TableHead className="text-xs sm:text-sm hidden md:table-cell">Remboursé</TableHead>
-              <TableHead className="text-xs sm:text-sm">Restant</TableHead>
-              <TableHead className="text-xs sm:text-sm hidden lg:table-cell">Progression</TableHead>
-              <TableHead className="text-xs sm:text-sm">Statut</TableHead>
-              <TableHead className="text-xs sm:text-sm hidden lg:table-cell">Échéance</TableHead>
-              <TableHead className="text-xs sm:text-sm text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {debts.map((debt) => (
-              <DebtRow
-                key={debt.id}
-                debt={debt}
-                onViewDetail={onViewDetail}
-                onAddRepayment={onAddRepayment}
-                onCancel={onCancel}
-              />
-            ))}
-          </TableBody>
-        </Table>
+    return (
+      <div className="rounded-lg border overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-xs sm:text-sm">Membre</TableHead>
+                <TableHead className="text-xs sm:text-sm">Titre</TableHead>
+                <TableHead className="text-xs sm:text-sm">
+                  Dette initiale
+                </TableHead>
+                <TableHead className="text-xs sm:text-sm hidden md:table-cell">
+                  Remboursé
+                </TableHead>
+                <TableHead className="text-xs sm:text-sm">Restant</TableHead>
+                <TableHead className="text-xs sm:text-sm hidden lg:table-cell">
+                  Progression
+                </TableHead>
+                <TableHead className="text-xs sm:text-sm">Statut</TableHead>
+                <TableHead className="text-xs sm:text-sm hidden lg:table-cell">
+                  Échéance
+                </TableHead>
+                <TableHead className="text-xs sm:text-sm text-right">
+                  Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {debts.map((debt) => (
+                <DebtRow
+                  key={debt.id}
+                  debt={debt}
+                  onViewDetail={onViewDetail}
+                  onAddRepayment={onAddRepayment}
+                  onCancel={onCancel}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  },
+);
 
 DebtTableView.displayName = "DebtTableView";
 
@@ -68,14 +88,35 @@ const DebtRow = memo(({ debt, onViewDetail, onAddRepayment, onCancel }) => {
       <TableCell>
         <div className="flex items-center gap-2">
           <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
+            <AvatarImage src={formatted.memberAvatar} />
             <AvatarFallback className="text-xs">
-              {formatted.memberFullName?.split(' ').map(n => n[0]).join('').slice(0, 2) || '??'}
+              {formatted.memberFullName
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2) || "??"}
             </AvatarFallback>
           </Avatar>
+
           <div className="min-w-0">
-            <p className="text-xs sm:text-sm font-medium truncate max-w-30 sm:max-w-none">
-              {formatted.memberFullName || "Inconnu"}
+            {/* Nom */}
+            <p className="text-xs sm:text-sm font-medium truncate">
+              {formatted.memberFullName}
             </p>
+
+            {/* Numéro + badge */}
+            <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground truncate hidden sm:flex">
+              <span>{formatted.memberPhone}</span>
+
+              {formatted.isProvisional && (
+                <Badge
+                  variant="secondary"
+                  className="text-[9px] h-4 px-1 bg-amber-500/10 text-amber-600"
+                >
+                  Provisoire
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
       </TableCell>
@@ -87,7 +128,9 @@ const DebtRow = memo(({ debt, onViewDetail, onAddRepayment, onCancel }) => {
 
       {/* Dette initiale */}
       <TableCell>
-        <p className="text-xs sm:text-sm font-semibold">{formatted.formattedInitialAmount}</p>
+        <p className="text-xs sm:text-sm font-semibold">
+          {formatted.formattedInitialAmount}
+        </p>
       </TableCell>
 
       {/* Remboursé */}
@@ -108,7 +151,9 @@ const DebtRow = memo(({ debt, onViewDetail, onAddRepayment, onCancel }) => {
       <TableCell className="hidden lg:table-cell w-32">
         <div className="space-y-1">
           <DebtProgressBar percent={formatted.progressPercent} />
-          <p className="text-[10px] text-muted-foreground">{formatted.progressPercent}%</p>
+          <p className="text-[10px] text-muted-foreground">
+            {formatted.progressPercent}%
+          </p>
         </div>
       </TableCell>
 
@@ -170,23 +215,59 @@ const DebtTableSkeleton = () => (
       <Table>
         <TableHeader>
           <TableRow>
-            {["Membre", "Titre", "Dette", "Remboursé", "Restant", "Progression", "Statut", "Échéance", "Actions"].map((h) => (
-              <TableHead key={h} className="text-xs sm:text-sm">{h}</TableHead>
+            {[
+              "Membre",
+              "Titre",
+              "Dette",
+              "Remboursé",
+              "Restant",
+              "Progression",
+              "Statut",
+              "Échéance",
+              "Actions",
+            ].map((h) => (
+              <TableHead key={h} className="text-xs sm:text-sm">
+                {h}
+              </TableHead>
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
           {[...Array(5)].map((_, i) => (
             <TableRow key={i}>
-              <TableCell><div className="flex items-center gap-2"><Skeleton className="w-8 h-8 rounded-full" /><Skeleton className="h-4 w-24" /></div></TableCell>
-              <TableCell><Skeleton className="h-4 w-28" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-              <TableCell><Skeleton className="h-2 w-24 rounded-full" /></TableCell>
-              <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-              <TableCell><div className="flex justify-end gap-1"><Skeleton className="w-8 h-8" /><Skeleton className="w-8 h-8" /></div></TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-28" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-20" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-20" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-20" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-2 w-24 rounded-full" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-6 w-16 rounded-full" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-20" />
+              </TableCell>
+              <TableCell>
+                <div className="flex justify-end gap-1">
+                  <Skeleton className="w-8 h-8" />
+                  <Skeleton className="w-8 h-8" />
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
