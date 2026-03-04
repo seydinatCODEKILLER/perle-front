@@ -21,6 +21,7 @@ import { DebtDetailModal } from "../components/DebtDetailModal";
 import { computeDebtStats } from "../utils/debt-helpers";
 import { DEBT_STATUS_OPTIONS } from "../constants/debt.constants";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
+import { PaginationControls } from "@/components/ui/pagination-control";
 
 export const MemberDebtsPage = () => {
   const { organizationId } = useParams();
@@ -39,7 +40,7 @@ export const MemberDebtsPage = () => {
   const filters = {
     status: statusFilter !== "all" ? statusFilter : undefined,
     page: currentPage,
-    limit: 12,
+    limit: 6,
   };
 
   // ✅ Utiliser useMyDebts - pas besoin de membershipId
@@ -208,15 +209,19 @@ export const MemberDebtsPage = () => {
                 />
               ))}
             </div>
-            {pagination?.pages > 1 && (
-              <div className="flex justify-center pt-4">
-                <Pagination
-                  currentPage={pagination.page}
-                  totalPages={pagination.pages}
-                  onPageChange={setCurrentPage}
-                />
-              </div>
-            )}
+                    {pagination && pagination.pages > 1 && (
+                      <div className="overflow-x-auto">
+                        <PaginationControls
+                          currentPage={pagination.page}
+                          totalPages={pagination.pages}
+                          totalItems={pagination.total}
+                          itemsPerPage={pagination.limit}
+                          onPageChange={(page) => setCurrentPage(page)}
+                          showFirstLast
+                          showInfo
+                        />
+                      </div>
+                    )}
           </>
         )}
 

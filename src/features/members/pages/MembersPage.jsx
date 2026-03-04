@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Search, Plus, RefreshCw } from "lucide-react";
 import { MemberDetailDrawer } from "../components/MemberDetailDrawer";
+import { PaginationControls } from "@/components/ui/pagination-control";
 
 export const MembersPage = () => {
   const { organizationId } = useParams();
@@ -36,6 +37,7 @@ export const MembersPage = () => {
   const [selectedMember, setSelectedMember] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isActionDrawerOpen, setIsActionDrawerOpen] = useState(false);
   const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
@@ -47,7 +49,8 @@ export const MembersPage = () => {
   const filters = {
     search: debouncedSearch || undefined,
     status: statusFilter !== "all" ? statusFilter : undefined,
-    limit: 1000,
+    page: currentPage,
+    limit: 8,
   };
 
   const { data, isLoading, refetch } = useOrganizationMembers(
@@ -61,6 +64,7 @@ export const MembersPage = () => {
   const deleteMutation = useDeleteMember();
 
   const members = useMemo(() => data?.members || [], [data?.members]);
+  const pagination = data?.pagination;
 
   // Handlers...
   const handleAddMember = (memberData) => {
@@ -242,6 +246,20 @@ export const MembersPage = () => {
             </div>
           )}
         </div>
+
+        {pagination && pagination.pages > 1 && (
+          <div className="overflow-x-auto pt-4">
+            <PaginationControls
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              totalItems={pagination.total}
+              itemsPerPage={pagination.limit}
+              onPageChange={(page) => setCurrentPage(page)}
+              showFirstLast
+              showInfo
+            />
+          </div>
+        )}
 
         {/* Modals & Drawers */}
         <AddMemberModal

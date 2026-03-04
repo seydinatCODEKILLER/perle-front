@@ -27,6 +27,7 @@ import { ExpenseDetailModal } from "../components/ExpenseDetailModal";
 import { computeExpenseStats } from "../utils/expense-helpers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
+import { PaginationControls } from "@/components/ui/pagination-control";
 
 export const ExpensesPage = () => {
   const { organizationId } = useParams();
@@ -53,7 +54,7 @@ export const ExpensesPage = () => {
     status: statusFilter !== "all" ? statusFilter : undefined,
     category: categoryFilter !== "all" ? categoryFilter : undefined,
     page: currentPage,
-    limit: 12,
+    limit: 5,
   };
 
   const { data, isLoading, refetch } = useExpenses(organizationId, filters);
@@ -277,12 +278,16 @@ export const ExpensesPage = () => {
               </div>
             )}
 
-            {pagination?.pages > 1 && (
-              <div className="flex justify-center pt-4">
-                <Pagination
+            {pagination && pagination.pages > 1 && (
+              <div className="overflow-x-auto">
+                <PaginationControls
                   currentPage={pagination.page}
                   totalPages={pagination.pages}
-                  onPageChange={setCurrentPage}
+                  totalItems={pagination.total}
+                  itemsPerPage={pagination.limit}
+                  onPageChange={(page) => setCurrentPage(page)}
+                  showFirstLast
+                  showInfo
                 />
               </div>
             )}
