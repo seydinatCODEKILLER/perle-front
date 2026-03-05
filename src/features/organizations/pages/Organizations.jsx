@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { TrashModal } from "../components/TrashModal";
 import { UserMenuDropdown } from "../components/UserMenuDropdown";
+import { FloatLogoutWithConfirm } from "@/components/layout/FloatLogoutWithConfirm";
 
 export const Organizations = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -185,7 +186,7 @@ export const Organizations = () => {
         onPageChange={setTrashPage}
       />
 
-      {/* <FloatLogoutWithConfirm /> */}
+      <FloatLogoutWithConfirm />
     </div>
   );
 };
