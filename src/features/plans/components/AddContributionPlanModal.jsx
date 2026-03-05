@@ -1,9 +1,29 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -39,7 +59,6 @@ export const AddContributionPlanModal = ({
   const differentiateByGender = form.watch("differentiateByGender");
 
   const handleSubmit = (data) => {
-    // ✅ Préparer les données selon le mode
     const submitData = {
       name: data.name,
       description: data.description || "",
@@ -51,29 +70,24 @@ export const AddContributionPlanModal = ({
     };
 
     if (data.differentiateByGender) {
-      // Mode différencié : envoyer amountMale et amountFemale
       submitData.amountMale = data.amountMale;
       submitData.amountFemale = data.amountFemale;
-      submitData.amount = null; // ✅ amount à null
+      submitData.amount = null;
     } else {
-      // Mode unique : envoyer amount
       submitData.amount = data.amount;
-      submitData.amountMale = null; // ✅ montants genrés à null
+      submitData.amountMale = null;
       submitData.amountFemale = null;
     }
 
     onSubmit(submitData);
   };
 
-  // ✅ Réinitialiser les valeurs quand on toggle
   const handleGenderToggle = (checked) => {
     if (checked) {
-      // Passer en mode différencié
       form.setValue("amount", null);
       form.setValue("amountMale", null);
       form.setValue("amountFemale", null);
     } else {
-      // Passer en mode unique
       form.setValue("amountMale", null);
       form.setValue("amountFemale", null);
       form.setValue("amount", null);
@@ -98,11 +112,14 @@ export const AddContributionPlanModal = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-6"
+          >
             {/* Informations de base */}
             <div className="space-y-4">
               <h3 className="text-sm font-semibold">Informations générales</h3>
-              
+
               <FormField
                 control={form.control}
                 name="name"
@@ -110,7 +127,10 @@ export const AddContributionPlanModal = ({
                   <FormItem>
                     <FormLabel>Nom du plan *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ex: Cotisation mensuelle" {...field} />
+                      <Input
+                        placeholder="Ex: Cotisation mensuelle"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -141,8 +161,10 @@ export const AddContributionPlanModal = ({
             {/* Configuration financière */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Configuration financière</h3>
-                
+                <h3 className="text-sm font-semibold">
+                  Configuration financière
+                </h3>
+
                 {/* ✅ Toggle différenciation par genre */}
                 <FormField
                   control={form.control}
@@ -203,7 +225,10 @@ export const AddContributionPlanModal = ({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Fréquence *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Sélectionner" />
@@ -211,7 +236,10 @@ export const AddContributionPlanModal = ({
                           </FormControl>
                           <SelectContent>
                             {PLAN_FREQUENCY_OPTIONS.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
                                 {option.label}
                               </SelectItem>
                             ))}
@@ -228,7 +256,8 @@ export const AddContributionPlanModal = ({
                   <Alert className="border-blue-500/50 bg-blue-500/10">
                     <Users2 className="h-4 w-4 text-blue-600" />
                     <AlertDescription className="text-xs">
-                      Les montants seront appliqués selon le genre renseigné dans le profil du membre.
+                      Les montants seront appliqués selon le genre renseigné
+                      dans le profil du membre.
                     </AlertDescription>
                   </Alert>
 
@@ -253,7 +282,9 @@ export const AddContributionPlanModal = ({
                               value={field.value || ""}
                               onChange={(e) => {
                                 const value = e.target.value;
-                                field.onChange(value ? parseFloat(value) : null);
+                                field.onChange(
+                                  value ? parseFloat(value) : null,
+                                );
                               }}
                             />
                           </FormControl>
@@ -281,7 +312,9 @@ export const AddContributionPlanModal = ({
                               value={field.value || ""}
                               onChange={(e) => {
                                 const value = e.target.value;
-                                field.onChange(value ? parseFloat(value) : null);
+                                field.onChange(
+                                  value ? parseFloat(value) : null,
+                                );
                               }}
                             />
                           </FormControl>
@@ -298,7 +331,10 @@ export const AddContributionPlanModal = ({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Fréquence *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Sélectionner" />
@@ -306,7 +342,10 @@ export const AddContributionPlanModal = ({
                           </FormControl>
                           <SelectContent>
                             {PLAN_FREQUENCY_OPTIONS.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
                                 {option.label}
                               </SelectItem>
                             ))}
@@ -328,7 +367,7 @@ export const AddContributionPlanModal = ({
                 <Calendar className="w-4 h-4" />
                 Période
               </h3>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -340,8 +379,16 @@ export const AddContributionPlanModal = ({
                         <Input
                           type="date"
                           {...field}
-                          value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
-                          onChange={(e) => field.onChange(new Date(e.target.value))}
+                          value={
+                            field.value
+                              ? new Date(field.value)
+                                  .toISOString()
+                                  .split("T")[0]
+                              : ""
+                          }
+                          onChange={(e) =>
+                            field.onChange(new Date(e.target.value))
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -359,8 +406,18 @@ export const AddContributionPlanModal = ({
                         <Input
                           type="date"
                           {...field}
-                          value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''}
-                          onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                          value={
+                            field.value
+                              ? new Date(field.value)
+                                  .toISOString()
+                                  .split("T")[0]
+                              : ""
+                          }
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value ? new Date(e.target.value) : null,
+                            )
+                          }
                         />
                       </FormControl>
                       <FormDescription className="text-xs">
@@ -376,7 +433,12 @@ export const AddContributionPlanModal = ({
             <Separator />
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="outline" onClick={onClose} type="button" disabled={isPending}>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                type="button"
+                disabled={isPending}
+              >
                 Annuler
               </Button>
               <Button type="submit" disabled={isPending}>

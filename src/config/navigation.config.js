@@ -18,7 +18,16 @@ export const NAVIGATION_CONFIG = {
       },
     ],
     management: [
-      { label: "Dashboard", path: "dashboard", icon: "LayoutDashboard" },
+      {
+        label: "Dashboard Financier",
+        path: "dashboard",
+        icon: "DollarSign",
+      },
+      {
+        label: "Mes plans de cotisations",
+        path: "contribution-plans",
+        icon: "FileText",
+      },
       { label: "Cotisations", path: "contributions", icon: "Coins" },
       { label: "Transactions", path: "transactions", icon: "ArrowLeftRight" },
       { label: "Dettes", path: "debts", icon: "CreditCard" },
@@ -64,4 +73,19 @@ export const ROLES = {
 export const SPACES = {
   PERSONAL: "personal",
   MANAGEMENT: "management",
+};
+
+export const hasManagementAccess = (role) => {
+  return role === ROLES.ADMIN || role === ROLES.FINANCIAL_MANAGER;
+};
+
+export const getDefaultDashboard = (role) => {
+  switch (role) {
+    case ROLES.ADMIN:
+    case ROLES.FINANCIAL_MANAGER:
+      return "dashboard";
+    case ROLES.MEMBER:
+    default:
+      return "me/dashboard";
+  }
 };
