@@ -27,8 +27,6 @@ import {
 } from "../utils/contribution-plan-helpers";
 import { cn } from "@/lib/utils";
 
-// Version alternative avec effet glassmorphism
-
 export const ContributionPlanCard = ({
   plan,
   onEdit = () => {},
@@ -95,9 +93,28 @@ export const ContributionPlanCard = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => onEdit(plan)}>
-                <Edit className="w-4 h-4 mr-2" />
-                Modifier
+              {plan.isActive && (
+                <>
+                  <DropdownMenuItem onClick={() => onEdit(plan)}>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Modifier
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => onGenerate(plan)}>
+                    <Zap className="w-4 h-4 mr-2" />
+                    Générer
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => onAssign(plan)}>
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Assignation
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              <DropdownMenuItem onClick={() => onView(plan)}>
+                <Eye className="w-4 h-4 mr-2" />
+                Consultez
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -201,41 +218,6 @@ export const ContributionPlanCard = ({
             </div>
           )}
         </div>
-
-        {/* Actions */}
-        {plan.isActive && (
-          <div className="flex gap-2">
-            <Button
-              variant="default"
-              size="sm"
-              className="flex-1 h-9"
-              onClick={() => onGenerate(plan)}
-            >
-              <Zap className="w-3.5 h-3.5 mr-1.5" />
-              Générer
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 h-9"
-              onClick={() => onAssign(plan)}
-            >
-              <UserPlus className="w-3.5 h-3.5 mr-1.5" />
-              Assigner
-            </Button>
-          </div>
-        )}
-        {plan.isActive && (
-          <Button
-            variant="default"
-            size="sm"
-            className="w-full h-9"
-            onClick={() => onView(plan)}
-          >
-            <Eye className="w-3.5 h-3.5 mr-1.5" />
-            Voir les détails
-          </Button>
-        )}
       </CardContent>
     </Card>
   );
