@@ -102,7 +102,7 @@ export const ViewPlanMembersModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-[95vw] sm:w-full h-[95vh] sm:h-[90vh] p-0 flex flex-col gap-0">
+      <DialogContent className="max-w-2xl w-[95vw] sm:w-full h-[95vh] sm:h-[90vh] p-0 flex flex-col gap-0">
         {/* ✅ Header moderne avec gradient - Responsive */}
         <div className="relative overflow-hidden bg-linear-to-br text-white">
           {/* Effet de fond */}
