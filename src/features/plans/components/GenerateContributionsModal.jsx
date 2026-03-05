@@ -27,14 +27,13 @@ export const GenerateContributionsModal = ({
   isGenerating = false,
 }) => {
   const [force, setForce] = useState(false);
-  const [dueDateOffset, setDueDateOffset] = useState(0);
+  const [dueDateOffset, setDueDateOffset] = useState(0);  
 
   // ✅ Récupérer les membres pour afficher les stats
   const { data: membersData } = useOrganizationMembers(organizationId, {
     status: "ACTIVE",
     limit: 1000,
   });
-
   const members = useMemo(() => membersData?.members || [], [membersData]);
 
   // ✅ Calculer les stats
@@ -78,7 +77,7 @@ export const GenerateContributionsModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">

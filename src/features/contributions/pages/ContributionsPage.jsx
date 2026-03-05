@@ -24,6 +24,8 @@ import { computeContributionStats } from "../utils/contribution-helpers";
 import { useOrganizationPlans } from "@/features/plans/hooks/useContributionPlans";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
 import { PaginationControls } from "@/components/ui/pagination-control";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 export const ContributionsPage = () => {
   const { organizationId } = useParams();
@@ -48,11 +50,14 @@ export const ContributionsPage = () => {
     status: statusFilter !== "all" ? statusFilter : undefined,
     contributionPlanId: planFilter !== "all" ? planFilter : undefined,
     page: currentPage,
-    limit: 6,
+    limit: 8,
   };
 
   // Data
-  const { data, isLoading } = useContributions(organizationId, filters);
+  const { data, isLoading, refetch } = useContributions(
+    organizationId,
+    filters,
+  );
   const { data: plansData } = useOrganizationPlans(organizationId, {
     isActive: "true",
     limit: 100,
@@ -159,10 +164,27 @@ export const ContributionsPage = () => {
   return (
     <PageWithBackButton backTo={`/organizations/${organizationId}/dashboard`}>
       <div className="space-y-6">
-        <PageHeader
-          title="Gestion des cotisations"
-          description="Suivez et gérez les cotisations de votre organisation"
-        />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <PageHeader
+            title="Gestion des cotisations"
+            description="Suivez et gérez les cotisations de votre organisation"
+          />
+
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isLoading}
+              className="gap-1.5 flex-1 sm:flex-none"
+            >
+              <RefreshCw
+                className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
+              />
+              <span className="text-xs sm:text-sm">Actualiser</span>
+            </Button>
+          </div>
+        </div>
 
         <ContributionStatsCards stats={stats} isLoading={isLoading} />
 
