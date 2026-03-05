@@ -18,7 +18,7 @@ import { Pagination } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DollarSign, Plus } from "lucide-react";
+import { DollarSign, Plus, RefreshCw } from "lucide-react";
 import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 import { AssignPlanToMemberModal } from "@/features/plans/components/AssignPlanToMemberModal";
 import { GenerateContributionsModal } from "@/features/plans/components/GenerateContributionsModal";
@@ -60,12 +60,12 @@ export const ContributionPlansPage = () => {
   };
 
   // Hooks
-  const { data, isLoading } = useOrganizationPlans(organizationId, filters);
+  const { data, isLoading, refetch } = useOrganizationPlans(
+    organizationId,
+    filters,
+  );
   const { data: contributionsData, isLoading: isLoadingContributions } =
     useContributionPlan(organizationId, planToView?.id);
-
-    console.log(contributionsData)
-    
 
   const createMutation = useCreatePlan();
   const updateMutation = useUpdatePlan();
@@ -74,7 +74,7 @@ export const ContributionPlansPage = () => {
   const assignMutation = useAssignPlanToMember();
 
   const plans = data?.plans || [];
-  
+
   const pagination = data?.pagination;
 
   // Handlers pour CRUD des plans
@@ -154,10 +154,25 @@ export const ContributionPlansPage = () => {
           title="Plans de cotisation"
           description="Gérez les plans de cotisation de votre organisation"
           actions={
-            <Button onClick={() => setIsAddModalOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Créer un plan
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                disabled={isLoading}
+                className="gap-1.5"
+              >
+                <RefreshCw
+                  className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`}
+                />
+                <span className="text-sm">Actualiser</span>
+              </Button>
+
+              <Button size="sm" onClick={() => setIsAddModalOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Créer un plan
+              </Button>
+            </div>
           }
         />
 
@@ -282,6 +297,7 @@ export const ContributionPlansPage = () => {
             setPlanToGenerate(null);
           }}
           plan={planToGenerate}
+          organizationId={organizationId}
           onGenerate={handleGenerate}
           isGenerating={generateMutation.isPending}
         />

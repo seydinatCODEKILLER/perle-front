@@ -27,6 +27,7 @@ import { MemberDebtsPage } from "@/features/dettes/pages/MemberDebtsPage";
 import { ProfilePage } from "@/features/profile/pages/ProfilePage";
 import { ExpensesPage } from "@/features/depense/pages/ExpensesPage";
 import { OrganizationSettingsPage } from "@/features/parametres/pages/OrganizationSettingsPage";
+import { DashboardRouter } from "@/features/dashboard/components/DashboardRouter";
 
 // Loader pour le lazy loading
 const PageLoader = () => (
@@ -108,7 +109,7 @@ export const AppRoutes = () => {
           }
         >
           {/* Routes de gestion (management space) */}
-          <Route path="dashboard" element={<OrganizationDashboard />} />
+           <Route path="dashboard" element={<DashboardRouter />} />
           <Route path="members" element={<MembersPage />} />
           <Route
             path="contribution-plans"
