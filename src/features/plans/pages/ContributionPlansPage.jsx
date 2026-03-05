@@ -2,7 +2,10 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { useOrganizationPlans } from "../hooks/useContributionPlans";
+import {
+  useContributionPlan,
+  useOrganizationPlans,
+} from "../hooks/useContributionPlans";
 import { useCreatePlan } from "../hooks/useCreatePlan";
 import { useUpdatePlan } from "../hooks/useUpdatePlan";
 import { useGenerateContributions } from "../hooks/useGenerateContributions";
@@ -22,6 +25,7 @@ import { GenerateContributionsModal } from "@/features/plans/components/Generate
 import { useTogglePlanStatus } from "../hooks/useTogglePlanStatus";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
 import { PaginationControls } from "@/components/ui/pagination-control";
+import { ViewPlanMembersModal } from "../components/ViewPlanMembersDrawer";
 
 export const ContributionPlansPage = () => {
   const { organizationId } = useParams();
@@ -34,6 +38,10 @@ export const ContributionPlansPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+
+  // ✅ NOUVEAU : État pour le drawer
+  const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false);
+  const [planToView, setPlanToView] = useState(null);
 
   // Selected items
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -53,6 +61,12 @@ export const ContributionPlansPage = () => {
 
   // Hooks
   const { data, isLoading } = useOrganizationPlans(organizationId, filters);
+  const { data: contributionsData, isLoading: isLoadingContributions } =
+    useContributionPlan(organizationId, planToView?.id);
+
+    console.log(contributionsData)
+    
+
   const createMutation = useCreatePlan();
   const updateMutation = useUpdatePlan();
   const toggleStatusMutation = useTogglePlanStatus();
@@ -60,6 +74,7 @@ export const ContributionPlansPage = () => {
   const assignMutation = useAssignPlanToMember();
 
   const plans = data?.plans || [];
+  
   const pagination = data?.pagination;
 
   // Handlers pour CRUD des plans
@@ -197,10 +212,9 @@ export const ContributionPlansPage = () => {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3">
               {plans.map((plan) => (
                 <ContributionPlanCard
-                  key={plan.id}
                   plan={plan}
                   onEdit={(p) => {
                     setSelectedPlan(p);
@@ -214,6 +228,10 @@ export const ContributionPlansPage = () => {
                   onAssign={(p) => {
                     setPlanToAssign(p);
                     setIsAssignModalOpen(true);
+                  }}
+                  onView={(p) => {
+                    setPlanToView(p);
+                    setIsViewDrawerOpen(true);
                   }}
                 />
               ))}
@@ -296,6 +314,18 @@ export const ContributionPlansPage = () => {
           confirmText={planToToggle?.isActive ? "Désactiver" : "Activer"}
           cancelText="Annuler"
           isLoading={toggleStatusMutation.isPending}
+        />
+
+        {/* ✅ NOUVEAU : Drawer de consultation */}
+        <ViewPlanMembersModal
+          open={isViewDrawerOpen}
+          onClose={() => {
+            setIsViewDrawerOpen(false);
+            setPlanToView(null);
+          }}
+          plan={planToView}
+          contributions={contributionsData?.contributions || []}
+          isLoading={isLoadingContributions}
         />
       </div>
     </PageWithBackButton>
