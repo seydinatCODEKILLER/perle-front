@@ -36,20 +36,20 @@ const rawAuthApi = {
   /**
    * Rafraîchir l'access token
    */
-  refreshToken: async (refreshToken) =>
-    await api.post("/auth/refresh-token", { refreshToken }),
+  refreshToken: async () =>
+    await api.post("/auth/refresh-token"),
 
   /**
    * Déconnexion
    */
-  logout: async (refreshToken) =>
-    await api.post("/auth/logout", { refreshToken }),
+  logout: async () =>
+    await api.post("/auth/logout"),
 
   /**
    * Révoquer un refresh token spécifique
    */
-  revokeRefreshToken: async (refreshToken) =>
-    await api.post("/auth/revoke-refresh-token", { refreshToken }),
+  revokeRefreshToken: async () =>
+    await api.post("/auth/revoke-refresh-token"),
 
   /**
    * Révoquer tous les tokens de l'utilisateur

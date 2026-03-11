@@ -1,4 +1,5 @@
-import { tokenManager } from "../utils/token-manager";
+// shared/services/api/interceptors/response.interceptor.js
+
 import {
   formatValidationErrors,
   getErrorMessage,
@@ -9,7 +10,6 @@ import { isRetryableError, getRetryDelay, sleep } from "../utils/retry.utils";
 import { API_CONFIG } from "../config/api.config";
 import apiClient from "../api.service";
 import { shouldAutoLogoutOn401 } from "../utils/endpoint-checker";
-import { authApi } from "@/features/auth";
 
 /**
  * Intercepteur de réponse réussie
@@ -17,9 +17,7 @@ import { authApi } from "@/features/auth";
 export const responseInterceptor = (response) => {
   console.log("📥 RESPONSE:", response.config.url);
   console.log("📊 Status:", response.status);
-  console.log("📦 Data:", response.data);
   
-  // Logger le temps de réponse en dev
   if (import.meta.env.DEV && response.config.metadata) {
     const duration = Date.now() - response.config.metadata.startTime;
     console.log(`⏱️ Duration: ${duration}ms`);
@@ -29,17 +27,15 @@ export const responseInterceptor = (response) => {
 };
 
 /**
- * Intercepteur d'erreur de réponse avec gestion du refresh token
+ * Intercepteur d'erreur de réponse
  */
 export const responseErrorInterceptor = async (error) => {
   const config = error.config;
 
-  // Erreur de réseau (pas de réponse)
   if (!error.response) {
     return handleNetworkError(error, config);
   }
 
-  // Erreur HTTP (avec réponse)
   return handleHttpError(error, config);
 };
 
@@ -58,7 +54,6 @@ const handleNetworkError = async (error, config) => {
     errorTitle = "Requête annulée";
   }
 
-  // Retry automatique si possible
   if (isRetryableError(error) && config.metadata.retryCount < API_CONFIG.RETRY_ATTEMPTS) {
     return retryRequest(config);
   }
@@ -74,31 +69,26 @@ const handleHttpError = async (error, config) => {
   const { status, data } = error.response;
   const url = config?.url || "";
 
-  // 401 - Non autorisé (avec tentative de refresh token)
   if (status === 401) {
     return handle401Error(error, config, url);
   }
 
-  // 403 - Accès interdit
   if (status === 403) {
     showErrorToast("Accès refusé", getErrorMessage(status, data));
     return Promise.reject(error);
   }
 
-  // 404 - Non trouvé
   if (status === 404) {
     showErrorToast("Ressource introuvable", getErrorMessage(status, data));
     return Promise.reject(error);
   }
 
-  // 422 - Erreurs de validation
   if (status === 422 && data?.errors) {
     const errorMessages = formatValidationErrors(data.errors);
     showErrorToast("Erreur de validation", errorMessages, 5000);
     return Promise.reject(error);
   }
 
-  // 429 - Rate limit
   if (status === 429) {
     const retryAfter = error.response.headers["retry-after"];
     const message = retryAfter 
@@ -109,7 +99,6 @@ const handleHttpError = async (error, config) => {
     return Promise.reject(error);
   }
 
-  // 500+ - Erreurs serveur (avec retry)
   if (status >= 500) {
     if (isRetryableError(error) && config.metadata.retryCount < API_CONFIG.RETRY_ATTEMPTS) {
       return retryRequest(config);
@@ -119,84 +108,96 @@ const handleHttpError = async (error, config) => {
     return Promise.reject(error);
   }
 
-  // Autres erreurs
   showErrorToast("Une erreur est survenue", getErrorMessage(status, data));
   return Promise.reject(error);
 };
 
 /**
- * ✅ GESTION INTELLIGENTE DES 401 AVEC REFRESH TOKEN
+ * ✅ GESTION DES 401 AVEC COOKIES (version corrigée sans boucle)
  */
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+const subscribeTokenRefresh = (callback) => {
+  refreshSubscribers.push(callback);
+};
+
+const onRefreshed = () => {
+  refreshSubscribers.forEach((callback) => callback());
+  refreshSubscribers = [];
+};
+
 const handle401Error = async (error, originalConfig, url) => {
-  // CAS 1: Endpoint public (login, register) → ne pas tenter de refresh
+  console.log("🔴 401 Error on:", url);
+
+  // ✅ CAS 1: Endpoint où 401 est normal → ne PAS tenter de refresh
   if (!shouldAutoLogoutOn401(url)) {
+    console.log("⚠️ 401 attendu sur:", url, "- Pas de refresh");
     return Promise.reject(error);
   }
 
-  // CAS 2: Requête de refresh token qui échoue → déconnecter
-  if (url.includes("/auth/refresh-token")) {
-    console.log("❌ Refresh token invalide, déconnexion");
-    tokenManager.logout("Session expirée. Veuillez vous reconnecter.");
+  // ✅ CAS 2: Logout qui échoue → ne PAS déconnecter (éviter la boucle)
+  if (url.includes("/auth/logout")) {
+    console.log("⚠️ Logout failed but ignoring (avoiding loop)");
+    // Ne pas déclencher de logout, juste rejeter l'erreur
     return Promise.reject(error);
   }
 
-  // CAS 3: Endpoint protégé → tenter un refresh du token
+  // ✅ CAS 3: Refresh qui échoue → déconnexion silencieuse
+  if (url.includes("/auth/refresh-token") || url.includes("/auth/refresh")) {
+    console.log("❌ Refresh token invalide, déconnexion silencieuse");
+    
+    const { useAuthStore } = await import("@/features/auth/store/auth.store");
+    const store = useAuthStore.getState();
+    
+    // ✅ Déconnexion SANS appel API (éviter la boucle)
+    store.silentLogout("Session expirée. Veuillez vous reconnecter.");
+    
+    return Promise.reject(error);
+  }
+
+  // ✅ CAS 4: Endpoint protégé → tenter un refresh du token
   
   // Si un refresh est déjà en cours, attendre son résultat
-  if (tokenManager.isRefreshInProgress()) {
+  if (isRefreshing) {
+    console.log("⏳ Refresh déjà en cours, mise en file d'attente");
+    // eslint-disable-next-line no-unused-vars
     return new Promise((resolve, reject) => {
-      tokenManager.subscribeTokenRefresh((newToken) => {
-        if (newToken) {
-          originalConfig.headers.Authorization = `Bearer ${newToken}`;
-          resolve(apiClient(originalConfig));
-        } else {
-          reject(error);
-        }
+      subscribeTokenRefresh(() => {
+        console.log("✅ Retry requête après refresh");
+        resolve(apiClient(originalConfig));
       });
     });
   }
 
-  // Marquer le refresh comme en cours
-  tokenManager.setRefreshing(true);
+  isRefreshing = true;
 
   try {
-    const refreshToken = tokenManager.getRefreshToken();
-    
-    if (!refreshToken) {
-      throw new Error("Pas de refresh token disponible");
-    }
+    console.log("🔄 Tentative de refresh du token via cookie...");
 
-    console.log("🔄 Tentative de refresh du token...");
+    // ✅ Appel simple sans attendre de données dans le body
+    await apiClient.post("/auth/refresh-token");
 
-    // Appeler l'API de refresh
-    const response = await authApi.refreshToken(refreshToken);
-    const newAccessToken = response.accessToken;
-
-    // Mettre à jour le token dans le store
-    const { useAuthStore } = await import("@/features/auth/store/auth.store");
-    useAuthStore.getState().setAccessToken(newAccessToken);
-
-    console.log("✅ Token rafraîchi avec succès");
+    console.log("✅ Token rafraîchi avec succès (cookie mis à jour)");
 
     // Notifier tous les subscribers
-    tokenManager.onTokenRefreshed(newAccessToken);
+    onRefreshed();
 
-    // Réessayer la requête originale avec le nouveau token
-    originalConfig.headers.Authorization = `Bearer ${newAccessToken}`;
+    // Réessayer la requête originale (le nouveau cookie sera envoyé automatiquement)
     return apiClient(originalConfig);
 
   } catch (refreshError) {
     console.error("❌ Échec du refresh token:", refreshError);
     
-    // Notifier les subscribers de l'échec
-    tokenManager.onTokenRefreshed(null);
+    const { useAuthStore } = await import("@/features/auth/store/auth.store");
+    const store = useAuthStore.getState();
     
-    // Déconnecter l'utilisateur
-    tokenManager.logout("Session expirée. Veuillez vous reconnecter.");
+    // ✅ Déconnexion SANS appel API (éviter la boucle)
+    store.silentLogout("Session expirée. Veuillez vous reconnecter.");
     
     return Promise.reject(error);
   } finally {
-    tokenManager.setRefreshing(false);
+    isRefreshing = false;
   }
 };
 

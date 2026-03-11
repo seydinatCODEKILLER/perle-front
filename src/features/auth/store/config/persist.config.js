@@ -1,18 +1,18 @@
+// features/auth/store/config/persist.config.js
+
 import { AUTH_CONFIG } from "../../constants/auth.constants";
 
 /**
- * Configuration de persistance pour Zustand avec support du refresh token
+ * Configuration de persistance pour Zustand avec cookies
  */
 export const createPersistConfig = (storage) => ({
   name: AUTH_CONFIG.STORAGE_KEY,
   storage,
   version: AUTH_CONFIG.STORAGE_VERSION,
 
-  // Persister l'access token ET le refresh token
+  // ✅ Persister UNIQUEMENT le user (pas les tokens)
   partialize: (state) => ({
     user: state.user,
-    accessToken: state.accessToken,
-    refreshToken: state.refreshToken,
   }),
 
   // Callback après réhydratation
@@ -22,25 +22,20 @@ export const createPersistConfig = (storage) => ({
       return;
     }
 
-    if (state?.accessToken && state?.refreshToken) {
+    if (state?.user) {
       state.isAuthenticated = true;
-      console.log("✅ Tokens réhydratés depuis le storage");
+      console.log("✅ User réhydraté depuis le storage");
     }
   },
 
   // Migration entre versions
   migrate: (persistedState, version) => {
-    // Migration v0 -> v1 : conversion token → accessToken + refreshToken
-    if (version === 0) {
-      if (persistedState.token) {
-        console.log("🔄 Migration v0 -> v1: conversion du token");
-        return {
-          ...persistedState,
-          accessToken: persistedState.token,
-          refreshToken: null, // L'utilisateur devra se reconnecter
-          token: undefined,
-        };
-      }
+    // Migration v1 -> v2 : suppression des tokens du storage
+    if (version === 1) {
+      console.log("🔄 Migration v1 -> v2: suppression des tokens du storage");
+      return {
+        user: persistedState.user,
+      };
     }
     return persistedState;
   },

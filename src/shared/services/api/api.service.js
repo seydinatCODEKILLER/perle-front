@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import { API_CONFIG, DEFAULT_HEADERS } from "./config/api.config";
 import {
@@ -10,12 +11,13 @@ import {
 } from "./interceptors/response.interceptor";
 
 /**
- * Instance Axios configurée
+ * Instance Axios configurée avec support des cookies
  */
 export const apiClient = axios.create({
   baseURL: API_CONFIG.BASE_URL,
   timeout: API_CONFIG.TIMEOUT,
   headers: DEFAULT_HEADERS,
+  withCredentials: true,
 });
 
 // Intercepteurs de requêtes
