@@ -21,7 +21,7 @@ export const createAuthActions = (set, get, storageKey) => ({
     }
 
     const currentUser = get().user;
-    
+
     // Log si changement d'utilisateur
     if (currentUser && currentUser.id !== data.user.id) {
       console.warn("⚠️ Changement d'utilisateur détecté dans setUser");
@@ -41,69 +41,64 @@ export const createAuthActions = (set, get, storageKey) => ({
     });
   },
 
-  /**
-   * Déconnexion silencieuse (SANS appel API)
-   * Utilisé quand :
-   * - Le refresh échoue (éviter la boucle)
-   * - Session expirée détectée par CookieSyncManager
-   * - 401 sur /auth/refresh-token
-   */
-  silentLogout: (reason) => {
-    console.log("🔇 Silent logout (no API call):", reason);
-    
-    const wasAuthenticated = get().isAuthenticated;
-
-    set({
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-    });
-
-    clearAuthStorage(storageKey);
-
-    if (reason) {
-      toast.error("Déconnexion", { description: reason });
-    } else if (wasAuthenticated) {
-      toast.info(AUTH_MESSAGES.LOGOUT_SUCCESS);
-    }
-  },
-
-  /**
-   * Déconnexion normale (avec appel API)
-   * Utilisé quand :
-   * - L'utilisateur clique sur "Se déconnecter"
-   * - Déconnexion volontaire
-   */
   logout: async (reason) => {
     console.log("🚪 Logout with API call");
     const wasAuthenticated = get().isAuthenticated;
 
-    // Appeler l'API de logout (les cookies seront supprimés côté serveur)
     try {
       await authApi.logout();
       console.log("✅ Logout API call successful");
     } catch (error) {
       console.error("❌ Erreur lors du logout API:", error);
-      
-      // Si c'est une erreur 401, c'est que les cookies sont déjà invalides
-      // On continue quand même la déconnexion locale
+
       if (error?.response?.status === 401) {
-        console.log("⚠️ 401 sur logout (cookies déjà invalides), continuing...");
+        console.log(
+          "⚠️ 401 sur logout (cookies déjà invalides), continuing...",
+        );
       }
     }
 
+    // ✅ Nettoyer COMPLÈTEMENT l'état
     set({
       user: null,
       isAuthenticated: false,
       isLoading: false,
+      isInitialized: true, // ✅ Garder initialisé pour éviter re-vérification
     });
 
+    // ✅ Vider le localStorage
     clearAuthStorage(storageKey);
+
+    console.log("✅ État nettoyé après logout");
 
     if (reason) {
       toast.error("Déconnexion", { description: reason });
     } else if (wasAuthenticated) {
-      toast.info(AUTH_MESSAGES.LOGOUT_SUCCESS);
+      toast.info("Vous êtes déconnecté");
+    }
+  },
+
+  silentLogout: (reason) => {
+    console.log("🔇 Silent logout (no API call):", reason);
+
+    const wasAuthenticated = get().isAuthenticated;
+
+    // ✅ Nettoyer COMPLÈTEMENT l'état
+    set({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      isInitialized: true, // ✅ Garder initialisé
+    });
+
+    // ✅ Vider le localStorage
+    clearAuthStorage(storageKey);
+
+    console.log("✅ État nettoyé après silent logout");
+
+    // ✅ Toast SEULEMENT si on était vraiment connecté et qu'il y a une raison
+    if (wasAuthenticated && reason) {
+      toast.error("Déconnexion", { description: reason });
     }
   },
 
@@ -113,7 +108,6 @@ export const createAuthActions = (set, get, storageKey) => ({
   initializeAuth: async () => {
     const { user, isInitialized } = get();
 
-    // Éviter les initialisations multiples
     if (isInitialized) {
       console.log("⚠️ Auth déjà initialisée, skip");
       return;
@@ -121,22 +115,22 @@ export const createAuthActions = (set, get, storageKey) => ({
 
     console.log("🔄 Initialisation de l'authentification...");
 
-    // Marquer comme initialisé IMMÉDIATEMENT
     set({ isInitialized: true });
 
-    // Si on a un user en cache, l'utiliser tout de suite (UX optimiste)
-    if (user) {
-      console.log("✅ User trouvé en cache:", user.id);
-      set({
-        isAuthenticated: true,
-        isLoading: false,
-      });
-    } else {
-      console.log("⏳ Pas de user en cache, vérification en cours...");
-      set({ isLoading: true });
+    // ✅ Si pas de user en cache, ne PAS vérifier via API
+    if (!user) {
+      console.log("⏳ Pas de user en cache, pas de vérification API");
+      set({ isLoading: false, isAuthenticated: false });
+      return; // ✅ STOP ICI, pas d'appel API
     }
 
-    // Vérifier en arrière-plan (le cookie est envoyé automatiquement)
+    // ✅ Si on a un user en cache, vérifier qu'il est toujours valide
+    console.log("✅ User trouvé en cache:", user.id);
+    set({
+      isAuthenticated: true,
+      isLoading: true, // ✅ Vérification en arrière-plan
+    });
+
     try {
       console.log("🔍 Vérification de la session via /auth/me...");
       const userData = await authApi.getCurrentUser();
@@ -147,36 +141,32 @@ export const createAuthActions = (set, get, storageKey) => ({
         isLoading: false,
       });
 
-      console.log("✅ Auth vérifiée en arrière-plan (via cookie):", userData.id);
+      console.log(
+        "✅ Auth vérifiée en arrière-plan (via cookie):",
+        userData.id,
+      );
     } catch (error) {
       console.error("❌ Erreur de vérification auth:", error);
 
       const status = error?.response?.status;
 
       if (status === 401) {
-        console.log("🔓 401 lors de l'initialisation, tentative de refresh...");
-        
-        // Tenter un refresh automatique (géré par l'intercepteur)
-        try {
-          const userData = await authApi.getCurrentUser();
-          set({
-            user: userData,
-            isAuthenticated: true,
-            isLoading: false,
-          });
+        console.log("🔓 Session expirée, déconnexion silencieuse SANS toast");
 
-          console.log("✅ Session restaurée après refresh:", userData.id);
-        } catch (refreshError) {
-          console.error("❌ Échec de restauration:", refreshError);
-          
-          // Déconnexion silencieuse (pas d'appel API)
-          get().silentLogout("Session expirée");
-        }
+        // ✅ Déconnexion silencieuse SANS toast (pas de raison)
+        set({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+        });
+
+        clearAuthStorage(storageKey);
+
+        // ❌ PAS DE TOAST ici (l'utilisateur n'était pas vraiment connecté)
       } else {
-        // Erreur réseau ou autre : garder l'état en cache
+        // Erreur réseau : garder l'état en cache
         set({ isLoading: false });
 
-        // Toast silencieux (pas bloquant)
         toast.warning("Mode hors ligne", {
           description: "Impossible de vérifier la session",
           duration: 2000,
@@ -184,7 +174,6 @@ export const createAuthActions = (set, get, storageKey) => ({
       }
     }
   },
-
   /**
    * Mettre à jour les données utilisateur
    */
