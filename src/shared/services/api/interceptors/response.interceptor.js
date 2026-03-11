@@ -130,39 +130,53 @@ const onRefreshed = () => {
 const handle401Error = async (error, originalConfig, url) => {
   console.log("🔴 401 Error on:", url);
 
-  // ✅ CAS 1: Endpoint où 401 est normal → ne PAS tenter de refresh
+  // ✅ CAS 1: Endpoint où 401 est normal
   if (!shouldAutoLogoutOn401(url)) {
     console.log("⚠️ 401 attendu sur:", url, "- Pas de refresh");
     return Promise.reject(error);
   }
 
-  // ✅ CAS 2: Logout qui échoue → ne PAS déconnecter (éviter la boucle)
+  // ✅ CAS 2: Logout qui échoue
   if (url.includes("/auth/logout")) {
     console.log("⚠️ Logout failed but ignoring (avoiding loop)");
-    // Ne pas déclencher de logout, juste rejeter l'erreur
     return Promise.reject(error);
   }
 
-  // ✅ CAS 3: Refresh qui échoue → déconnexion silencieuse
+  // ✅ CAS 3: Refresh qui échoue
   if (url.includes("/auth/refresh-token") || url.includes("/auth/refresh")) {
     console.log("❌ Refresh token invalide, déconnexion silencieuse");
     
     const { useAuthStore } = await import("@/features/auth/store/auth.store");
     const store = useAuthStore.getState();
     
-    // ✅ Déconnexion SANS appel API (éviter la boucle)
-    store.silentLogout("Session expirée. Veuillez vous reconnecter.");
+    // ✅ Déconnexion silencieuse SANS raison (pas de toast)
+    if (store.isAuthenticated) {
+      store.silentLogout(); // ❌ PAS de raison = PAS de toast
+    }
     
     return Promise.reject(error);
   }
 
-  // ✅ CAS 4: Endpoint protégé → tenter un refresh du token
+  // ✅ CAS 4: /auth/me qui échoue sans user en cache
+  if (url.includes("/auth/me")) {
+    const { useAuthStore } = await import("@/features/auth/store/auth.store");
+    const store = useAuthStore.getState();
+    
+    // Si pas de user en cache, c'est normal que ça fail
+    if (!store.user) {
+      console.log("⚠️ /auth/me failed mais pas de user en cache - Normal");
+      return Promise.reject(error);
+    }
+    
+    // Si user en cache, tenter refresh
+    console.log("🔄 /auth/me failed avec user en cache, tentative refresh...");
+  }
+
+  // ✅ CAS 5: Endpoint protégé → tenter un refresh
   
-  // Si un refresh est déjà en cours, attendre son résultat
   if (isRefreshing) {
     console.log("⏳ Refresh déjà en cours, mise en file d'attente");
-    // eslint-disable-next-line no-unused-vars
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       subscribeTokenRefresh(() => {
         console.log("✅ Retry requête après refresh");
         resolve(apiClient(originalConfig));
@@ -175,15 +189,12 @@ const handle401Error = async (error, originalConfig, url) => {
   try {
     console.log("🔄 Tentative de refresh du token via cookie...");
 
-    // ✅ Appel simple sans attendre de données dans le body
     await apiClient.post("/auth/refresh-token");
 
     console.log("✅ Token rafraîchi avec succès (cookie mis à jour)");
 
-    // Notifier tous les subscribers
     onRefreshed();
 
-    // Réessayer la requête originale (le nouveau cookie sera envoyé automatiquement)
     return apiClient(originalConfig);
 
   } catch (refreshError) {
@@ -192,8 +203,10 @@ const handle401Error = async (error, originalConfig, url) => {
     const { useAuthStore } = await import("@/features/auth/store/auth.store");
     const store = useAuthStore.getState();
     
-    // ✅ Déconnexion SANS appel API (éviter la boucle)
-    store.silentLogout("Session expirée. Veuillez vous reconnecter.");
+    // ✅ Déconnexion silencieuse AVEC raison (toast affiché)
+    if (store.isAuthenticated) {
+      store.silentLogout("Session expirée. Veuillez vous reconnecter.");
+    }
     
     return Promise.reject(error);
   } finally {
