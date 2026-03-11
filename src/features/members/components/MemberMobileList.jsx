@@ -1,15 +1,7 @@
 // components/members/MemberMobileList.jsx
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card } from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import {
   Eye,
   Edit,
@@ -20,45 +12,28 @@ import {
   Shield,
   Mars,
   Venus,
+  Mail,
+  Phone,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const STATUS_CONFIG = {
-  ACTIVE: { 
-    label: "Actif", 
-    color: "bg-green-500",
-    variant: "default",
-    className: "bg-green-500 hover:bg-green-600"
-  },
-  SUSPENDED: { 
-    label: "Suspendu", 
-    color: "bg-orange-500",
-    variant: "warning",
-    className: "bg-orange-500 hover:bg-orange-600"
-  },
-  PENDING: { 
-    label: "En attente", 
-    color: "bg-yellow-500",
-    variant: "secondary",
-    className: "bg-yellow-500 hover:bg-yellow-600"
-  },
-  INACTIVE: { 
-    label: "Inactif", 
-    color: "bg-gray-500",
-    variant: "secondary",
-    className: "bg-gray-500 hover:bg-gray-600"
-  },
+  ACTIVE: { label: "Actif", color: "bg-green-500" },
+  SUSPENDED: { label: "Suspendu", color: "bg-orange-500" },
+  PENDING: { label: "En attente", color: "bg-yellow-500" },
+  INACTIVE: { label: "Inactif", color: "bg-gray-500" },
 };
 
 const ROLE_CONFIG = {
-  ADMIN: { icon: Crown, label: "Administrateur", color: "text-amber-500" },
-  FINANCIAL_MANAGER: { icon: Shield, label: "Gestionnaire", color: "text-blue-500" },
-  MEMBER: { icon: null, label: "Membre", color: "text-gray-500" },
+  ADMIN: { icon: Crown, label: "Admin" },
+  FINANCIAL_MANAGER: { icon: Shield, label: "Gestionnaire" },
 };
 
 const GENDER_CONFIG = {
-  MALE: { icon: Mars, label: "Homme", color: "text-blue-500" },
-  FEMALE: { icon: Venus, label: "Femme", color: "text-pink-500" },
+  MALE: { icon: Mars, color: "text-blue-500" },
+  FEMALE: { icon: Venus, color: "text-pink-500" },
 };
 
 export const MemberMobileList = ({
@@ -70,19 +45,23 @@ export const MemberMobileList = ({
   onActivate,
   isLoading = false,
 }) => {
+  const [expandedId, setExpandedId] = useState(null);
+
+  const toggleExpand = (id) => {
+    setExpandedId(expandedId === id ? null : id);
+  };
+
   if (isLoading) {
     return (
-      <div className="space-y-3">
-        {[...Array(3)].map((_, i) => (
-          <Card key={i} className="p-4 animate-pulse bg-card/50">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-muted" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 bg-muted rounded w-3/4" />
-                <div className="h-3 bg-muted rounded w-1/2" />
-              </div>
+      <div className="space-y-1">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="flex items-center gap-3 p-3 animate-pulse bg-muted/20">
+            <div className="w-12 h-12 rounded-full bg-muted" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 bg-muted rounded w-3/4" />
+              <div className="h-3 bg-muted rounded w-1/2" />
             </div>
-          </Card>
+          </div>
         ))}
       </div>
     );
@@ -90,20 +69,15 @@ export const MemberMobileList = ({
 
   if (members.length === 0) {
     return (
-      <Card className="p-8 text-center bg-card/50">
-        <p className="text-muted-foreground">Aucun membre trouvé</p>
-      </Card>
+      <div className="p-8 text-center">
+        <p className="text-muted-foreground">Aucun membre</p>
+      </div>
     );
   }
 
   return (
-    <Accordion type="single" collapsible className="space-y-3">
+    <div className="divide-y divide-border/50">
       {members.map((member) => {
-        const statusConfig = STATUS_CONFIG[member.status] || STATUS_CONFIG.ACTIVE;
-        const roleConfig = ROLE_CONFIG[member.role] || ROLE_CONFIG.MEMBER;
-        const RoleIcon = roleConfig.icon;
-
-        // ✅ Utiliser displayInfo pour l'affichage
         const displayInfo = member.displayInfo || {
           firstName: member.user?.prenom,
           lastName: member.user?.nom,
@@ -112,178 +86,166 @@ export const MemberMobileList = ({
           avatar: member.user?.avatar,
           gender: member.user?.gender,
           hasAccount: !!member.userId,
-          isProvisional: !member.userId,
         };
 
-        const displayName = `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() || "Sans nom";
-        const displayContact = displayInfo.email || displayInfo.phone || "Pas de contact";
+        const fullName = [displayInfo.firstName, displayInfo.lastName]
+          .filter(Boolean)
+          .join(" ") || "Sans nom";
         
-        const userInitials = displayName
+        const initials = fullName
           .split(" ")
-          .map((n) => n[0])
+          .map(n => n[0])
           .join("")
           .toUpperCase()
-          .slice(0, 2) || "??";
+          .slice(0, 2);
 
-        const genderConfig = displayInfo.gender ? GENDER_CONFIG[displayInfo.gender] : null;
-        const GenderIcon = genderConfig?.icon;
-
+        const status = STATUS_CONFIG[member.status] || STATUS_CONFIG.ACTIVE;
+        const RoleIcon = ROLE_CONFIG[member.role]?.icon;
+        const GenderIcon = displayInfo.gender ? GENDER_CONFIG[displayInfo.gender]?.icon : null;
+        const genderColor = displayInfo.gender ? GENDER_CONFIG[displayInfo.gender]?.color : "";
         const isAdmin = member.role === "ADMIN";
-        const isSuspended = member.status === "SUSPENDED";
-        const isActive = member.status === "ACTIVE";
+        const isExpanded = expandedId === member.id;
 
         return (
-          <AccordionItem
-            key={member.id}
-            value={member.id}
-            className="border-0"
-          >
-            <Card className="overflow-hidden bg-card/50 dark:bg-card/80 backdrop-blur-sm border-border/50">
-              {/* Header du membre */}
-              <AccordionTrigger className="hover:no-underline px-4 py-3">
-                <div className="flex items-center gap-3 w-full">
-                  {/* Avatar avec indicateur de statut */}
-                  <div className="relative">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={displayInfo.avatar} />
-                      <AvatarFallback className="text-xs">
-                        {userInitials}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div
-                      className={cn(
-                        "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-background",
-                        statusConfig.color
-                      )}
-                    />
-                  </div>
+          <div key={member.id} className="bg-card">
+            {/* Ligne principale - style WhatsApp */}
+            <div
+              onClick={() => toggleExpand(member.id)}
+              className="flex items-center gap-3 p-3 active:bg-muted/50 cursor-pointer transition-colors"
+            >
+              {/* Avatar avec statut */}
+              <div className="relative">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={displayInfo.avatar} />
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <span className={cn(
+                  "absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-card",
+                  status.color
+                )} />
+              </div>
 
-                  {/* Infos */}
-                  <div className="flex-1 min-w-0 text-left">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-sm truncate">
-                        {displayName}
-                      </p>
-                      
-                      {/* Icône de rôle */}
-                      {RoleIcon && (
-                        <RoleIcon className={cn("w-4 h-4 shrink-0", roleConfig.color)} />
-                      )}
-                      
-                      {/* Icône de genre */}
-                      {GenderIcon && (
-                        <GenderIcon className={cn("w-3.5 h-3.5 shrink-0", genderConfig.color)} />
-                      )}
-                      
-                      {/* Badge provisoire */}
-                      {displayInfo.isProvisional && (
-                        <Badge variant="secondary" className="text-[10px] h-5 px-1.5 bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                          Sans compte
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <p className="text-xs text-muted-foreground truncate">
-                        {displayContact}
-                      </p>
-                    </div>
+              {/* Infos */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <p className="font-medium truncate">{fullName}</p>
+                    {GenderIcon && (
+                      <GenderIcon className={cn("w-4 h-4 shrink-0", genderColor)} />
+                    )}
+                    {RoleIcon && (
+                      <RoleIcon className="w-4 h-4 shrink-0 text-muted-foreground" />
+                    )}
                   </div>
+                  <ChevronRight className={cn(
+                    "w-5 h-5 text-muted-foreground transition-transform",
+                    isExpanded && "rotate-90"
+                  )} />
                 </div>
-              </AccordionTrigger>
+                
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
+                  {displayInfo.email ? (
+                    <>
+                      <Mail className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{displayInfo.email}</span>
+                    </>
+                  ) : displayInfo.phone ? (
+                    <>
+                      <Phone className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{displayInfo.phone}</span>
+                    </>
+                  ) : (
+                    <span className="italic">Pas de contact</span>
+                  )}
+                  
+                  {!displayInfo.hasAccount && (
+                    <Badge variant="secondary" className="text-[10px] px-1.5 ml-auto">
+                      Provisoire
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
 
-              {/* Contenu de l'accordion - Boutons d'action */}
-              <AccordionContent className="pb-0">
-                <div className="border-t border-border/50 bg-muted/30 dark:bg-muted/20 p-3">
-                  <div className="grid grid-cols-2 gap-2">
-                    {/* Voir détails */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onViewDetails(member);
-                      }}
-                      className="gap-2"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Détails
-                    </Button>
+            {/* Actions déroulantes - style WhatsApp */}
+            {isExpanded && (
+              <div className="px-3 pb-2 pt-1 bg-muted/5 border-t border-border/50">
+                <div className="grid grid-cols-4 gap-1">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewDetails(member);
+                    }}
+                    className="flex flex-col items-center py-2 rounded-lg active:bg-muted/80 transition-colors"
+                  >
+                    <Eye className="w-5 h-5 mb-1 text-muted-foreground" />
+                    <span className="text-xs">Détails</span>
+                  </button>
 
-                    {/* Modifier */}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit(member);
-                      }}
-                      className="gap-2"
-                      disabled={isAdmin}
-                    >
-                      <Edit className="w-4 h-4" />
-                      Modifier
-                    </Button>
+                  {!isAdmin && (
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(member);
+                        }}
+                        className="flex flex-col items-center py-2 rounded-lg active:bg-muted/80 transition-colors"
+                      >
+                        <Edit className="w-5 h-5 mb-1 text-muted-foreground" />
+                        <span className="text-xs">Modifier</span>
+                      </button>
 
-                    {/* Suspendre / Activer */}
-                    {!isAdmin && (
-                      <>
-                        {isActive ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSuspend(member);
-                            }}
-                            className="gap-2 text-orange-600 hover:text-orange-700"
-                          >
-                            <UserX className="w-4 h-4" />
-                            Suspendre
-                          </Button>
-                        ) : isSuspended ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onActivate(member);
-                            }}
-                            className="gap-2 text-green-600 hover:text-green-700"
-                          >
-                            <UserCheck className="w-4 h-4" />
-                            Activer
-                          </Button>
-                        ) : null}
-
-                        {/* Supprimer */}
-                        <Button
-                          variant="outline"
-                          size="sm"
+                      {member.status === "ACTIVE" ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSuspend(member);
+                          }}
+                          className="flex flex-col items-center py-2 rounded-lg active:bg-muted/80 transition-colors"
+                        >
+                          <UserX className="w-5 h-5 mb-1 text-orange-500" />
+                          <span className="text-xs text-orange-600">Suspendre</span>
+                        </button>
+                      ) : member.status === "SUSPENDED" ? (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onActivate(member);
+                          }}
+                          className="flex flex-col items-center py-2 rounded-lg active:bg-muted/80 transition-colors"
+                        >
+                          <UserCheck className="w-5 h-5 mb-1 text-green-500" />
+                          <span className="text-xs text-green-600">Activer</span>
+                        </button>
+                      ) : (
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             onDelete(member);
                           }}
-                          className="gap-2 text-red-600 hover:text-red-700"
+                          className="flex flex-col items-center py-2 rounded-lg active:bg-muted/80 transition-colors"
                         >
-                          <Trash2 className="w-4 h-4" />
-                          Supprimer
-                        </Button>
-                      </>
-                    )}
-                  </div>
+                          <Trash2 className="w-5 h-5 mb-1 text-red-500" />
+                          <span className="text-xs text-red-600">Supprimer</span>
+                        </button>
+                      )}
+                    </>
+                  )}
 
-                  {/* Message si admin */}
                   {isAdmin && (
-                    <p className="text-xs text-muted-foreground text-center mt-2">
-                      Les administrateurs ne peuvent pas être modifiés ou supprimés
-                    </p>
+                    <div className="flex flex-col items-center py-2 opacity-50">
+                      <Crown className="w-5 h-5 mb-1 text-amber-500" />
+                      <span className="text-xs">Admin</span>
+                    </div>
                   )}
                 </div>
-              </AccordionContent>
-            </Card>
-          </AccordionItem>
+              </div>
+            )}
+          </div>
         );
       })}
-    </Accordion>
+    </div>
   );
 };
