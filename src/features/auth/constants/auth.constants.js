@@ -1,10 +1,11 @@
+// features/auth/constants/auth.constants.js
+
 /**
  * Clés de configuration pour l'authentification
  */
 export const AUTH_CONFIG = {
   STORAGE_KEY: "auth-storage",
-  STORAGE_VERSION: 1,
-  TOKEN_REFRESH_INTERVAL: 5 * 60 * 1000,
+  STORAGE_VERSION: 2,
 };
 
 /**
