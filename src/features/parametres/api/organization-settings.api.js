@@ -12,8 +12,14 @@ const rawOrganizationSettingsApi = {
    */
   updateSettings: async (organizationId, settingsData) =>
     await api.patch(`/organizations/${organizationId}/settings`, settingsData),
+
+  /**
+   * ✅ NOUVEAU : Solder le wallet (remettre à 0)
+   */
+  settleWallet: async (organizationId) =>
+    await api.patch(`/organizations/${organizationId}/wallet/settle`),
 };
 
 export const organizationSettingsApi = createApiWithExtraction(
-  rawOrganizationSettingsApi
+  rawOrganizationSettingsApi,
 );
