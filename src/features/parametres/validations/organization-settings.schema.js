@@ -1,4 +1,3 @@
-// features/organizations/validators/organization-settings.schema.js
 
 import { z } from "zod";
 

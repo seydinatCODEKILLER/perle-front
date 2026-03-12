@@ -69,3 +69,48 @@ export const useSettleWallet = () => {
     onError: (error) => handleWalletOrganizationError(error, "Échec du solde du portefeuille"),
   });
 };
+
+
+export const useUpdateWallet = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ["organization", "update-wallet"],
+    mutationFn: async ({ organizationId, walletData }) =>
+      await organizationSettingsApi.updateWallet(organizationId, walletData),
+    onSuccess: (data, variables) => {
+      toast.success("Portefeuille mis à jour", {
+        description: "Les modifications ont été enregistrées avec succès",
+        duration: 4000,
+      });
+      
+      // Rafraîchir les données
+      queryClient.invalidateQueries({
+        queryKey: ["organization", variables.organizationId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["organization-details", variables.organizationId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["organizations"],
+      });
+    },
+    onError: (error) => {
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Échec de la mise à jour";
+
+      if (message.includes("Permissions")) {
+        toast.error("Permissions insuffisantes", {
+          description: "Seuls les administrateurs peuvent modifier le portefeuille",
+        });
+        return;
+      }
+
+      toast.error("Erreur", {
+        description: message,
+      });
+    },
+  });
+};
