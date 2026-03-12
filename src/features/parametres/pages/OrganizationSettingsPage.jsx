@@ -14,6 +14,7 @@ import { PaymentSettings } from "../components/PaymentSettings";
 import { ReminderSettings } from "../components/ReminderSettings";
 import { NotificationSettings } from "../components/NotificationSettings";
 import { SecuritySettings } from "../components/SecuritySettings";
+import { WalletSettings } from "../components/WalletSettings";
 import { useOrganization } from "@/features/organizations/hooks/useOrganizations";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
 
@@ -70,7 +71,7 @@ export const OrganizationSettingsPage = () => {
           description="Configuration de l'organisation"
         />
         <div className="space-y-4">
-          {[...Array(4)].map((_, i) => (
+          {[...Array(5)].map((_, i) => (
             <Card key={i}>
               <CardContent className="p-6">
                 <Skeleton className="h-20 w-full" />
@@ -119,7 +120,11 @@ export const OrganizationSettingsPage = () => {
             Retour
           </Button>
         </div>
-        {/* Formulaire */}
+
+        {/* ✅ NOUVEAU : Section Wallet */}
+        <WalletSettings organization={organization} />
+
+        {/* Formulaire paramètres */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSubmit)}
