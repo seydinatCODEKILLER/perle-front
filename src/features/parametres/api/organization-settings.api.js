@@ -18,6 +18,9 @@ const rawOrganizationSettingsApi = {
    */
   settleWallet: async (organizationId) =>
     await api.patch(`/organizations/${organizationId}/wallet/settle`),
+
+    updateWallet: async (organizationId, walletData) =>
+    await api.patch(`/organizations/${organizationId}/wallet`, walletData),
 };
 
 export const organizationSettingsApi = createApiWithExtraction(
