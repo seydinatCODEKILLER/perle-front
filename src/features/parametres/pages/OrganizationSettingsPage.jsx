@@ -17,6 +17,7 @@ import { SecuritySettings } from "../components/SecuritySettings";
 import { WalletSettings } from "../components/WalletSettings";
 import { useOrganization } from "@/features/organizations/hooks/useOrganizations";
 import { PageWithBackButton } from "@/components/layout/PageWithBackButton";
+import { WalletManagementSettings } from "../components/WalletManagementSettings";
 
 export const OrganizationSettingsPage = () => {
   const { organizationId } = useParams();
@@ -123,6 +124,9 @@ export const OrganizationSettingsPage = () => {
 
         {/* ✅ NOUVEAU : Section Wallet */}
         <WalletSettings organization={organization} />
+
+
+         <WalletManagementSettings organization={organization} />
 
         {/* Formulaire paramètres */}
         <Form {...form}>
