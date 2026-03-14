@@ -7,7 +7,7 @@ import { ArrowRight, Loader2 } from "lucide-react";
 export const SubmitButton = ({ isPending }) => (
   <div className="relative w-full">
     {/* Background glow effect */}
-    <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-blue-600/20 blur opacity-0 hover:opacity-100 transition-opacity duration-500" />
+    <div className="absolute -inset-1 rounded-xl bg-linear-to-r from-blue-600/20 via-indigo-600/20 to-blue-600/20 blur opacity-0 hover:opacity-100 transition-opacity duration-500" />
     
     <Button
       type="submit"
@@ -16,10 +16,10 @@ export const SubmitButton = ({ isPending }) => (
       size="lg"
     >
       {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/0 via-indigo-900/5 to-blue-900/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-linear-to-r from-blue-900/0 via-indigo-900/5 to-blue-900/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
       {/* Animated line effect */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-blue-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
       <span className="relative flex items-center justify-center">
         {isPending ? (

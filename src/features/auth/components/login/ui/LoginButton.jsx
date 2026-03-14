@@ -14,7 +14,7 @@ export const LoginButton = ({ isPending }) => (
   >
     <Button
       type="submit"
-      className="w-full h-12 rounded bg-indigo-800 hover:bg-indigo-900 text-white font-semibold shadow-md transition-all duration-300"
+      className="w-full h-12 rounded-xl bg-indigo-800 hover:bg-indigo-900 text-white font-semibold shadow-md transition-all duration-300"
       disabled={isPending}
       size="lg"
     >

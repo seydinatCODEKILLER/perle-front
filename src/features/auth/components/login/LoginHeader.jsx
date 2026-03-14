@@ -14,7 +14,7 @@ export const LoginHeader = () => (
   >
     <div className="flex justify-center">
       <motion.div
-        className="flex items-center justify-center w-14 h-14 bg-indigo-900 rounded backdrop-blur-sm shadow-lg"
+        className="flex items-center justify-center w-14 h-14 bg-indigo-900 rounded-full backdrop-blur-sm shadow-lg"
         whileHover={{ scale: 1.05 }}
         transition={{ type: "spring", stiffness: 300 }}
       >
