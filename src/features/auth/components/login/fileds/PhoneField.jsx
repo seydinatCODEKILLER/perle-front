@@ -28,7 +28,7 @@ export const PhoneField = ({ control }) => (
             <Input
               placeholder="+221 77 123 45 67"
               type="tel"
-              className="h-12 pl-10 rounded border-2 border-gray-200 focus:border-purple-600 focus:ring-0 transition-all duration-300"
+              className="h-12 pl-10 rounded-xl border-2 border-gray-200 focus:border-purple-600 focus:ring-0 transition-all duration-300"
               {...field}
             />
           </motion.div>

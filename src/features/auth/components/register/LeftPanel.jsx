@@ -36,7 +36,7 @@ export const LeftPanel = ({ preview, onUpload }) => {
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/0 via-blue-900/5 to-indigo-900/0" />
+          <div className="absolute inset-0 bg-linear-to-r from-blue-900/0 via-blue-900/5 to-indigo-900/0" />
         </div>
       </div>
 
@@ -53,7 +53,7 @@ export const LeftPanel = ({ preview, onUpload }) => {
               <Building2 className="w-8 h-8 text-orange-400" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-orange-400 to-indigo-300 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold mb-3 bg-linear-to-r from-orange-400 to-indigo-300 bg-clip-text text-transparent">
             Organisation Manager Pro
           </h2>
           <p className="text-gray-300 text-base leading-relaxed mb-2">
