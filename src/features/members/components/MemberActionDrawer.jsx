@@ -152,8 +152,11 @@ export const MemberActionDrawer = ({
           <div className="space-y-6">
             {/* Avatar & nom */}
             <div className="flex flex-col items-center text-center space-y-4">
-              <Avatar className="w-24 h-24">
-                <AvatarImage src={displayInfo.avatar} />
+              <Avatar className="w-24 h-24 overflow-hidden rounded-full">
+                <AvatarImage
+                  src={displayInfo.avatar}
+                  className="w-full h-full object-cover object-center"
+                />
                 <AvatarFallback className="text-2xl">
                   {userInitials}
                 </AvatarFallback>

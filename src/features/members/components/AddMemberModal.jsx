@@ -1,9 +1,29 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -126,9 +146,16 @@ export const AddMemberModal = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-6"
+          >
             {/* Tabs pour choisir le type de membre */}
-            <Tabs value={memberType} onValueChange={handleTabChange} className="w-full">
+            <Tabs
+              value={memberType}
+              onValueChange={handleTabChange}
+              className="w-full"
+            >
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="existing" className="gap-2">
                   <Phone className="w-4 h-4" />
@@ -145,8 +172,8 @@ export const AddMemberModal = ({
                 <Alert className="border-border/50 bg-card/50">
                   <Info className="h-4 w-4" />
                   <AlertDescription className="text-xs">
-                    Le membre doit déjà avoir un compte sur la plateforme. 
-                    Il sera automatiquement lié à votre organisation.
+                    Le membre doit déjà avoir un compte sur la plateforme. Il
+                    sera automatiquement lié à votre organisation.
                   </AlertDescription>
                 </Alert>
 
@@ -160,10 +187,7 @@ export const AddMemberModal = ({
                         Numéro de téléphone *
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="+221 77 123 45 67"
-                          {...field}
-                        />
+                        <Input placeholder="+221 77 123 45 67" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -176,16 +200,20 @@ export const AddMemberModal = ({
                 <Alert className="border-border/50 bg-card/50">
                   <Info className="h-4 w-4" />
                   <AlertDescription className="text-xs">
-                    Le membre pourra créer son compte plus tard. 
-                    Ses informations seront automatiquement synchronisées lors de son inscription.
+                    Le membre pourra créer son compte plus tard. Ses
+                    informations seront automatiquement synchronisées lors de
+                    son inscription.
                   </AlertDescription>
                 </Alert>
 
                 {/* Upload Avatar */}
                 <div className="flex flex-col items-center gap-4 p-4 border border-dashed rounded-lg bg-muted/30 dark:bg-muted/20">
-                  <Avatar className="w-24 h-24">
-                    <AvatarImage src={avatarPreview} />
-                    <AvatarFallback>
+                  <Avatar className="w-24 h-24 overflow-hidden rounded-full">
+                    <AvatarImage
+                      src={avatarPreview}
+                      className="w-full h-full object-cover object-center"
+                    />
+                    <AvatarFallback className="flex items-center justify-center">
                       <User className="w-12 h-12 text-muted-foreground" />
                     </AvatarFallback>
                   </Avatar>
@@ -195,7 +223,9 @@ export const AddMemberModal = ({
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => document.getElementById("avatar-upload").click()}
+                      onClick={() =>
+                        document.getElementById("avatar-upload").click()
+                      }
                       className="gap-2"
                     >
                       <Upload className="w-4 h-4" />
@@ -302,7 +332,10 @@ export const AddMemberModal = ({
                 />
 
                 {/* Genre */}
-                <GenderField control={form.control} name="provisionalData.gender" />
+                <GenderField
+                  control={form.control}
+                  name="provisionalData.gender"
+                />
               </TabsContent>
             </Tabs>
 
@@ -313,7 +346,10 @@ export const AddMemberModal = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Rôle dans l'organisation</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner un rôle" />
@@ -338,7 +374,12 @@ export const AddMemberModal = ({
             />
 
             <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button variant="outline" onClick={handleClose} type="button" disabled={isPending}>
+              <Button
+                variant="outline"
+                onClick={handleClose}
+                type="button"
+                disabled={isPending}
+              >
                 Annuler
               </Button>
               <Button type="submit" disabled={isPending}>
