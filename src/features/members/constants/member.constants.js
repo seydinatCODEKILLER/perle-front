@@ -1,6 +1,10 @@
 export const MEMBER_ROLES = {
-  ADMIN: "ADMIN",
   FINANCIAL_MANAGER: "FINANCIAL_MANAGER",
+  ADMIN: "ADMIN",
+  PRESIDENT: "PRESIDENT",
+  VICE_PRESIDENT: "VICE_PRESIDENT",
+  SECRETARY_GENERAL: "SECRETARY_GENERAL",
+  ORGANIZER: "ORGANIZER",
   MEMBER: "MEMBER",
 };
 
@@ -11,9 +15,41 @@ export const MEMBER_STATUS = {
 };
 
 export const MEMBER_ROLE_OPTIONS = [
-  { value: "MEMBER", label: "Membre", description: "Accès basique" },
-  { value: "FINANCIAL_MANAGER", label: "Responsable Financier", description: "Gestion des finances" },
-  { value: "ADMIN", label: "Administrateur", description: "Accès complet" },
+  {
+    value: "ADMIN",
+    label: "Administrateur",
+    description: "Accès complet à toutes les fonctionnalités",
+  },
+  {
+    value: "FINANCIAL_MANAGER",
+    label: "Responsable Financier",
+    description: "Gestion des finances",
+  },
+  {
+    value: "PRESIDENT",
+    label: "Président",
+    description: "Dirige l'organisation et prend les décisions stratégiques",
+  },
+  {
+    value: "VICE_PRESIDENT",
+    label: "Vice-Président",
+    description: "Assiste le président et le remplace en son absence",
+  },
+  {
+    value: "SECRETARY_GENERAL",
+    label: "Secrétaire Général",
+    description: "Gère la documentation et les communications",
+  },
+  {
+    value: "ORGANIZER",
+    label: "Organisateur",
+    description: "Organise les événements et activités",
+  },
+  {
+    value: "MEMBER",
+    label: "Membre",
+    description: "Membre standard de l'organisation",
+  },
 ];
 
 export const MEMBER_STATUS_OPTIONS = [

@@ -2,23 +2,22 @@
 
 import { z } from "zod";
 
-// ✅ Schema pour ajouter un membre (avec ou sans compte)
+const ROLES = ["ADMIN", "PRESIDENT", "FINANCIAL_MANAGER", "VICE_PRESIDENT", "SECRETARY_GENERAL", "ORGANIZER", "MEMBER"];
+
 export const addMemberSchema = z.discriminatedUnion("memberType", [
-  // Option 1: Membre avec compte existant
+  // Membre avec compte existant
   z.object({
     memberType: z.literal("existing"),
     phone: z
       .string()
       .min(9, "Le numéro de téléphone doit contenir au moins 9 chiffres")
       .regex(/^[0-9+\s-]+$/, "Numéro de téléphone invalide"),
-    role: z
-      .enum(["ADMIN", "FINANCIAL_MANAGER", "MEMBER"], {
-        errorMap: () => ({ message: "Rôle invalide" }),
-      })
-      .default("MEMBER"),
+    role: z.enum(ROLES, {
+      errorMap: () => ({ message: "Rôle invalide" }),
+    }).default("MEMBER"),
   }),
   
-  // Option 2: Membre sans compte (provisoire)
+  // Membre sans compte (provisoire)
   z.object({
     memberType: z.literal("provisional"),
     provisionalData: z.object({
@@ -31,16 +30,14 @@ export const addMemberSchema = z.discriminatedUnion("memberType", [
       email: z.string().email("Email invalide").optional().or(z.literal("")),
       gender: z.enum(["MALE", "FEMALE"]).optional(),
     }),
-    role: z
-      .enum(["ADMIN", "FINANCIAL_MANAGER", "MEMBER"], {
-        errorMap: () => ({ message: "Rôle invalide" }),
-      })
-      .default("MEMBER"),
+    role: z.enum(ROLES, {
+      errorMap: () => ({ message: "Rôle invalide" }),
+    }).default("MEMBER"),
   }),
 ]);
 
 export const updateMemberSchema = z.object({
-  role: z.enum(["ADMIN", "FINANCIAL_MANAGER", "MEMBER"], {
+  role: z.enum(ROLES, {
     errorMap: () => ({ message: "Rôle invalide" }),
   }),
   memberNumber: z.string().optional(),
@@ -53,7 +50,7 @@ export const updateMemberStatusSchema = z.object({
 });
 
 export const updateMemberRoleSchema = z.object({
-  role: z.enum(["ADMIN", "FINANCIAL_MANAGER", "MEMBER"], {
+  role: z.enum(ROLES, {
     errorMap: () => ({ message: "Rôle invalide" }),
   }),
 });
