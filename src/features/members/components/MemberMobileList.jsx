@@ -136,8 +136,11 @@ export const MemberMobileList = ({
             >
               {/* Avatar avec statut */}
               <div className="relative">
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={displayInfo.avatar} />
+                <Avatar className="w-12 h-12 overflow-hidden rounded-full">
+                  <AvatarImage
+                    src={displayInfo.avatar}
+                    className="w-full h-full object-cover object-center"
+                  />
                   <AvatarFallback className="bg-primary/10 text-primary">
                     {initials}
                   </AvatarFallback>

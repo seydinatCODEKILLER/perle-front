@@ -135,8 +135,11 @@ export const MemberDetailDrawer = ({ open, onClose, member }) => {
           <div className="space-y-6">
             {/* Avatar et infos principales */}
             <div className="flex flex-col items-center text-center space-y-3">
-              <Avatar className="w-20 h-20">
-                <AvatarImage src={displayInfo.avatar} />
+              <Avatar className="w-20 h-20 overflow-hidden rounded-full">
+                <AvatarImage
+                  src={displayInfo.avatar}
+                  className="w-full h-full object-cover object-center"
+                />
                 <AvatarFallback className="text-2xl">
                   {userInitials}
                 </AvatarFallback>

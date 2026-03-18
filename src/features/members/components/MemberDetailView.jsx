@@ -50,12 +50,28 @@ const STATUS_CONFIG = {
 
 const ROLE_CONFIG = {
   SUPER_ADMIN: { icon: Crown, label: "Super Admin", color: "text-purple-500" },
-  FINANCIAL_MANAGER: { icon: Shield, label: "Gestionnaire", color: "text-blue-500" },
+  FINANCIAL_MANAGER: {
+    icon: Shield,
+    label: "Gestionnaire",
+    color: "text-blue-500",
+  },
   ADMIN: { icon: Crown, label: "Administrateur", color: "text-amber-500" },
   PRESIDENT: { icon: Crown, label: "Président", color: "text-blue-600" },
-  VICE_PRESIDENT: { icon: Shield, label: "Vice-Président", color: "text-blue-500" },
-  SECRETARY_GENERAL: { icon: FileText, label: "Secrétaire Général", color: "text-green-500" },
-  ORGANIZER: { icon: Calendar, label: "Organisateur", color: "text-orange-500" },
+  VICE_PRESIDENT: {
+    icon: Shield,
+    label: "Vice-Président",
+    color: "text-blue-500",
+  },
+  SECRETARY_GENERAL: {
+    icon: FileText,
+    label: "Secrétaire Général",
+    color: "text-green-500",
+  },
+  ORGANIZER: {
+    icon: Calendar,
+    label: "Organisateur",
+    color: "text-orange-500",
+  },
   MEMBER: { icon: User, label: "Membre", color: "text-gray-500" },
 };
 
@@ -98,15 +114,20 @@ export const MemberDetailView = ({
 
   const statusConfig = STATUS_CONFIG[member.status] || STATUS_CONFIG.ACTIVE;
   const roleConfig = ROLE_CONFIG[member.role] || ROLE_CONFIG.MEMBER;
-  const genderConfig = displayInfo.gender ? GENDER_CONFIG[displayInfo.gender] : null;
+  const genderConfig = displayInfo.gender
+    ? GENDER_CONFIG[displayInfo.gender]
+    : null;
 
-  const displayName = `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() || "Sans nom";
-  const userInitials = displayName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) || "??";
+  const displayName =
+    `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() ||
+    "Sans nom";
+  const userInitials =
+    displayName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "??";
 
   const isAdmin = member.role === "ADMIN";
   const isSuspended = member.status === "SUSPENDED";
@@ -126,8 +147,11 @@ export const MemberDetailView = ({
         <div className="space-y-6">
           {/* En-tête avec avatar et infos */}
           <div className="flex flex-col items-center text-center space-y-4">
-            <Avatar className="w-24 h-24">
-              <AvatarImage src={displayInfo.avatar} />
+            <Avatar className="w-24 h-24 overflow-hidden rounded-full">
+              <AvatarImage
+                src={displayInfo.avatar}
+                className="w-full h-full object-cover object-center"
+              />
               <AvatarFallback className="text-3xl">
                 {userInitials}
               </AvatarFallback>
@@ -143,14 +167,20 @@ export const MemberDetailView = ({
                 >
                   {statusConfig.label}
                 </Badge>
-                <Badge variant="outline" className={cn("text-xs", roleConfig.color)}>
+                <Badge
+                  variant="outline"
+                  className={cn("text-xs", roleConfig.color)}
+                >
                   <roleConfig.icon className="w-3 h-3 mr-1" />
                   {roleConfig.label}
                 </Badge>
 
                 {/* ✅ Badge provisoire */}
                 {displayInfo.isProvisional && (
-                  <Badge variant="secondary" className="text-xs bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <Badge
+                    variant="secondary"
+                    className="text-xs bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                  >
                     <UserCircle className="w-3 h-3 mr-1" />
                     Sans compte
                   </Badge>
@@ -243,7 +273,9 @@ export const MemberDetailView = ({
                   <Phone className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-muted-foreground mb-1">Téléphone</p>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Téléphone
+                  </p>
                   <p className="text-sm font-medium">{displayInfo.phone}</p>
                 </div>
               </div>
@@ -253,7 +285,9 @@ export const MemberDetailView = ({
             {genderConfig && (
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <genderConfig.icon className={cn("w-5 h-5", genderConfig.color)} />
+                  <genderConfig.icon
+                    className={cn("w-5 h-5", genderConfig.color)}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-muted-foreground mb-1">Genre</p>
@@ -354,9 +388,10 @@ export const MemberDetailView = ({
                   Membre sans compte
                 </h4>
                 <p className="text-xs text-amber-600/80 dark:text-amber-400/80">
-                  Ce membre a été ajouté sans compte utilisateur. Lorsqu'il créera 
-                  son compte avec le numéro <strong>{displayInfo.phone}</strong>, 
-                  ses informations seront automatiquement synchronisées.
+                  Ce membre a été ajouté sans compte utilisateur. Lorsqu'il
+                  créera son compte avec le numéro{" "}
+                  <strong>{displayInfo.phone}</strong>, ses informations seront
+                  automatiquement synchronisées.
                 </p>
               </div>
             </>

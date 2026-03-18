@@ -139,8 +139,11 @@ export const MemberCard = ({ member, onClick }) => {
         <div className="flex items-start gap-3">
           {/* Avatar avec indicateur de statut */}
           <div className="relative shrink-0">
-            <Avatar className="w-14 h-14 ring-2 ring-background">
-              <AvatarImage src={displayInfo.avatar} />
+            <Avatar className="w-14 h-14 ring-2 ring-background overflow-hidden rounded-full">
+              <AvatarImage
+                src={displayInfo.avatar}
+                className="w-full h-full object-cover object-center"
+              />
               <AvatarFallback className="text-sm font-semibold">
                 {userInitials}
               </AvatarFallback>
