@@ -21,6 +21,7 @@ import {
   Mars,
   Venus,
   UserCircle,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -48,8 +49,13 @@ const STATUS_CONFIG = {
 };
 
 const ROLE_CONFIG = {
+  SUPER_ADMIN: { icon: Crown, label: "Super Admin", color: "text-purple-500" },
+  FINANCIAL_MANAGER: { icon: Shield, label: "Gestionnaire", color: "text-blue-500" },
   ADMIN: { icon: Crown, label: "Administrateur", color: "text-amber-500" },
-  FINANCIAL_MANAGER: { icon: Shield, label: "Gestionnaire financier", color: "text-blue-500" },
+  PRESIDENT: { icon: Crown, label: "Président", color: "text-blue-600" },
+  VICE_PRESIDENT: { icon: Shield, label: "Vice-Président", color: "text-blue-500" },
+  SECRETARY_GENERAL: { icon: FileText, label: "Secrétaire Général", color: "text-green-500" },
+  ORGANIZER: { icon: Calendar, label: "Organisateur", color: "text-orange-500" },
   MEMBER: { icon: User, label: "Membre", color: "text-gray-500" },
 };
 

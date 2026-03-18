@@ -11,18 +11,19 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Mail, 
-  Phone, 
-  Calendar, 
-  Hash, 
-  User, 
+import {
+  Mail,
+  Phone,
+  Calendar,
+  Hash,
+  User,
   BarChart3,
   Crown,
   Shield,
   Mars,
   Venus,
   UserCircle,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -50,8 +51,29 @@ const STATUS_CONFIG = {
 };
 
 const ROLE_CONFIG = {
+  SUPER_ADMIN: { icon: Crown, label: "Super Admin", color: "text-purple-500" },
+  FINANCIAL_MANAGER: {
+    icon: Shield,
+    label: "Gestionnaire",
+    color: "text-blue-500",
+  },
   ADMIN: { icon: Crown, label: "Administrateur", color: "text-amber-500" },
-  FINANCIAL_MANAGER: { icon: Shield, label: "Gestionnaire financier", color: "text-blue-500" },
+  PRESIDENT: { icon: Crown, label: "Président", color: "text-blue-600" },
+  VICE_PRESIDENT: {
+    icon: Shield,
+    label: "Vice-Président",
+    color: "text-blue-500",
+  },
+  SECRETARY_GENERAL: {
+    icon: FileText,
+    label: "Secrétaire Général",
+    color: "text-green-500",
+  },
+  ORGANIZER: {
+    icon: Calendar,
+    label: "Organisateur",
+    color: "text-orange-500",
+  },
   MEMBER: { icon: User, label: "Membre", color: "text-gray-500" },
 };
 
@@ -76,15 +98,20 @@ export const MemberDetailDrawer = ({ open, onClose, member }) => {
 
   const statusConfig = STATUS_CONFIG[member.status] || STATUS_CONFIG.ACTIVE;
   const roleConfig = ROLE_CONFIG[member.role] || ROLE_CONFIG.MEMBER;
-  const genderConfig = displayInfo.gender ? GENDER_CONFIG[displayInfo.gender] : null;
+  const genderConfig = displayInfo.gender
+    ? GENDER_CONFIG[displayInfo.gender]
+    : null;
 
-  const displayName = `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() || "Sans nom";
-  const userInitials = displayName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) || "??";
+  const displayName =
+    `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() ||
+    "Sans nom";
+  const userInitials =
+    displayName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "??";
 
   const joinDate = member.joinDate
     ? new Date(member.joinDate).toLocaleDateString("fr-FR", {
@@ -124,14 +151,20 @@ export const MemberDetailDrawer = ({ open, onClose, member }) => {
                   >
                     {statusConfig.label}
                   </Badge>
-                  <Badge variant="outline" className={cn("text-xs", roleConfig.color)}>
+                  <Badge
+                    variant="outline"
+                    className={cn("text-xs", roleConfig.color)}
+                  >
                     <roleConfig.icon className="w-3 h-3 mr-1" />
                     {roleConfig.label}
                   </Badge>
 
                   {/* ✅ Badge provisoire */}
                   {displayInfo.isProvisional && (
-                    <Badge variant="secondary" className="text-xs bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <Badge
+                      variant="secondary"
+                      className="text-xs bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                    >
                       <UserCircle className="w-3 h-3 mr-1" />
                       Sans compte
                     </Badge>
@@ -178,11 +211,15 @@ export const MemberDetailDrawer = ({ open, onClose, member }) => {
               {genderConfig && (
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <genderConfig.icon className={cn("w-4 h-4", genderConfig.color)} />
+                    <genderConfig.icon
+                      className={cn("w-4 h-4", genderConfig.color)}
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-muted-foreground">Genre</p>
-                    <p className={cn("text-sm font-medium", genderConfig.color)}>
+                    <p
+                      className={cn("text-sm font-medium", genderConfig.color)}
+                    >
                       {genderConfig.label}
                     </p>
                   </div>
@@ -203,7 +240,9 @@ export const MemberDetailDrawer = ({ open, onClose, member }) => {
                   <Hash className="w-4 h-4 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs text-muted-foreground">Numéro de membre</p>
+                  <p className="text-xs text-muted-foreground">
+                    Numéro de membre
+                  </p>
                   <p className="text-sm font-medium font-mono">
                     {member.memberNumber || "Non attribué"}
                   </p>
@@ -215,7 +254,9 @@ export const MemberDetailDrawer = ({ open, onClose, member }) => {
                   <Calendar className="w-4 h-4 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs text-muted-foreground">Date d'adhésion</p>
+                  <p className="text-xs text-muted-foreground">
+                    Date d'adhésion
+                  </p>
                   <p className="text-sm font-medium">{joinDate}</p>
                 </div>
               </div>
@@ -270,9 +311,10 @@ export const MemberDetailDrawer = ({ open, onClose, member }) => {
                 <Separator />
                 <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                   <p className="text-xs text-amber-600 dark:text-amber-400">
-                    <strong>Membre sans compte</strong> : Ce membre a été ajouté sans compte utilisateur. 
-                    Lorsqu'il créera son compte avec le numéro {displayInfo.phone}, 
-                    ses informations seront automatiquement synchronisées.
+                    <strong>Membre sans compte</strong> : Ce membre a été ajouté
+                    sans compte utilisateur. Lorsqu'il créera son compte avec le
+                    numéro {displayInfo.phone}, ses informations seront
+                    automatiquement synchronisées.
                   </p>
                 </div>
               </>
