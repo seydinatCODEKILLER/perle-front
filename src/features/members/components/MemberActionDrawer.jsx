@@ -29,6 +29,7 @@ import {
   Trash2,
   UserX,
   UserCheck,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -52,11 +53,28 @@ const STATUS_CONFIG = {
 };
 
 const ROLE_CONFIG = {
+  SUPER_ADMIN: { icon: Crown, label: "Super Admin", color: "text-purple-500" },
   ADMIN: { icon: Crown, label: "Administrateur", color: "text-amber-500" },
+  PRESIDENT: { icon: Crown, label: "Président", color: "text-blue-600" },
   FINANCIAL_MANAGER: {
     icon: Shield,
-    label: "Gestionnaire financier",
+    label: "Gestionnaire",
     color: "text-blue-500",
+  },
+  VICE_PRESIDENT: {
+    icon: Shield,
+    label: "Vice-Président",
+    color: "text-blue-500",
+  },
+  SECRETARY_GENERAL: {
+    icon: FileText,
+    label: "Secrétaire Général",
+    color: "text-green-500",
+  },
+  ORGANIZER: {
+    icon: Calendar,
+    label: "Organisateur",
+    color: "text-orange-500",
   },
   MEMBER: { icon: User, label: "Membre", color: "text-gray-500" },
 };
@@ -120,10 +138,7 @@ export const MemberActionDrawer = ({
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent
-        side="right"
-        className="w-full sm:w-105 p-0 flex flex-col"
-      >
+      <SheetContent side="right" className="w-full sm:w-105 p-0 flex flex-col">
         {/* Header */}
         <SheetHeader className="border-b px-4 py-4">
           <SheetTitle>Détails du membre</SheetTitle>
@@ -178,11 +193,7 @@ export const MemberActionDrawer = ({
               </h4>
 
               {displayInfo.email && (
-                <InfoRow
-                  icon={Mail}
-                  label="Email"
-                  value={displayInfo.email}
-                />
+                <InfoRow icon={Mail} label="Email" value={displayInfo.email} />
               )}
 
               {displayInfo.phone && (
@@ -233,10 +244,7 @@ export const MemberActionDrawer = ({
                 label="Cotisations"
                 value={member._count?.contributions || 0}
               />
-              <StatCard
-                label="Dettes"
-                value={member._count?.debts || 0}
-              />
+              <StatCard label="Dettes" value={member._count?.debts || 0} />
             </div>
 
             {displayInfo.isProvisional && (
@@ -339,7 +347,7 @@ const InfoRow = ({ icon: Icon, label, value, mono, valueClass }) => (
         className={cn(
           "text-sm font-medium truncate",
           mono && "font-mono",
-          valueClass
+          valueClass,
         )}
       >
         {value}

@@ -3,48 +3,88 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Crown, Shield, Mars, Venus, UserCircle, Phone, Mail } from "lucide-react";
+import {
+  Crown,
+  Shield,
+  Mars,
+  Venus,
+  UserCircle,
+  Phone,
+  Mail,
+  FileText,
+  Calendar,
+  User,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STATUS_CONFIG = {
-  ACTIVE: { 
-    label: "Actif", 
+  ACTIVE: {
+    label: "Actif",
     color: "bg-green-500",
     dotColor: "bg-green-500",
   },
-  SUSPENDED: { 
-    label: "Suspendu", 
+  SUSPENDED: {
+    label: "Suspendu",
     color: "bg-orange-500",
     dotColor: "bg-orange-500",
   },
-  PENDING: { 
-    label: "En attente", 
+  PENDING: {
+    label: "En attente",
     color: "bg-yellow-500",
     dotColor: "bg-yellow-500",
   },
-  INACTIVE: { 
-    label: "Inactif", 
+  INACTIVE: {
+    label: "Inactif",
     color: "bg-gray-500",
     dotColor: "bg-gray-500",
   },
 };
 
 const ROLE_CONFIG = {
-  ADMIN: { 
-    icon: Crown, 
-    label: "Admin", 
+  SUPER_ADMIN: {
+    icon: Crown,
+    label: "Super Admin",
+    color: "text-purple-500",
+    bgColor: "bg-purple-500/10",
+  },
+  ADMIN: {
+    icon: Crown,
+    label: "Administrateur",
     color: "text-amber-500",
     bgColor: "bg-amber-500/10",
   },
-  FINANCIAL_MANAGER: { 
-    icon: Shield, 
-    label: "Gestionnaire", 
+  FINANCIAL_MANAGER: {
+    icon: Shield,
+    label: "Gestionnaire",
+    color: "text-blue-500",
+  },
+  PRESIDENT: {
+    icon: Crown,
+    label: "Président",
+    color: "text-blue-600",
+    bgColor: "bg-blue-500/10",
+  },
+  VICE_PRESIDENT: {
+    icon: Shield,
+    label: "Vice-Président",
     color: "text-blue-500",
     bgColor: "bg-blue-500/10",
   },
-  MEMBER: { 
-    icon: null, 
-    label: "Membre", 
+  SECRETARY_GENERAL: {
+    icon: FileText,
+    label: "Secrétaire Général",
+    color: "text-green-500",
+    bgColor: "bg-green-500/10",
+  },
+  ORGANIZER: {
+    icon: Calendar,
+    label: "Organisateur",
+    color: "text-orange-500",
+    bgColor: "bg-orange-500/10",
+  },
+  MEMBER: {
+    icon: User,
+    label: "Membre",
     color: "text-gray-500",
     bgColor: "bg-gray-500/10",
   },
@@ -68,18 +108,23 @@ export const MemberCard = ({ member, onClick }) => {
 
   const statusConfig = STATUS_CONFIG[member.status] || STATUS_CONFIG.ACTIVE;
   const roleConfig = ROLE_CONFIG[member.role] || ROLE_CONFIG.MEMBER;
-  const genderConfig = displayInfo.gender ? GENDER_CONFIG[displayInfo.gender] : null;
+  const genderConfig = displayInfo.gender
+    ? GENDER_CONFIG[displayInfo.gender]
+    : null;
 
   const RoleIcon = roleConfig.icon;
   const GenderIcon = genderConfig?.icon;
 
-  const displayName = `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() || "Sans nom";
-  const userInitials = displayName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) || "??";
+  const displayName =
+    `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() ||
+    "Sans nom";
+  const userInitials =
+    displayName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "??";
 
   return (
     <Card
@@ -104,7 +149,7 @@ export const MemberCard = ({ member, onClick }) => {
             <div
               className={cn(
                 "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-background",
-                statusConfig.dotColor
+                statusConfig.dotColor,
               )}
             />
           </div>
@@ -116,7 +161,9 @@ export const MemberCard = ({ member, onClick }) => {
                 {displayName}
               </h3>
               {GenderIcon && (
-                <GenderIcon className={cn("w-4 h-4 shrink-0", genderConfig.color)} />
+                <GenderIcon
+                  className={cn("w-4 h-4 shrink-0", genderConfig.color)}
+                />
               )}
             </div>
 
@@ -124,12 +171,12 @@ export const MemberCard = ({ member, onClick }) => {
             <div className="flex items-center gap-1.5 flex-wrap">
               {/* Badge rôle */}
               {RoleIcon && (
-                <Badge 
-                  variant="secondary" 
+                <Badge
+                  variant="secondary"
                   className={cn(
                     "text-xs h-5 px-2",
                     roleConfig.bgColor,
-                    roleConfig.color
+                    roleConfig.color,
                   )}
                 >
                   <RoleIcon className="w-3 h-3 mr-1" />
@@ -139,8 +186,8 @@ export const MemberCard = ({ member, onClick }) => {
 
               {/* Badge provisoire */}
               {displayInfo.isProvisional && (
-                <Badge 
-                  variant="secondary" 
+                <Badge
+                  variant="secondary"
                   className="text-xs h-5 px-2 bg-amber-500/10 text-amber-600 dark:text-amber-400"
                 >
                   <UserCircle className="w-3 h-3 mr-1" />
@@ -149,12 +196,12 @@ export const MemberCard = ({ member, onClick }) => {
               )}
 
               {/* Badge statut */}
-              <Badge 
-                variant="secondary" 
+              <Badge
+                variant="secondary"
                 className={cn(
                   "text-xs h-5 px-2",
                   statusConfig.color,
-                  "text-white"
+                  "text-white",
                 )}
               >
                 {statusConfig.label}

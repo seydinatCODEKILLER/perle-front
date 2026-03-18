@@ -15,6 +15,9 @@ import {
   Mail,
   Phone,
   ChevronRight,
+  FileText,
+  Calendar,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -27,8 +30,18 @@ const STATUS_CONFIG = {
 };
 
 const ROLE_CONFIG = {
-  ADMIN: { icon: Crown, label: "Admin" },
-  FINANCIAL_MANAGER: { icon: Shield, label: "Gestionnaire" },
+  SUPER_ADMIN: { icon: Crown, label: "Super Admin" },
+  FINANCIAL_MANAGER: {
+    icon: Shield,
+    label: "Gestionnaire",
+    color: "text-blue-500",
+  },
+  ADMIN: { icon: Crown, label: "Administrateur" },
+  PRESIDENT: { icon: Crown, label: "Président" },
+  VICE_PRESIDENT: { icon: Shield, label: "Vice-Président" },
+  SECRETARY_GENERAL: { icon: FileText, label: "Secrétaire Général" },
+  ORGANIZER: { icon: Calendar, label: "Organisateur" },
+  MEMBER: { icon: User, label: "Membre" },
 };
 
 const GENDER_CONFIG = {
@@ -55,7 +68,10 @@ export const MemberMobileList = ({
     return (
       <div className="space-y-1">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="flex items-center gap-3 p-3 animate-pulse bg-muted/20">
+          <div
+            key={i}
+            className="flex items-center gap-3 p-3 animate-pulse bg-muted/20"
+          >
             <div className="w-12 h-12 rounded-full bg-muted" />
             <div className="flex-1 space-y-2">
               <div className="h-4 bg-muted rounded w-3/4" />
@@ -88,21 +104,26 @@ export const MemberMobileList = ({
           hasAccount: !!member.userId,
         };
 
-        const fullName = [displayInfo.firstName, displayInfo.lastName]
-          .filter(Boolean)
-          .join(" ") || "Sans nom";
-        
+        const fullName =
+          [displayInfo.firstName, displayInfo.lastName]
+            .filter(Boolean)
+            .join(" ") || "Sans nom";
+
         const initials = fullName
           .split(" ")
-          .map(n => n[0])
+          .map((n) => n[0])
           .join("")
           .toUpperCase()
           .slice(0, 2);
 
         const status = STATUS_CONFIG[member.status] || STATUS_CONFIG.ACTIVE;
         const RoleIcon = ROLE_CONFIG[member.role]?.icon;
-        const GenderIcon = displayInfo.gender ? GENDER_CONFIG[displayInfo.gender]?.icon : null;
-        const genderColor = displayInfo.gender ? GENDER_CONFIG[displayInfo.gender]?.color : "";
+        const GenderIcon = displayInfo.gender
+          ? GENDER_CONFIG[displayInfo.gender]?.icon
+          : null;
+        const genderColor = displayInfo.gender
+          ? GENDER_CONFIG[displayInfo.gender]?.color
+          : "";
         const isAdmin = member.role === "ADMIN";
         const isExpanded = expandedId === member.id;
 
@@ -121,10 +142,12 @@ export const MemberMobileList = ({
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                <span className={cn(
-                  "absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-card",
-                  status.color
-                )} />
+                <span
+                  className={cn(
+                    "absolute bottom-0 right-0 w-3 h-3 rounded-full ring-2 ring-card",
+                    status.color,
+                  )}
+                />
               </div>
 
               {/* Infos */}
@@ -133,18 +156,22 @@ export const MemberMobileList = ({
                   <div className="flex items-center gap-1.5">
                     <p className="font-medium truncate">{fullName}</p>
                     {GenderIcon && (
-                      <GenderIcon className={cn("w-4 h-4 shrink-0", genderColor)} />
+                      <GenderIcon
+                        className={cn("w-4 h-4 shrink-0", genderColor)}
+                      />
                     )}
                     {RoleIcon && (
                       <RoleIcon className="w-4 h-4 shrink-0 text-muted-foreground" />
                     )}
                   </div>
-                  <ChevronRight className={cn(
-                    "w-5 h-5 text-muted-foreground transition-transform",
-                    isExpanded && "rotate-90"
-                  )} />
+                  <ChevronRight
+                    className={cn(
+                      "w-5 h-5 text-muted-foreground transition-transform",
+                      isExpanded && "rotate-90",
+                    )}
+                  />
                 </div>
-                
+
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
                   {displayInfo.email ? (
                     <>
@@ -159,9 +186,12 @@ export const MemberMobileList = ({
                   ) : (
                     <span className="italic">Pas de contact</span>
                   )}
-                  
+
                   {!displayInfo.hasAccount && (
-                    <Badge variant="secondary" className="text-[10px] px-1.5 ml-auto">
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] px-1.5 ml-auto"
+                    >
                       Provisoire
                     </Badge>
                   )}
@@ -206,7 +236,9 @@ export const MemberMobileList = ({
                           className="flex flex-col items-center py-2 rounded-lg active:bg-muted/80 transition-colors"
                         >
                           <UserX className="w-5 h-5 mb-1 text-orange-500" />
-                          <span className="text-xs text-orange-600">Suspendre</span>
+                          <span className="text-xs text-orange-600">
+                            Suspendre
+                          </span>
                         </button>
                       ) : member.status === "SUSPENDED" ? (
                         <button
@@ -217,7 +249,9 @@ export const MemberMobileList = ({
                           className="flex flex-col items-center py-2 rounded-lg active:bg-muted/80 transition-colors"
                         >
                           <UserCheck className="w-5 h-5 mb-1 text-green-500" />
-                          <span className="text-xs text-green-600">Activer</span>
+                          <span className="text-xs text-green-600">
+                            Activer
+                          </span>
                         </button>
                       ) : (
                         <button
@@ -228,7 +262,9 @@ export const MemberMobileList = ({
                           className="flex flex-col items-center py-2 rounded-lg active:bg-muted/80 transition-colors"
                         >
                           <Trash2 className="w-5 h-5 mb-1 text-red-500" />
-                          <span className="text-xs text-red-600">Supprimer</span>
+                          <span className="text-xs text-red-600">
+                            Supprimer
+                          </span>
                         </button>
                       )}
                     </>

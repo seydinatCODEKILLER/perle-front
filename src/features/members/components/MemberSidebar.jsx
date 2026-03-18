@@ -14,7 +14,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Plus, X, Crown, Shield, Mars, Venus, UserCircle } from "lucide-react";
+import {
+  Search,
+  Plus,
+  X,
+  Crown,
+  Shield,
+  Mars,
+  Venus,
+  UserCircle,
+  FileText,
+  Calendar,
+  User,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STATUS_CONFIG = {
@@ -25,9 +37,30 @@ const STATUS_CONFIG = {
 };
 
 const ROLE_CONFIG = {
-  ADMIN: { icon: Crown, label: "Admin", color: "text-amber-500" },
-  FINANCIAL_MANAGER: { icon: Shield, label: "Gestionnaire", color: "text-blue-500" },
-  MEMBER: { icon: null, label: "Membre", color: "text-gray-500" },
+  SUPER_ADMIN: { icon: Crown, label: "Super Admin", color: "text-purple-500" },
+  FINANCIAL_MANAGER: {
+    icon: Shield,
+    label: "Gestionnaire",
+    color: "text-blue-500",
+  },
+  ADMIN: { icon: Crown, label: "Administrateur", color: "text-amber-500" },
+  PRESIDENT: { icon: Crown, label: "Président", color: "text-blue-600" },
+  VICE_PRESIDENT: {
+    icon: Shield,
+    label: "Vice-Président",
+    color: "text-blue-500",
+  },
+  SECRETARY_GENERAL: {
+    icon: FileText,
+    label: "Secrétaire Général",
+    color: "text-green-500",
+  },
+  ORGANIZER: {
+    icon: Calendar,
+    label: "Organisateur",
+    color: "text-orange-500",
+  },
+  MEMBER: { icon: User, label: "Membre", color: "text-gray-500" },
 };
 
 const GENDER_CONFIG = {
@@ -56,8 +89,13 @@ export const MemberSidebar = ({
         email: member.user?.email,
       };
 
-      const displayName = `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.toLowerCase();
-      const displayContact = (displayInfo.email || displayInfo.phone || "").toLowerCase();
+      const displayName =
+        `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.toLowerCase();
+      const displayContact = (
+        displayInfo.email ||
+        displayInfo.phone ||
+        ""
+      ).toLowerCase();
       const searchLower = searchTerm.toLowerCase();
 
       const matchesSearch =
@@ -160,7 +198,8 @@ export const MemberSidebar = ({
           ) : (
             filteredMembers.map((member) => {
               const isSelected = selectedMember?.id === member.id;
-              const statusConfig = STATUS_CONFIG[member.status] || STATUS_CONFIG.ACTIVE;
+              const statusConfig =
+                STATUS_CONFIG[member.status] || STATUS_CONFIG.ACTIVE;
               const roleConfig = ROLE_CONFIG[member.role] || ROLE_CONFIG.MEMBER;
               const RoleIcon = roleConfig.icon;
 
@@ -175,17 +214,23 @@ export const MemberSidebar = ({
                 isProvisional: !member.userId,
               };
 
-              const displayName = `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() || "Sans nom";
-              const displayContact = displayInfo.email || displayInfo.phone || "Pas de contact";
-              
-              const userInitials = displayName
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2) || "??";
+              const displayName =
+                `${displayInfo.firstName || ""} ${displayInfo.lastName || ""}`.trim() ||
+                "Sans nom";
+              const displayContact =
+                displayInfo.email || displayInfo.phone || "Pas de contact";
 
-              const genderConfig = displayInfo.gender ? GENDER_CONFIG[displayInfo.gender] : null;
+              const userInitials =
+                displayName
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2) || "??";
+
+              const genderConfig = displayInfo.gender
+                ? GENDER_CONFIG[displayInfo.gender]
+                : null;
               const GenderIcon = genderConfig?.icon;
 
               return (
@@ -196,7 +241,7 @@ export const MemberSidebar = ({
                     "w-full p-3 rounded-lg border transition-all text-left",
                     isSelected
                       ? "bg-primary/10 border-primary"
-                      : "hover:bg-accent border-transparent"
+                      : "hover:bg-accent border-transparent",
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -211,7 +256,7 @@ export const MemberSidebar = ({
                       <div
                         className={cn(
                           "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-background",
-                          statusConfig.color
+                          statusConfig.color,
                         )}
                       />
                     </div>
@@ -223,10 +268,20 @@ export const MemberSidebar = ({
                           {displayName}
                         </p>
                         {RoleIcon && (
-                          <RoleIcon className={cn("w-3.5 h-3.5 shrink-0", roleConfig.color)} />
+                          <RoleIcon
+                            className={cn(
+                              "w-3.5 h-3.5 shrink-0",
+                              roleConfig.color,
+                            )}
+                          />
                         )}
                         {GenderIcon && (
-                          <GenderIcon className={cn("w-3 h-3 shrink-0", genderConfig.color)} />
+                          <GenderIcon
+                            className={cn(
+                              "w-3 h-3 shrink-0",
+                              genderConfig.color,
+                            )}
+                          />
                         )}
                       </div>
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -234,7 +289,10 @@ export const MemberSidebar = ({
                           {displayContact}
                         </p>
                         {displayInfo.isProvisional && (
-                          <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                          <Badge
+                            variant="secondary"
+                            className="text-[9px] h-4 px-1 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                          >
                             <UserCircle className="w-2.5 h-2.5 mr-0.5" />
                             Provisoire
                           </Badge>

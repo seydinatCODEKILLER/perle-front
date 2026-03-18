@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Users, Crown, Shield } from "lucide-react";
+import { Users, Crown, Shield, FileText, Calendar } from "lucide-react";
 import { formatRole } from "../utils/member-helpers";
 
 export const MemberSidebarItem = ({ member, isSelected, onClick }) => {
@@ -17,6 +17,16 @@ export const MemberSidebarItem = ({ member, isSelected, onClick }) => {
         return <Crown className="w-3 h-3" />;
       case "FINANCIAL_MANAGER":
         return <Shield className="w-3 h-3" />;
+      case "SUPER_ADMIN":
+        return <Crown className="w-3 h-3 text-purple-500" />;
+        case "PRESIDENT":
+        return <Crown className="w-3 h-3 text-blue-600" />;
+      case "VICE_PRESIDENT":
+        return <Shield className="w-3 h-3 text-blue-500" />;
+      case "SECRETARY_GENERAL":
+        return <FileText className="w-3 h-3 text-green-500" />;
+      case "ORGANIZER":
+        return <Calendar className="w-3 h-3 text-orange-500" />;
       default:
         return null;
     }

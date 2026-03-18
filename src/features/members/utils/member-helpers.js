@@ -1,8 +1,6 @@
+
 import { MEMBER_ROLES, MEMBER_STATUS } from "../constants/member.constants";
 
-/**
- * Formater les données d'un membre pour l'affichage
- */
 export const formatMember = (member) => {
   return {
     ...member,
@@ -15,39 +13,46 @@ export const formatMember = (member) => {
   };
 };
 
-/**
- * Formater le rôle pour l'affichage
- */
 export const formatRole = (role) => {
   const roles = {
-    [MEMBER_ROLES.ADMIN]: "Administrateur",
+    [MEMBER_ROLES.SUPER_ADMIN]: "Super Administrateur",
     [MEMBER_ROLES.FINANCIAL_MANAGER]: "Responsable Financier",
+    [MEMBER_ROLES.ADMIN]: "Administrateur",
+    [MEMBER_ROLES.PRESIDENT]: "Président",
+    [MEMBER_ROLES.VICE_PRESIDENT]: "Vice-Président",
+    [MEMBER_ROLES.SECRETARY_GENERAL]: "Secrétaire Général",
+    [MEMBER_ROLES.ORGANIZER]: "Organisateur",
     [MEMBER_ROLES.MEMBER]: "Membre",
   };
   return roles[role] || role;
 };
 
-/**
- * Formater le statut pour l'affichage
- */
 export const formatStatus = (status) => {
   const statuses = {
     [MEMBER_STATUS.ACTIVE]: "Actif",
     [MEMBER_STATUS.INACTIVE]: "Inactif",
     [MEMBER_STATUS.SUSPENDED]: "Suspendu",
+    [MEMBER_STATUS.PENDING]: "En attente",
   };
   return statuses[status] || status;
 };
 
-/**
- * Générer les badges de rôle et statut
- */
 export const getRoleBadgeVariant = (role) => {
   switch (role) {
+    case MEMBER_ROLES.SUPER_ADMIN:
+      return "default";
     case MEMBER_ROLES.ADMIN:
       return "default";
     case MEMBER_ROLES.FINANCIAL_MANAGER:
+      return "primary";
+    case MEMBER_ROLES.PRESIDENT:
+      return "default";
+    case MEMBER_ROLES.VICE_PRESIDENT:
       return "secondary";
+    case MEMBER_ROLES.SECRETARY_GENERAL:
+      return "success";
+    case MEMBER_ROLES.ORGANIZER:
+      return "outline";
     default:
       return "outline";
   }
